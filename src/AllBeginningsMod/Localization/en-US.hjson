@@ -45,6 +45,11 @@ Mods: {
 				DisplayName: Accented Blue Dynasty Shingles Item
 				Tooltip: ""
 			}
+
+			CorruptAshItem: {
+				DisplayName: Corrupt Ash Item
+				Tooltip: ""
+			}
 		}
 
 		NPCs: {
