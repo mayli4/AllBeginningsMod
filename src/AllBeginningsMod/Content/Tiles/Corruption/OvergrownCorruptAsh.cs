@@ -1,3 +1,4 @@
+using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Metadata;
@@ -25,10 +26,37 @@ public class OvergrownCorruptAsh : ModTile {
         TileID.Sets.NeedsGrassFraming[Type] = true;
         TileID.Sets.NeedsGrassFramingDirt[Type] = ModContent.TileType<CorruptAsh>();
         TileID.Sets.CanBeDugByShovel[Type] = true;
+        
+        Main.tileMerge[Type][ModContent.TileType<CorruptAsh>()] = true;
     }
     
     public override bool IsTileBiomeSightable(int i, int j, ref Color sightColor) {
         sightColor = Color.Yellow;
         return true;
+    }
+    
+    public override void RandomUpdate(int i, int j) {
+        if (SpreadUtilities.Spread(i, j, Type, 2, ModContent.TileType<CorruptAsh>()))
+            NetMessage.SendTileSquare(-1, i, j, 3, TileChangeType.None); //Try spread grass
+
+        GrowTiles(i, j);
+    }
+
+    protected virtual void GrowTiles(int i, int j) {
+        var tile = Framing.GetTileSafely(i, j);
+        var tileAbove = Framing.GetTileSafely(i, j - 1);
+
+        //try place foliage
+        if (WorldGen.genRand.NextBool(10) && !tileAbove.HasTile && tileAbove.LiquidAmount < 80) {
+            if (!tile.BottomSlope && !tile.TopSlope && !tile.IsHalfBlock && !tile.TopSlope) {
+                tileAbove.TileType = (ushort)ModContent.TileType<OvergrownCorruptAshFoliage>();
+                tileAbove.HasTile = true;
+                tileAbove.TileFrameY = 0;
+                tileAbove.TileFrameX = (short)(WorldGen.genRand.Next(8) * 18);
+                WorldGen.SquareTileFrame(i, j + 1, true);
+                if (Main.netMode == NetmodeID.Server)
+                    NetMessage.SendTileSquare(-1, i, j - 1, 3, TileChangeType.None);
+            }
+        }
     }
 }
