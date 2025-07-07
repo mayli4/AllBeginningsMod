@@ -15,46 +15,46 @@ namespace AllBeginningsMod.Content.Tiles.Corruption;
 
 public class CorruptHellTree : ModTree {
     
-		public override TreePaintingSettings TreeShaderSettings => new TreePaintingSettings {
-			// UseSpecialGroups = true,
-			// SpecialGroupMinimalHueValue = 11f / 72f,
-			// SpecialGroupMaximumHueValue = 0.25f,
-			// SpecialGroupMinimumSaturationValue = 0.88f,
-			// SpecialGroupMaximumSaturationValue = 1f
-		};
+    public override TreePaintingSettings TreeShaderSettings => new TreePaintingSettings {
+        UseSpecialGroups = true,
+        SpecialGroupMinimalHueValue = 11f / 72f,
+        SpecialGroupMaximumHueValue = 0.25f,
+        SpecialGroupMinimumSaturationValue = 0.88f,
+        SpecialGroupMaximumSaturationValue = 1f
+    };
 
-		public override void SetStaticDefaults() {
-			GrowsOnTileId = [ModContent.TileType<OvergrownCorruptAsh>()];
-		}
+    public override void SetStaticDefaults() {
+        GrowsOnTileId = [ModContent.TileType<OvergrownCorruptAsh>()];
+    }
 
-		public override Asset<Texture2D> GetTexture() {
-			return Assets.Assets.Textures.Tiles.Corruption.CorruptHellTree;
-		}
+    public override Asset<Texture2D> GetTexture() {
+        return Assets.Assets.Textures.Tiles.Corruption.CorruptHellTree;
+    }
 
-		public override int SaplingGrowthType(ref int style) {
-			style = 0;
-			return ModContent.TileType<CorruptHellTreeSapling>();
-		}
+    public override int SaplingGrowthType(ref int style) {
+        style = 0;
+        return ModContent.TileType<CorruptHellTreeSapling>();
+    }
 
-		public override void SetTreeFoliageSettings(Tile tile, ref int xoffset, ref int treeFrame, ref int floorY, ref int topTextureFrameWidth, ref int topTextureFrameHeight) {
-            topTextureFrameWidth = 196;
-            topTextureFrameHeight = 144;
-            xoffset = 36;
-            floorY = 2;
-        }
+    public override void SetTreeFoliageSettings(Tile tile, ref int xoffset, ref int treeFrame, ref int floorY, ref int topTextureFrameWidth, ref int topTextureFrameHeight) {
+        topTextureFrameWidth = 196;
+        topTextureFrameHeight = 144;
+        xoffset = 36;
+        floorY = 2;
+    }
 
-		public override Asset<Texture2D> GetBranchTextures() => Assets.Assets.Textures.Tiles.Corruption.CorruptHellTreeBranches;
+    public override Asset<Texture2D> GetBranchTextures() => Assets.Assets.Textures.Tiles.Corruption.CorruptHellTreeBranches;
 
-		public override Asset<Texture2D> GetTopTextures() => Assets.Assets.Textures.Tiles.Corruption.CorruptHellTreeTops;
+    public override Asset<Texture2D> GetTopTextures() => Assets.Assets.Textures.Tiles.Corruption.CorruptHellTreeTops;
 
-		public override int DropWood() {
-            return 0;
-        }
+    public override int DropWood() => ItemID.Shadewood;
 
-		public override bool Shake(int x, int y, ref bool createLeaves) {
-			Item.NewItem(WorldGen.GetItemSource_FromTreeShake(x, y), new Vector2(x, y) * 16, ItemID.Shadewood);
-			return false;
-		}
+    public override int TreeLeaf() => GoreID.TreeLeaf_Corruption;
+
+    public override bool Shake(int x, int y, ref bool createLeaves) {
+        Item.NewItem(WorldGen.GetItemSource_FromTreeShake(x, y), new Vector2(x, y) * 16, ItemID.Shadewood);
+        return false;
+    }
 }
 
 public class CorruptHellTreeSapling : ModTile {
@@ -83,7 +83,7 @@ public class CorruptHellTreeSapling : ModTile {
 
         TileObjectData.addTile(Type);
 
-        AddMapEntry(new Color(200, 200, 200), Language.GetText("MapObject.Sapling"));
+        AddMapEntry(new Color(106, 103, 126), Language.GetText("MapObject.Sapling"));
 
         TileID.Sets.TreeSapling[Type] = true;
         TileID.Sets.CommonSapling[Type] = true;
@@ -95,36 +95,18 @@ public class CorruptHellTreeSapling : ModTile {
         AdjTiles = [TileID.Saplings];
     }
 
-		public override void NumDust(int i, int j, bool fail, ref int num) {
-			num = fail ? 1 : 3;
-		}
+    public override void NumDust(int i, int j, bool fail, ref int num) {
+        num = fail ? 1 : 3;
+    }
 
-		public override void RandomUpdate(int i, int j) {
-            WorldGen.GrowTree(i, j);
-			// // A random chance to slow down growth
-			// if (!WorldGen.genRand.NextBool(20)) {
-			// 	return;
-			// }
-   //
-			// Tile tile = Framing.GetTileSafely(i, j); // Safely get the tile at the given coordinates
-			// bool growSuccess; // A bool to see if the tree growing was successful.
-   //
-			// // Style 0 is for the ExampleTree sapling, and style 1 is for ExamplePalmTree, so here we check frameX to call the correct method.
-			// // Any pixels before 54 on the tilesheet are for ExampleTree while any pixels above it are for ExamplePalmTree
-   //          growSuccess = WorldGen.GrowTree(i, j);
-   //
-			// // A flag to check if a player is near the sapling
-			// bool isPlayerNear = WorldGen.PlayerLOS(i, j);
-   //
-			// // If growing the tree was a success and the player is near, show growing effects
-			// if (growSuccess && isPlayerNear) {
-			// 	WorldGen.TreeGrowFXCheck(i, j);
-			// }
-		}
+    public override void RandomUpdate(int i, int j) {
+        WorldGen.GrowTree(i, j);
+        WorldGen.TreeGrowFXCheck(i, j);
+    }
 
-		public override void SetSpriteEffects(int i, int j, ref SpriteEffects effects) {
-			if (i % 2 == 0) {
-				effects = SpriteEffects.FlipHorizontally;
-			}
-		}
+    public override void SetSpriteEffects(int i, int j, ref SpriteEffects effects) {
+        if (i % 2 == 0) {
+            effects = SpriteEffects.FlipHorizontally;
+        }
+    }
 }

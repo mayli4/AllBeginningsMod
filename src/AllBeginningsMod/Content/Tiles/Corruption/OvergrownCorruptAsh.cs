@@ -21,7 +21,7 @@ public class OvergrownCorruptAsh : ModTile {
 
         DustType = DustID.CorruptPlants;
         
-        AddMapEntry(new Color(69, 68, 114));
+        AddMapEntry(new Color(53, 37, 62));
         
         TileID.Sets.NeedsGrassFraming[Type] = true;
         TileID.Sets.NeedsGrassFramingDirt[Type] = ModContent.TileType<CorruptAsh>();

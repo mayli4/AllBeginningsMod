@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -17,14 +18,14 @@ public class OvergrownCorruptAshFoliage : ModTile {
         Main.tileNoFail[Type] = true;
         Main.tileObsidianKill[Type] = true;
 
-        DustType = DustID.Stone;
+        DustType = DustID.Corruption;
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
         TileObjectData.newTile.StyleHorizontal = true;
         TileObjectData.newTile.DrawYOffset = 2;
         TileObjectData.addTile(Type);
 
-        //AddMapEntry(new Color(152, 171, 198));
+        AddMapEntry(new Color(69, 68, 114));
     }
 
     public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
