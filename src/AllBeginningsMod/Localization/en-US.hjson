@@ -134,6 +134,11 @@ Mods: {
 				DisplayName: Garden Biome
 				TownNPCDialogueName: the Garden Biome
 			}
+
+			UnderworldCorruptionBiome: {
+				DisplayName: Underworld Corruption Biome
+				TownNPCDialogueName: The Underworld Corruption Biome
+			}
 		}
 
 		Tiles.BigPotTile.MapEntry: Big Pot Tile
