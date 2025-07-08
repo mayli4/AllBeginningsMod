@@ -6,7 +6,8 @@ using System.Collections.Immutable;
 using Terraria;
 
 namespace AllBeginningsMod.Common.PrimitiveDrawing; 
-internal class PrimitiveTrail {
+
+public class PrimitiveTrail {
     public DynamicVertexBuffer VertexBuffer { get; private set; }
     public DynamicIndexBuffer IndexBuffer { get; private set; }
     public ITrailStyle TrailStyle { get; }

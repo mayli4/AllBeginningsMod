@@ -84,6 +84,8 @@ Mods: {
 					Line3: Give this guy 5 golden coins, and get yourself a bunch of grass seeds.
 				}
 			}
+
+			DevilOWarNPC.DisplayName: Devil O War N P C
 		}
 
 		Projectiles: {
