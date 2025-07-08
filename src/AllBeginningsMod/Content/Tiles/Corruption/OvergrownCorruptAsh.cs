@@ -23,7 +23,7 @@ public class OvergrownCorruptAsh : ModTile {
 
         DustType = DustID.CorruptPlants;
         
-        AddMapEntry(new Color(53, 37, 62));
+        AddMapEntry(new Color(69, 68, 114));
         
         TileID.Sets.NeedsGrassFraming[Type] = true;
         TileID.Sets.NeedsGrassFramingDirt[Type] = ModContent.TileType<CorruptAsh>();
@@ -55,7 +55,7 @@ public class OvergrownCorruptAsh : ModTile {
         WorldGen.SpreadInfectionToNearbyTile(i, j, BiomeConversionID.Corruption);
             
         if (SpreadUtilities.Spread(i, j, Type, 2, ModContent.TileType<CorruptAsh>()))
-            NetMessage.SendTileSquare(-1, i, j, 3);
+            NetMessage.SendTileSquare(-1, i, j, 3); // try spread grass
 
         GrowTiles(i, j);
     }

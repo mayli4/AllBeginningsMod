@@ -17,7 +17,7 @@ public class CorruptAsh : ModTile {
 
         DustType = DustID.Corruption;
         
-        AddMapEntry(new Color(69, 68, 114));
+        AddMapEntry(new Color(53, 37, 62));
         Main.tileMerge[Type][ModContent.TileType<OvergrownCorruptAsh>()] = true;
         
         TileLoader.RegisterConversion(TileID.Ash, BiomeConversionID.Corruption, ConvertToCorruption);
