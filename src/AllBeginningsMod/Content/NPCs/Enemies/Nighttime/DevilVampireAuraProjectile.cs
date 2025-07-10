@@ -1,4 +1,4 @@
-﻿using AllBeginningsMod.Common.Loaders;
+﻿using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Content.Buffs;
 using AllBeginningsMod.Utilities;

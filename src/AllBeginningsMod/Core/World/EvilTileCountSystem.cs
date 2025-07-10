@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.ModLoader;
 using CorruptAsh = AllBeginningsMod.Content.Tiles.Corruption.CorruptAsh;
 
-namespace AllBeginningsMod.Common.World;
+namespace AllBeginningsMod.Core.World;
 
 public class EvilTileCountSystem : ModSystem {
     public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts) {

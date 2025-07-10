@@ -1,5 +1,5 @@
 ﻿using AllBeginningsMod.Common.Bases.NPCs;
-using AllBeginningsMod.Common.Loaders;
+using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Content.CameraModifiers;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Content.Items.Materials;

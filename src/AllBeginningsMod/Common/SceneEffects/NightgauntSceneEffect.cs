@@ -1,4 +1,4 @@
-﻿using AllBeginningsMod.Common.Loaders;
+﻿using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Content.NPCs.Enemies.Bosses.Nightgaunt;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;

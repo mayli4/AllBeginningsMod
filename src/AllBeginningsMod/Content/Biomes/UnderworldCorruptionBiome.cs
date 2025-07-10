@@ -1,10 +1,11 @@
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.Biomes;
 
-internal sealed class UnderworldCorruptionBiome : ModBiome {
+public sealed class UnderworldCorruptionBiome : ModBiome {
     public override SceneEffectPriority Priority => SceneEffectPriority.Environment;
     public override float GetWeight(Player player) => 0.75f;
 
@@ -13,5 +14,11 @@ internal sealed class UnderworldCorruptionBiome : ModBiome {
     public override bool IsBiomeActive(Player player) {
         var underworld = player.ZoneUnderworldHeight;
         return Main.SceneMetrics.EvilTileCount >= 200 && underworld;
+    }
+}
+
+internal sealed class UnderworldCorruptionSystem : ModSystem {
+    public override void ModifyLightingBrightness(ref float scale) {
+        base.ModifyLightingBrightness(ref scale);
     }
 }

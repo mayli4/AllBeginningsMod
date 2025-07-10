@@ -1,4 +1,4 @@
-﻿using AllBeginningsMod.Common.Loaders;
+﻿using AllBeginningsMod.Core.Loaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

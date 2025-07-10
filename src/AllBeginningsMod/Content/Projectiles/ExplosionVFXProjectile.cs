@@ -1,5 +1,5 @@
 ﻿using AllBeginningsMod.Common;
-using AllBeginningsMod.Common.Loaders;
+using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;

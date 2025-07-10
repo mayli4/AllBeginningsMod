@@ -1,7 +1,7 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace AllBeginningsMod.Common.World;
+namespace AllBeginningsMod.Core.World;
 
 //todo implement this
 

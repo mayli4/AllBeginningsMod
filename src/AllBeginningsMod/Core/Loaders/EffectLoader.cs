@@ -7,8 +7,9 @@ using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
+    
+namespace AllBeginningsMod.Core.Loaders; 
 
-namespace AllBeginningsMod.Common.Loaders; 
 internal class EffectLoader : ILoadable {
     private readonly static Dictionary<string, Effect> Effects = new();
 

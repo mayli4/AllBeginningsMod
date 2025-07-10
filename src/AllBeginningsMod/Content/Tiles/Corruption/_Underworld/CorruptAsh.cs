@@ -1,4 +1,4 @@
-using AllBeginningsMod.Common.World;
+using AllBeginningsMod.Core.World;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Terraria;
