@@ -95,7 +95,9 @@ public class PrimitiveTrail {
         Effect effect = EffectLoader.GetEffect("Trail::Default");
         effect.Parameters["sampleTexture"].SetValue(texture);
         effect.Parameters["color"].SetValue(color.ToVector4());
-        effect.Parameters["transformationMatrix"].SetValue(transformationMatrix ?? Matrix.Identity);
+        effect.Parameters["transformationMatrix"].SetValue(
+            Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1)
+        );
         effect.Parameters["blackAsAlpha"].SetValue(blackAsAlpha);
 
         Draw(effect);

@@ -85,7 +85,7 @@ Mods: {
 				}
 			}
 
-			DevilOWarNPC.DisplayName: Devil O War N P C
+			DevilOWarNPC.DisplayName: Devil O' War
 		}
 
 		Projectiles: {
@@ -112,6 +112,7 @@ Mods: {
 			StarWhirlProjectile.DisplayName: Star Whirl Projectile
 			GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
 			TestProj.DisplayName: Test Proj
+			DevilOWarStingerProjectile.DisplayName: Devil O War Stinger Projectile
 		}
 
 		Buffs: {

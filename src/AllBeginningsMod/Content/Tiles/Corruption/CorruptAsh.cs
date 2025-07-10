@@ -37,6 +37,8 @@ public class CorruptAsh : ModTile {
         switch (conversionType) {
             case BiomeConversionID.Chlorophyte:
             case BiomeConversionID.Purity:
+                WorldGen.ConvertTile(i, j, TileID.Ash);
+                return;
             case BiomeConversionID.Sand:
             case BiomeConversionID.Corruption:
                 WorldGen.ConvertTile(i, j, ModContent.TileType<CorruptAsh>());

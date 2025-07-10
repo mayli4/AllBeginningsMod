@@ -31,7 +31,7 @@ public class OvergrownCorruptAsh : ModTile {
         
         Main.tileMerge[Type][ModContent.TileType<CorruptAsh>()] = true;
         
-        TileLoader.RegisterConversion(TileID.Ash, BiomeConversionID.Corruption, ConvertToCorruption);
+        TileLoader.RegisterConversion(TileID.AshGrass, BiomeConversionID.Corruption, ConvertToCorruption);
     }
     
     public bool ConvertToCorruption(int i, int j, int type, int conversionType) {
@@ -43,6 +43,8 @@ public class OvergrownCorruptAsh : ModTile {
         switch (conversionType) {
             case BiomeConversionID.Chlorophyte:
             case BiomeConversionID.Purity:
+                WorldGen.ConvertTile(i, j, TileID.AshGrass);
+                return;
             case BiomeConversionID.Sand:
             case BiomeConversionID.Corruption:
                 WorldGen.ConvertTile(i, j, ModContent.TileType<OvergrownCorruptAsh>());
