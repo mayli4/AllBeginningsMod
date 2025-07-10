@@ -50,6 +50,11 @@ Mods: {
 				DisplayName: Corrupt Ash Item
 				Tooltip: ""
 			}
+
+			CrimsonAshItem: {
+				DisplayName: Crimson Ash Item
+				Tooltip: ""
+			}
 		}
 
 		NPCs: {
