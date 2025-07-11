@@ -24,6 +24,10 @@ public class LavaStyleLoader : ModSystem {
     internal static Texture2D LavaBlockTexture;
     internal static Texture2D LavaTexture;
     internal static Texture2D LavaSlopeTexture;
+    
+    private static LavaStyle _cachedLavaStyle;
+
+    private static readonly MethodInfo textureGetValueMethod = typeof(Asset<Texture2D>).GetMethod("get_Value", BindingFlags.Public | BindingFlags.Instance);
 
     public static void RegisterStyle(LavaStyle lavaStyle) {
         lavaStyle.Type = CustomLavaStyles.Count;
@@ -63,10 +67,9 @@ public class LavaStyleLoader : ModSystem {
         if (initialLavafallStyle != 1)
             return initialLavafallStyle;
 
-        foreach (LavaStyle lavaStyle in CustomLavaStyles)
-        {
-            int waterfallStyle = lavaStyle.ChooseWaterfallStyle();
-            if (lavaStyle.ChooseLavaStyle() && waterfallStyle >= 0)
+        if (_cachedLavaStyle != default) {
+            int waterfallStyle = _cachedLavaStyle.ChooseWaterfallStyle();
+            if (waterfallStyle >= 0)
                 return waterfallStyle;
         }
 
@@ -77,48 +80,26 @@ public class LavaStyleLoader : ModSystem {
         if (initialLavafallStyle != 1)
             return initialLavafallColor;
 
-        foreach (LavaStyle lavaStyle in CustomLavaStyles)
-        {
-            if (lavaStyle.ChooseLavaStyle())
-            {
-                lavaStyle.SelectLightColor(ref initialLavafallColor);
-                return initialLavafallColor;
-            }
+        if (_cachedLavaStyle != default) {
+            _cachedLavaStyle.SelectLightColor(ref initialLavafallColor);
+            return initialLavafallColor;
         }
 
         return initialLavafallColor;
     }
         
     public static LavaStyle Get(int type) => CustomLavaStyles[type];
-        
-    public static void ModifyLight(int i, int j, int type, ref float r, ref float g, ref float b) {
-        var style = Get(type);
-            
-        style.ModifyLight(i, j, ref r, ref g, ref b);
-    }
-    
-        private static LavaStyle _cachedLavaStyle;
-
-    private static readonly MethodInfo textureGetValueMethod = typeof(Asset<Texture2D>).GetMethod("get_Value", BindingFlags.Public | BindingFlags.Instance);
-
 
     private static void CacheLavaStyle(On_Main.orig_RenderWater orig, Main self) {
-        foreach (LavaStyle style in LavaStyleLoader.CustomLavaStyles) {
-            // foreach(var biome in ModContent.GetContent<ModBiome>()) {
-            //     if (biome is IHasCustomLavaBiome customLavaBiome && Main.LocalPlayer.InModBiome(biome)) {
-            //         cachedLavaStyle = customLavaBiome.LavaStyle;
-            //         break;
-            //     }
-            // }
-            if (style.ChooseLavaStyle())
-            {
-                _cachedLavaStyle = style;
-                orig(self);
-                return;
+        _cachedLavaStyle = default;
+
+        foreach (ModBiome biome in ModContent.GetContent<ModBiome>()) {
+            if (biome is IHasCustomLavaBiome customLavaBiome && Main.LocalPlayer.InModBiome(biome)) {
+                _cachedLavaStyle = customLavaBiome.LavaStyle;
+                break;
             }
         }
 
-        _cachedLavaStyle = default;
         orig(self);
     }
 
