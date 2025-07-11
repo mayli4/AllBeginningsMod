@@ -1,5 +1,6 @@
 using AllBeginningsMod.Core.World;
 using AllBeginningsMod.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
@@ -38,6 +39,8 @@ public class UnderworldCorruptVines : ModTile {
         DustType = DustID.Corruption;
 
         TileObjectData.addTile(Type);
+        
+        AddMapEntry(new Color(128, 123, 88));
     }
     
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch) {
