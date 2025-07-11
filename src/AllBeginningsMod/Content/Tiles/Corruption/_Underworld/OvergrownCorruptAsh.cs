@@ -87,5 +87,8 @@ public class OvergrownCorruptAsh : ModTile {
                     NetMessage.SendTileSquare(-1, i, j - 1, 3, TileChangeType.None);
             }
         }
+        
+        if (Main.rand.NextBool(5) && WorldGen.GrowMoreVines(i, j) && Main.tile[i, j + 1].LiquidType != LiquidID.Lava)
+            TileUtilities.GrowVine(i, j + 1, ModContent.TileType<UnderworldCorruptVines>());
     }
 }

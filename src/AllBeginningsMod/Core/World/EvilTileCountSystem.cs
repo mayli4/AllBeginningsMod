@@ -8,14 +8,17 @@ using CorruptAsh = AllBeginningsMod.Content.Tiles.Corruption.CorruptAsh;
 namespace AllBeginningsMod.Core.World;
 
 public class EvilTileCountSystem : ModSystem {
+    internal static int[] CorruptTypes;
+    private int _corruptCount;
+
+    public static bool InUnderworldCorruption => ModContent.GetInstance<EvilTileCountSystem>()._corruptCount >= 200;
+
+    public override void SetStaticDefaults() => CorruptTypes = [ModContent.TileType<CorruptAsh>(), ModContent.TileType<OvergrownCorruptAsh>()];
+
     public override void TileCountsAvailable(ReadOnlySpan<int> tileCounts) {
-        //corruption
-        Main.SceneMetrics.EvilTileCount += tileCounts[ModContent.TileType<OvergrownCorruptAsh>()] 
-                                           + tileCounts[ModContent.TileType<CorruptAsh>()]
-                                           + tileCounts[ModContent.TileType<OvergrownCorruptAshFoliage>()];
-        
-        //crimson
-        Main.SceneMetrics.EvilTileCount += tileCounts[ModContent.TileType<CrimsonAshGrass>()]
-                                           + tileCounts[ModContent.TileType<CrimsonAsh>()];
+        _corruptCount = 0;
+
+        foreach (int type in CorruptTypes)
+            _corruptCount += tileCounts[type];
     }
 }
