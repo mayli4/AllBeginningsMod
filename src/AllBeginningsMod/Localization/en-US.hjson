@@ -152,6 +152,11 @@ Mods: {
 				DisplayName: Underworld Corruption Biome
 				TownNPCDialogueName: The Underworld Corruption Biome
 			}
+
+			UnderworldCrimsonBiome: {
+				DisplayName: Underworld Crimson Biome
+				TownNPCDialogueName: the Underworld Crimson Biome
+			}
 		}
 
 		Tiles: {
