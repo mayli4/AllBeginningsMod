@@ -63,7 +63,48 @@ public class LavaStyleLoader : ModSystem {
         On_TileLightScanner.ApplyLiquidLight += On_TileLightScanner_ApplyLiquidLight;
         // lava splash dusts change
         IL_Item.MoveInWorld += ChangeItemLavaSplashDust;
+        IL_Player.Update += ChangePlayerLavaSplashDust;
         IL_Projectile.Update += ChangeProjectileLavaSplashDust;
+        IL_NPC.Collision_WaterCollision += ChangeNPCLavaSplashDust;
+    }
+    // these are made into separate methods so if the stuff ever changes per entity type its a bit easier to change
+    private void ChangeNPCLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(35));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+    private void ChangePlayerLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(35));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
     }
 
     private void ChangeItemLavaSplashDust(ILContext il) {
