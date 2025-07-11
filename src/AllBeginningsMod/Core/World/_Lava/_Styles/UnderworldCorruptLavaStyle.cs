@@ -2,6 +2,7 @@ using AllBeginningsMod.Content.Biomes;
 using AllBeginningsMod.Core.World;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Core.World;
@@ -21,7 +22,7 @@ public class UnderworldCorruptLava : LavaStyle {
 
     public override int ChooseWaterfallStyle() => ModContent.Find<ModWaterfallStyle>("AllBeginningsMod/UnderworldCorruptLavafall").Slot;
 
-    public override int GetSplashDust() => 0;
+    public override int GetSplashDust() => DustID.CursedTorch;
 
     public override int GetDropletGore() => 0;
 

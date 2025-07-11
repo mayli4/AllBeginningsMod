@@ -96,6 +96,7 @@ Mods: {
 			}
 
 			DevilOWarNPC.DisplayName: Devil O' War
+			HellbatNPC.DisplayName: Hellbat N P C
 		}
 
 		Projectiles: {
