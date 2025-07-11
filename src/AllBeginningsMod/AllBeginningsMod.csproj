@@ -38,6 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Content\NPCs\Corruption\_Hellbat\" />
       <Folder Include="Core\" />
     </ItemGroup>
     

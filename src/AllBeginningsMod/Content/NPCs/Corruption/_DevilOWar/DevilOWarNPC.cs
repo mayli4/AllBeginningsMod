@@ -8,6 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using AllBeginningsMod.Common.PrimitiveDrawing;
 using AllBeginningsMod.Common.Rendering;
+using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Utilities;
 using ReLogic.Content;
 using System.Linq;
@@ -257,6 +258,10 @@ public sealed class DevilOWarNPC : ModNPC {
         
         for (int i = 1; i <= 3; i++) {
             Gore.NewGoreDirect(NPC.GetSource_Death(), NPC.Center, Main.rand.NextVector2Circular(2, 2), Mod.Find<ModGore>("DevilOWarGore" + i).Type);
+        }
+
+        for(int i = 0; i < 4; i++) {
+            Dust.NewDustDirect(NPC.Center, 5, 5, ModContent.DustType<Gas>(), 0, 0, 1, new Color(61, 54, 138, 255));
         }
 
         if (_tentacleTrails != null) {
