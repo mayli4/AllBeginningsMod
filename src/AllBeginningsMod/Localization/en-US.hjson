@@ -55,6 +55,11 @@ Mods: {
 				DisplayName: Crimson Ash Item
 				Tooltip: ""
 			}
+
+			UnderworldDemoniteItem: {
+				DisplayName: Underworld Demonite Item
+				Tooltip: ""
+			}
 		}
 
 		NPCs: {
@@ -149,6 +154,11 @@ Mods: {
 			}
 		}
 
-		Tiles.BigPotTile.MapEntry: Big Pot Tile
+		Tiles: {
+			BigPotTile.MapEntry: Big Pot Tile
+			UnderworldDemonite.MapEntry: Underworld Demonite
+		}
+
+		Bestiary.DevilOWarBestiary: Marine life in the underworld? this organism uses hot gases to float in the air, and a sharp stinger to feed off its prey!
 	}
 }

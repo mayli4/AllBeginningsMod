@@ -1,3 +1,4 @@
+using AllBeginningsMod.Common.Bestiary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,10 +13,9 @@ using ReLogic.Content;
 using System.Linq;
 using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
+using Terraria.Localization;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
-
-//todo: fix trails, add sfx, add bestiary entry, balancing
 
 public sealed class DevilOWarNPC : ModNPC {
     public enum State {
@@ -52,10 +52,8 @@ public sealed class DevilOWarNPC : ModNPC {
     public override void SetDefaults() {
         NPC.width = 36;
         NPC.height = 36;
-        //NPC.damage = 25;
-        //NPC.defense = 35;
         NPC.lifeMax = 120;
-        NPC.value = 67f;
+        NPC.value = 250f;
         NPC.noTileCollide = false;
         NPC.aiStyle = -1;
         NPC.noGravity = true;
@@ -63,6 +61,11 @@ public sealed class DevilOWarNPC : ModNPC {
         NPC.friendly = false;
 
         NPC.HitSound = SoundID.NPCHit23;
+    }
+    
+    public override void Load() {
+        for (int j = 1; j <= 5; j++)
+            GoreLoader.AddGoreFromTexture<SimpleModGore>(Mod, "AllBeginningsMod/Assets/Textures/Gores/DevilOWarGore" + j);
     }
 
     public override void OnSpawn(IEntitySource source) {
@@ -73,7 +76,10 @@ public sealed class DevilOWarNPC : ModNPC {
     }
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
-        base.SetBestiary(database, bestiaryEntry);
+        bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
+            SpawnConditions.UnderworldCorruption,
+            new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.AllBeginningsMod.Bestiary.DevilOWarBestiary"))
+        });
     }
 
     public override void AI() {
@@ -243,6 +249,37 @@ public sealed class DevilOWarNPC : ModNPC {
         }   
     }
     
+
+    public override void HitEffect(NPC.HitInfo hit) {
+        if(Main.netMode == NetmodeID.Server || NPC.life > 0) {
+            return;
+        }
+        
+        for (int i = 1; i <= 3; i++) {
+            Gore.NewGoreDirect(NPC.GetSource_Death(), NPC.Center, Main.rand.NextVector2Circular(2, 2), Mod.Find<ModGore>("DevilOWarGore" + i).Type);
+        }
+
+        if (_tentacleTrails != null) {
+            foreach (var trail in _tentacleTrails) {
+                if (trail.Positions != null && trail.Positions.Length > 0) {
+                    for (int i = 0; i < trail.Positions.Length - 1; i += 2) {
+                        var gorePosition = trail.Positions[i] + Main.screenPosition;
+                        var goreVelocity = Main.rand.NextVector2Circular(3, 3);
+
+                        var goreType = Mod.Find<ModGore>("DevilOWarGore4").Type;
+                        Gore.NewGoreDirect(NPC.GetSource_Death(), gorePosition, goreVelocity, goreType);
+                    }
+
+                    var tipPosition = trail.Positions[trail.Positions.Length - 1] + Main.screenPosition;
+                    var tipVelocity = Main.rand.NextVector2Circular(2, 2);
+                        
+                    var tipGoreType = Mod.Find<ModGore>("DevilOWarGore5").Type;
+                    Gore.NewGoreDirect(NPC.GetSource_Death(), tipPosition, tipVelocity, tipGoreType);
+                }
+            }
+        }
+    }
+    
     private void DrawTrails(Vector2 bodyDrawPosition, Color drawColor) {
         float Equation(float x) {
             return 0.2f * MathF.Sin(x) + 0.8f * MathF.Cos(x + MathHelper.PiOver4);
@@ -269,11 +306,11 @@ public sealed class DevilOWarNPC : ModNPC {
             _tentacleTrails[i].Positions = positions.Select(position => position + bodyDrawPosition).ToArray();
         }
 
-        Texture2D intestineTexture = Assets.Assets.Textures.NPCs.Corruption.DevilOWar.DevilOWarTentacle.Value;
-        Matrix transformationMatrix = Main.GameViewMatrix.TransformationMatrix
+        var tentacleTexture = Assets.Assets.Textures.NPCs.Corruption.DevilOWar.DevilOWarTentacle.Value;
+        var transformationMatrix = Main.GameViewMatrix.TransformationMatrix
                                       * Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
         for(int i = 0; i < _tentacleTrails.Length; i++) {
-            _tentacleTrails[i].Draw(intestineTexture, drawColor, transformationMatrix);
+            _tentacleTrails[i].Draw(tentacleTexture, drawColor, transformationMatrix);
         }
     }
     
@@ -281,8 +318,15 @@ public sealed class DevilOWarNPC : ModNPC {
         var headTexture = Assets.Assets.Textures.NPCs.Corruption.DevilOWar.DevilOWarHead.Value;
         var insidesTexture = Assets.Assets.Textures.NPCs.Corruption.DevilOWar.DevilOWarInsides.Value;
         
+        var glowColor = Color.Lerp(drawColor, new Color(114, 109, 27, 200), Pulsation);
+        
+        var flipped = NPC.direction != -1;
+        var effects = flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+        
         if(!NPC.IsABestiaryIconDummy) {
-            Vector2 bodyDrawPosition = NPC.Center + new Vector2(0, 40) - Main.screenPosition;
+            var offset = flipped ? new Vector2(-10, 30) : new Vector2(10, 30);
+            
+            Vector2 bodyDrawPosition = NPC.Center + offset - Main.screenPosition;
             
             SpriteBatchData capture = spriteBatch.Capture();
             spriteBatch.End();
@@ -290,11 +334,6 @@ public sealed class DevilOWarNPC : ModNPC {
 
             DrawTrails(bodyDrawPosition, drawColor);  
         }
-        
-        var glowColor = Color.Lerp(drawColor, new Color(114, 109, 27, 200), Pulsation);
-        
-        var flipped = NPC.direction != -1;
-        var effects = flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
         
         Vector2 origin = new Vector2(headTexture.Width, headTexture.Height) / 2;
         origin.X = flipped ? headTexture.Width - origin.X : origin.X;
@@ -307,6 +346,10 @@ public sealed class DevilOWarNPC : ModNPC {
         if (_activeStingerTrail != null) {
             var stingerColor = Color.Lerp(drawColor, Color.Yellow, 0.5f + MathF.Sin(Main.GameUpdateCount * 0.1f) * 0.2f);
             _activeStingerTrail.Draw(Assets.Assets.Textures.NPCs.Corruption.DevilOWar.DevilOWarTentacle.Value, stingerColor, transformationMatrix);
+        }
+
+        if(NPC.IsABestiaryIconDummy) {
+            Main.spriteBatch.Draw(Assets.Assets.Textures.NPCs.Corruption.DevilOWar.DevilOWarBestiary.Value, NPC.Center - new Vector2(0, 10), null, Color.White, 0, origin, 1f, effects, 0f);
         }
 
         return false;
