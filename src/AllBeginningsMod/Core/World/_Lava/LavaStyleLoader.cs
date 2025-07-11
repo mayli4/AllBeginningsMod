@@ -62,10 +62,31 @@ public class LavaStyleLoader : ModSystem {
         IL_LiquidRenderer.DrawNormalLiquids += ChangeWaterQuadColors;
         On_TileLightScanner.ApplyLiquidLight += On_TileLightScanner_ApplyLiquidLight;
         // lava splash dusts change
-        IL_Projectile.Update += ChangeProjectileSplashDust;
+        IL_Item.MoveInWorld += ChangeItemLavaSplashDust;
+        IL_Projectile.Update += ChangeProjectileLavaSplashDust;
     }
 
-    private void ChangeProjectileSplashDust(ILContext il) {
+    private void ChangeItemLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(35));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+
+    private void ChangeProjectileLavaSplashDust(ILContext il) {
         ILCursor c = new ILCursor(il);
         for (int i = 0; i < 2; i++) {
             c.GotoNext(MoveType.After,
