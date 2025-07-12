@@ -16,6 +16,7 @@ using Terraria.Graphics.Light;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
+using Terraria.ModLoader.UI;
 
 namespace AllBeginningsMod.Core.World;
 
@@ -59,8 +60,123 @@ public class LavaStyleLoader : ModSystem {
         On_WaterfallManager.DrawWaterfall_int_int_int_float_Vector2_Rectangle_Color_SpriteEffects += DrawCustomLavafalls;
         On_Main.RenderWater += CacheLavaStyle;
         IL_LiquidRenderer.DrawNormalLiquids += ChangeWaterQuadColors;
-        
         On_TileLightScanner.ApplyLiquidLight += On_TileLightScanner_ApplyLiquidLight;
+        // lava splash dusts change
+        IL_Item.MoveInWorld += ChangeItemLavaSplashDust;
+        IL_Player.Update += ChangePlayerLavaSplashDust;
+        IL_Projectile.Update += ChangeProjectileLavaSplashDust;
+        IL_NPC.Collision_WaterCollision += ChangeNPCLavaSplashDust;
+        // lava "bubble" dusts change
+        IL_Main.oldDrawWater += ChangeLavaBubbleDust;
+        IL_LiquidRenderer.InternalPrepareDraw += ChangeLavaBubbleDust_LiquidRenderer;
+    }
+
+    private void ChangeLavaBubbleDust_LiquidRenderer(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After, i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+
+    private void ChangeLavaBubbleDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+
+    // these are made into separate methods so if the stuff ever changes per entity type its a bit easier to change
+    private void ChangeNPCLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+    private void ChangePlayerLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+
+    private void ChangeItemLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+
+    private void ChangeProjectileLavaSplashDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for (int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,
+                        i => i.MatchLdarg0(),
+                        i => i.MatchLdfld(typeof(Entity).GetField("width", BindingFlags.Instance | BindingFlags.Public)),
+                        i => i.MatchLdcI4(12),
+                        i => i.MatchAdd(),
+                        i => i.MatchLdcI4(24),
+                        i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
     }
 
     internal static int SelectLavafallStyle(int initialLavafallStyle) {

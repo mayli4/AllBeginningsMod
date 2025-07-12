@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
 public class HellbatNPC : ModNPC {
+    public override string Texture => Assets.Assets.Textures.NPCs.Corruption.Hellbat.KEY_HellbatNPC;
     public enum States {
         IdleOnCeiling,
         WakingUp,
