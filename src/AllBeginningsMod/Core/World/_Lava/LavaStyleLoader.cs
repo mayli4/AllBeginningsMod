@@ -66,7 +66,72 @@ public class LavaStyleLoader : ModSystem {
         IL_Player.Update += ChangePlayerLavaSplashDust;
         IL_Projectile.Update += ChangeProjectileLavaSplashDust;
         IL_NPC.Collision_WaterCollision += ChangeNPCLavaSplashDust;
+        // lava "bubble" dusts change
+        IL_Main.oldDrawWater += ChangeLavaBubbleDust;
+        IL_LiquidRenderer.InternalPrepareDraw += ChangeLavaBubbleDust_LiquidRenderer;
     }
+
+    private void ChangeLavaBubbleDust_LiquidRenderer(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After, i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+    }
+
+    private void ChangeLavaBubbleDust(ILContext il) {
+        ILCursor c = new ILCursor(il);
+        for(int i = 0; i < 2; i++) {
+            c.GotoNext(MoveType.After,i => i.MatchLdcI4(DustID.Lava));
+            c.EmitPop();
+            c.EmitDelegate(() =>
+            {
+                if(_cachedLavaStyle != null)
+                    return _cachedLavaStyle.GetSplashDust();
+                else return DustID.Lava;
+            });
+        }
+        /*c.GotoNext(MoveType.After,
+            i => i.MatchLdloc(12),
+            i => i.MatchLdcI4(16),
+            i => i.MatchMul()
+            i => i.MatchLdcI4(DustID.Lava)
+            i => i.MatchLdloca(38),
+            i => i.MatchInitobj<Color>(),
+            i => i.MatchLdloc(38),
+            i => i.MatchLdcI4(1),
+            i => i.MatchCall<Dust>("NewDust"));
+        //c.GotoNext(MoveType.After, i => i.MatchLdcI4(DustID.Lava));
+        c.EmitPop();
+        c.EmitDelegate(() =>
+        {
+            if(_cachedLavaStyle != null)
+                return _cachedLavaStyle.GetSplashDust();
+            else return DustID.Lava;
+        });
+        /*c.GotoNext(MoveType.After, i => i.MatchLdcI4(DustID.Lava));
+        //i => i.MatchMul(),
+        //i => i.MatchAdd(),
+        //i => i.MatchLdcR4(8),
+        //i => i.MatchSub(),
+        //i => i.MatchNewobj<Vector2>(),
+        //i => i.MatchLdcI4(16),
+        //i => i.MatchLdcI4(8),
+        c.EmitPop();
+        c.EmitDelegate(() =>
+        {
+            if(_cachedLavaStyle != null)
+                return _cachedLavaStyle.GetSplashDust();
+            else return DustID.Lava;
+        });*/
+    }
+
     // these are made into separate methods so if the stuff ever changes per entity type its a bit easier to change
     private void ChangeNPCLavaSplashDust(ILContext il) {
         ILCursor c = new ILCursor(il);
@@ -77,7 +142,7 @@ public class LavaStyleLoader : ModSystem {
                         i => i.MatchLdcI4(12),
                         i => i.MatchAdd(),
                         i => i.MatchLdcI4(24),
-                        i => i.MatchLdcI4(35));
+                        i => i.MatchLdcI4(DustID.Lava));
             c.EmitPop();
             c.EmitDelegate(() =>
             {
@@ -96,7 +161,7 @@ public class LavaStyleLoader : ModSystem {
                         i => i.MatchLdcI4(12),
                         i => i.MatchAdd(),
                         i => i.MatchLdcI4(24),
-                        i => i.MatchLdcI4(35));
+                        i => i.MatchLdcI4(DustID.Lava));
             c.EmitPop();
             c.EmitDelegate(() =>
             {
@@ -116,7 +181,7 @@ public class LavaStyleLoader : ModSystem {
                         i => i.MatchLdcI4(12),
                         i => i.MatchAdd(),
                         i => i.MatchLdcI4(24),
-                        i => i.MatchLdcI4(35));
+                        i => i.MatchLdcI4(DustID.Lava));
             c.EmitPop();
             c.EmitDelegate(() =>
             {
@@ -136,7 +201,7 @@ public class LavaStyleLoader : ModSystem {
                         i => i.MatchLdcI4(12),
                         i => i.MatchAdd(),
                         i => i.MatchLdcI4(24),
-                        i => i.MatchLdcI4(35));
+                        i => i.MatchLdcI4(DustID.Lava));
             c.EmitPop();
             c.EmitDelegate(() =>
             {
