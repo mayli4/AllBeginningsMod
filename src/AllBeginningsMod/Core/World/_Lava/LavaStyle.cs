@@ -65,7 +65,5 @@ public abstract class LavaStyle : ModTexturedType {
 
     public virtual void SelectLightColor(ref Color initialLightColor) {}
 
-    public virtual void ModifyLight(int i, int j, ref float r, ref float g, ref float b) { }
-
     public virtual void ModifyVertexColors(int x, int y, ref VertexColors colors) { }
 }
