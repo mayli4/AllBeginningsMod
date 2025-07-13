@@ -18,8 +18,6 @@ public class UnderworldCorruptLava : LavaStyle {
 
     public override string SlopeTexturePath => LavaTexturePath + "_Slope";
 
-    public override bool ChooseLavaStyle() => Main.LocalPlayer.InModBiome<UnderworldCorruptionBiome>();
-
     public override int ChooseWaterfallStyle() => ModContent.Find<ModWaterfallStyle>("AllBeginningsMod/UnderworldCorruptLavafall").Slot;
 
     public override int GetSplashDust() => DustID.CursedTorch;

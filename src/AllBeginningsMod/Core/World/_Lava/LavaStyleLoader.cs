@@ -20,6 +20,8 @@ using Terraria.ModLoader.UI;
 
 namespace AllBeginningsMod.Core.World;
 
+//
+
 public class LavaStyleLoader : ModSystem {
     internal static List<LavaStyle> CustomLavaStyles = new List<LavaStyle>();
     internal static Texture2D LavaBlockTexture;
@@ -61,14 +63,18 @@ public class LavaStyleLoader : ModSystem {
         On_Main.RenderWater += CacheLavaStyle;
         IL_LiquidRenderer.DrawNormalLiquids += ChangeWaterQuadColors;
         On_TileLightScanner.ApplyLiquidLight += On_TileLightScanner_ApplyLiquidLight;
+        
         // lava splash dusts change
         IL_Item.MoveInWorld += ChangeItemLavaSplashDust;
         IL_Player.Update += ChangePlayerLavaSplashDust;
         IL_Projectile.Update += ChangeProjectileLavaSplashDust;
         IL_NPC.Collision_WaterCollision += ChangeNPCLavaSplashDust;
+        
         // lava "bubble" dusts change
         IL_Main.oldDrawWater += ChangeLavaBubbleDust;
         IL_LiquidRenderer.InternalPrepareDraw += ChangeLavaBubbleDust_LiquidRenderer;
+        
+        //todo: special custom lava drawing, gradients etc
     }
 
     private void ChangeLavaBubbleDust_LiquidRenderer(ILContext il) {

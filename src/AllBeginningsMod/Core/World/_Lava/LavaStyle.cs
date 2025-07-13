@@ -57,8 +57,6 @@ public abstract class LavaStyle : ModTexturedType {
 
     public abstract string SlopeTexturePath { get; }
 
-    public virtual bool ChooseLavaStyle() => false;
-
     public abstract int ChooseWaterfallStyle();
 
     public abstract int GetSplashDust();
@@ -68,4 +66,6 @@ public abstract class LavaStyle : ModTexturedType {
     public virtual void SelectLightColor(ref Color initialLightColor) {}
 
     public virtual void ModifyLight(int i, int j, ref float r, ref float g, ref float b) { }
+
+    public virtual bool DrawEffects(int x, int y) => false;
 }
