@@ -1,4 +1,3 @@
-using AllBeginningsMod.Common._NPCs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
@@ -9,10 +8,8 @@ using Terraria.ModLoader.Utilities;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
-public class HellbatNPC : ModNPC, ISpawnsInSwarm{
+public class HellbatNPC : ModNPC {
     public override string Texture => Assets.Assets.Textures.NPCs.Corruption.Hellbat.KEY_HellbatNPC;
-    
-    public int SwarmSize() => 0b1010011010;
     
     public enum State {
         IdleOnCeiling,

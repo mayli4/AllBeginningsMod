@@ -225,52 +225,52 @@ public class LavaStyleLoader : ModSystem {
         orig(self);
     }
 
-    private static void DrawCustomLava(On_TileDrawing.orig_DrawPartialLiquid orig, TileDrawing self, bool behindBlocks, Tile tileCache, ref Vector2 position, ref Rectangle liquidSize, int liquidType, ref VertexColors colors) {
-        if (liquidType != 1) {
-            orig(self, behindBlocks, tileCache, ref position, ref liquidSize, liquidType, ref colors);
-            return;
-        }
+        private static void DrawCustomLava(On_TileDrawing.orig_DrawPartialLiquid orig, TileDrawing self, bool behindBlocks, Tile tileCache, ref Vector2 position, ref Rectangle liquidSize, int liquidType, ref VertexColors colors) {
+            if (liquidType != 1) {
+                orig(self, behindBlocks, tileCache, ref position, ref liquidSize, liquidType, ref colors);
+                return;
+            }
 
-        int slope = (int)tileCache.Slope;
-        colors = SelectLavaQuadColor(TextureAssets.LiquidSlope[liquidType].Value, ref colors, true);
-        
-        if (!TileID.Sets.BlocksWaterDrawingBehindSelf[tileCache.TileType] || behindBlocks || slope == 0) {
-            Texture2D liquidTexture = SelectLavaTexture(LavaStyleLoader.LavaBlockTexture, LiquidTileType.Block);
-            Main.tileBatch.Draw(liquidTexture, position, liquidSize, colors, default(Vector2), 1f, SpriteEffects.None);
-            return;
-        }
+            int slope = (int)tileCache.Slope;
+            colors = SelectLavaQuadColor(TextureAssets.LiquidSlope[liquidType].Value, ref colors, true);
+            
+            if (!TileID.Sets.BlocksWaterDrawingBehindSelf[tileCache.TileType] || behindBlocks || slope == 0) {
+                Texture2D liquidTexture = SelectLavaTexture(LavaStyleLoader.LavaBlockTexture, LiquidTileType.Block);
+                Main.tileBatch.Draw(liquidTexture, position, liquidSize, colors, default(Vector2), 1f, SpriteEffects.None);
+                return;
+            }
 
-        Texture2D slopeTexture = SelectLavaTexture(LavaStyleLoader.LavaSlopeTexture, LiquidTileType.Slope);
-        liquidSize.X += 18 * (slope - 1);
-        switch (slope) {
-            case 1:
-                Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
-                break;
-            case 2:
-                Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
-                break;
-            case 3:
-                Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
-                break;
-            case 4:
-                Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
-                break;
+            Texture2D slopeTexture = SelectLavaTexture(LavaStyleLoader.LavaSlopeTexture, LiquidTileType.Slope);
+            liquidSize.X += 18 * (slope - 1);
+            switch (slope) {
+                case 1:
+                    Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
+                    break;
+                case 2:
+                    Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
+                    break;
+                case 3:
+                    Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
+                    break;
+                case 4:
+                    Main.tileBatch.Draw(slopeTexture, position, liquidSize, colors, Vector2.Zero, 1f, SpriteEffects.None);
+                    break;
+            }
         }
-    }
 
     private static void ChangeWaterQuadColors(ILContext il) {
         ILCursor cursor = new ILCursor(il);
-
+        
         cursor.TryGotoNext(c => c.MatchLdfld<LiquidRenderer>("_liquidTextures"));
             
         // locate liquid tex value
         cursor.TryGotoNext(MoveType.After, c => c.MatchCallvirt(textureGetValueMethod));
         
         cursor.EmitDelegate<Func<Texture2D, Texture2D>>(initialTexture => SelectLavaTexture(initialTexture, LiquidTileType.Fall));
-
+        
         // locate liquid light color
         cursor.TryGotoNext(MoveType.After, c => c.MatchLdloc(9));
-
+        
         // dont fuck with non liquid textures!
         cursor.Emit(OpCodes.Ldarg_0);
         cursor.Emit(OpCodes.Ldfld, typeof(LiquidRenderer).GetField("_liquidTextures")!);
@@ -279,12 +279,13 @@ public class LavaStyleLoader : ModSystem {
         cursor.Emit(OpCodes.Ldloc, 8);
         cursor.Emit(OpCodes.Ldloc, 3);
         cursor.Emit(OpCodes.Ldloc, 4);
-
+        
         cursor.EmitDelegate<Func<VertexColors, Texture2D, int, int, int, VertexColors>>((initialColor, initialTexture, liquidType, x, y) => {
             if (_cachedLavaStyle != default) {
                 initialColor = SelectLavaQuadColor(initialTexture, ref initialColor, liquidType == 1);
+                _cachedLavaStyle.ModifyVertexColors(x, y, ref initialColor);
             }
-
+            
             return initialColor;
         });
     }
@@ -292,7 +293,7 @@ public class LavaStyleLoader : ModSystem {
     private static void DrawCustomLavafalls(On_WaterfallManager.orig_DrawWaterfall_int_int_int_float_Vector2_Rectangle_Color_SpriteEffects orig, WaterfallManager self, int waterfallType, int x, int y, float opacity, Vector2 position, Rectangle sourceRect, Color color, SpriteEffects effects) {
         waterfallType = LavaStyleLoader.SelectLavafallStyle(waterfallType);
         color = LavaStyleLoader.SelectLavafallColor(waterfallType, color);
-
+        
         orig(self, waterfallType, x, y, opacity, position, sourceRect, color, effects);
     }
         
