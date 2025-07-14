@@ -348,16 +348,23 @@ public class LavaStyleLoader : ModSystem {
     }
     
     private void PlayerLavaDebuff(ILContext il) {
-        var c = new ILCursor(il);
+        ILCursor c = new ILCursor(il);
         c.GotoNext(MoveType.Before, i => i.MatchLdarg0(), i => i.MatchLdcI4(24), i => i.MatchLdloc(161), i => i.MatchLdcI4(1), i => i.MatchLdcI4(0), i => i.MatchCall<Player>("AddBuff"));
         c.EmitLdarg0();
         c.EmitLdloc(161);
         c.EmitDelegate((Player player, int onFiretime) =>
         {
             if(_cachedLavaStyle != default) {
-                //_cachedLavaStyle.InflictDebuff(player, null, onFiretime);
-                player.AddBuff(_cachedLavaStyle.DebuffType(), 7 * 60);
+                player.AddBuff(_cachedLavaStyle.DebuffType(), onFiretime);
             }
+        });
+        
+        c.GotoNext(MoveType.Before, i => i.MatchLdloc(161), i => i.MatchLdcI4(1), i => i.MatchLdcI4(0), i => i.MatchCall<Player>("AddBuff"));
+        c.EmitDelegate<Func<int, int>>((vanillaOnFireTime) => {
+            if (_cachedLavaStyle != default) {
+                return _cachedLavaStyle.KeepVanillaOnFire() ? vanillaOnFireTime : 0;
+            }
+            return vanillaOnFireTime;
         });
     }
 }

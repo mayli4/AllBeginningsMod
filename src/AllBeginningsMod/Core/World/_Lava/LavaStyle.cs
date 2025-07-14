@@ -60,6 +60,8 @@ public abstract class LavaStyle : ModTexturedType {
     public abstract int ChooseWaterfallStyle();
 
     public virtual int DebuffType() { return BuffID.OnFire; }
+    
+    public virtual bool KeepVanillaOnFire() => false;
 
     public abstract int GetSplashDust();
 
