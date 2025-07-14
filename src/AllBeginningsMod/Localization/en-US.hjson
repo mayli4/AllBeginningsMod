@@ -96,7 +96,7 @@ Mods: {
 			}
 
 			DevilOWarNPC.DisplayName: Devil O' War
-			HellbatNPC.DisplayName: Hellbat N P C
+			TerrorBatNPC.DisplayName: Terror Bat
 		}
 
 		Projectiles: {
@@ -126,6 +126,7 @@ Mods: {
 			DevilOWarStingerProjectile.DisplayName: Devil O War Stinger Projectile
 			HellbatSpit.DisplayName: Hellbat Spit
 			HellbatSpitProjectile.DisplayName: Hellbat Spit Projectile
+			TerrorBatSpit.DisplayName: Terror Bat Spit
 		}
 
 		Buffs: {
