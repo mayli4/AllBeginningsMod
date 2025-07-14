@@ -7,6 +7,6 @@ using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
-public class HellbatSpit : ModProjectile {
+public class TerrorBatSpit : ModProjectile {
     public override string Texture => "Terraria/Images/NPC_112";
 }

@@ -7,8 +7,8 @@ using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
-public class HellbatNPC : ModNPC {
-    public override string Texture => Assets.Assets.Textures.NPCs.Corruption.Hellbat.KEY_HellbatNPC;
+public class TerrorBatNPC : ModNPC {
+    public override string Texture => Assets.Assets.Textures.NPCs.Corruption.TerrorBat.KEY_TerrorBatNPC;
 
     public enum State {
         IdleOnCeiling,
@@ -137,7 +137,7 @@ public class HellbatNPC : ModNPC {
             for (int i = 0; i < Main.npc.Length; i++) {
                 var otherNpc = Main.npc[i];
                 if (otherNpc.active && otherNpc.type == Type && otherNpc.whoAmI != NPC.whoAmI) {
-                    var otherBat = otherNpc.ModNPC as HellbatNPC;
+                    var otherBat = otherNpc.ModNPC as TerrorBatNPC;
                     if (otherBat != null && otherBat.CurrentState == State.IdleOnCeiling) {
                         otherBat.CurrentState = State.Awake;
                         otherNpc.netUpdate = true;
@@ -231,7 +231,7 @@ public class HellbatNPC : ModNPC {
                 NPC.GetSource_FromAI(),
                 NPC.Center,
                 projectileVelocity,
-                ModContent.ProjectileType<HellbatSpit>(),
+                ModContent.ProjectileType<TerrorBatSpit>(),
                 NPC.damage / 2,
                 0.5f,
                 Main.myPlayer
