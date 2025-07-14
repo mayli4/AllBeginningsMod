@@ -8,6 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using AllBeginningsMod.Common.PrimitiveDrawing;
 using AllBeginningsMod.Common.Rendering;
+using AllBeginningsMod.Content.Biomes;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Utilities;
 using ReLogic.Content;
@@ -81,6 +82,10 @@ public sealed class DevilOWarNPC : ModNPC {
             SpawnConditions.UnderworldCorruption,
             new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.AllBeginningsMod.Bestiary.DevilOWarBestiary"))
         });
+    }
+    
+    public override float SpawnChance(NPCSpawnInfo spawnInfo) {
+        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.3f : 0;
     }
 
     public override void AI() {
