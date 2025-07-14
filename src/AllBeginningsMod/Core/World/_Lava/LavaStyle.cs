@@ -59,6 +59,8 @@ public abstract class LavaStyle : ModTexturedType {
 
     public abstract int ChooseWaterfallStyle();
 
+    public virtual int DebuffType() { return BuffID.OnFire; }
+
     public abstract int GetSplashDust();
 
     public abstract int GetDropletGore();
@@ -66,4 +68,6 @@ public abstract class LavaStyle : ModTexturedType {
     public virtual void SelectLightColor(ref Color initialLightColor) {}
 
     public virtual void ModifyVertexColors(int x, int y, ref VertexColors colors) { }
+    
+    public virtual void InflictDebuff(Player player, NPC npc, int onfireDuration) { }
 }

@@ -18,7 +18,7 @@ public class HellLightRemovalSystem : ModSystem {
     private void TileLightScanner_ApplyHellLight(On_TileLightScanner.orig_ApplyHellLight orig, TileLightScanner self, Tile tile, int x, int y, ref Vector3 lightColor) {
         orig.Invoke(self, tile, x, y, ref lightColor);
 
-        var underworldCorruptLightColor = new Vector3(0.3f, 0.3f, 0.06f);
+        var underworldCorruptLightColor = new Vector3(0.5f, 0.5f, 0.08f);
 
         if(!Main.LocalPlayer.InModBiome<UnderworldCorruptionBiome>())
             return;

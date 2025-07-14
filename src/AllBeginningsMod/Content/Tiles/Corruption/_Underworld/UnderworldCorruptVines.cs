@@ -41,6 +41,27 @@ public class UnderworldCorruptVines : ModTile {
         TileObjectData.addTile(Type);
         
         AddMapEntry(new Color(128, 123, 88));
+        
+        TileLoader.RegisterConversion(TileID.AshVines, BiomeConversionID.Corruption, ConvertToCorruption);
+    }
+    
+    public bool ConvertToCorruption(int i, int j, int type, int conversionType) {
+        WorldGen.ConvertTile(i, j, Type);
+        return false;
+    }
+
+    public override void Convert(int i, int j, int conversionType) {
+        switch (conversionType) {
+            case BiomeConversionID.Chlorophyte:
+            case BiomeConversionID.Purity:
+                WorldGen.ConvertTile(i, j, TileID.AshVines);
+                return;
+            case BiomeConversionID.Sand:
+            case BiomeConversionID.Corruption:
+                WorldGen.ConvertTile(i, j, ModContent.TileType<UnderworldCorruptVines>());
+                return;
+            
+        }
     }
     
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch) {

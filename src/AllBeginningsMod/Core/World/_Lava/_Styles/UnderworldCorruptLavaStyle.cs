@@ -25,6 +25,8 @@ public class UnderworldCorruptLava : LavaStyle {
 
     public override int GetDropletGore() => 0;
 
+    public override int DebuffType() => BuffID.CursedInferno;
+
     public override void SelectLightColor(ref Color initialLightColor) {
         initialLightColor = Color.Yellow;
         initialLightColor.A = 255;
