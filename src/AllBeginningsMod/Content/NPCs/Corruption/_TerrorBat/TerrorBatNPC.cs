@@ -7,6 +7,8 @@ using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
+//todo: natural spawning
+
 public class TerrorBatNPC : ModNPC {
     public override string Texture => Assets.Assets.Textures.NPCs.Corruption.TerrorBat.KEY_TerrorBatNPC;
 
