@@ -15,7 +15,7 @@ public class TerrorBatSpit : ModProjectile {
     public override string Texture => "Terraria/Images/NPC_112";
     
     private PrimitiveTrail sparkleTrail;
-    private OldPositionCache positionCache;
+    private PositionCache positionCache;
     private bool trailInit;
 
     public override void SetStaticDefaults() {
