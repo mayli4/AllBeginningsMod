@@ -1,6 +1,4 @@
-﻿using AllBeginningsMod.Common.Bestiary;
-using AllBeginningsMod.Core.World;
-using Terraria.ModLoader;
+﻿using Terraria.ModLoader;
 
 namespace AllBeginningsMod;
 

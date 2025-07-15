@@ -1,3 +1,4 @@
+using AllBeginningsMod.Common;
 using AllBeginningsMod.Common.Bestiary;
 using AllBeginningsMod.Content.Biomes;
 using Microsoft.Xna.Framework;
@@ -18,6 +19,7 @@ namespace AllBeginningsMod.Content.NPCs.Corruption;
 
 //todo: natural spawning
 
+[SpawnPack(4)]
 public class TerrorBatNPC : ModNPC {
     public override string Texture => Assets.Assets.Textures.NPCs.Corruption.TerrorBat.KEY_TerrorBatNPC;
 
@@ -93,7 +95,7 @@ public class TerrorBatNPC : ModNPC {
     }
     
     public override float SpawnChance(NPCSpawnInfo spawnInfo) {
-        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.1f : 0;
+        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.5f : 0;
     }
 
     public override void OnSpawn(IEntitySource source) {
@@ -293,7 +295,6 @@ public class TerrorBatNPC : ModNPC {
         if (StateTimer == dash_duration) {
             Vector2 dashDirection = Vector2.Normalize(targetPlayer.Center - NPC.Center);
             NPC.velocity = dashDirection * dash_speed;
-            SoundEngine.PlaySound(SoundID.DD2_WyvernScream, NPC.Center);
         }
 
         NPC.rotation = NPC.velocity.X * rotation_factor;
@@ -323,7 +324,7 @@ public class TerrorBatNPC : ModNPC {
                 0.5f,
                 Main.myPlayer
             );
-            SoundEngine.PlaySound(SoundID.NPCDeath1, NPC.Center);
+            SoundEngine.PlaySound(SoundID.NPCDeath13, NPC.Center);
         }
 
         NPC.rotation = NPC.velocity.X * rotation_factor;

@@ -1,5 +1,4 @@
 using AllBeginningsMod.Common.PrimitiveDrawing;
-using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,7 +6,6 @@ using System;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -33,7 +31,7 @@ public class TerrorBatSpit : ModProjectile {
         Projectile.DamageType = DamageClass.Ranged;
         Projectile.tileCollide = true;
         Projectile.ignoreWater = false;
-        Projectile.timeLeft = 3222200;
+        Projectile.timeLeft = 300;
 
         Projectile.penetrate = 2;
 
@@ -95,7 +93,6 @@ public class TerrorBatSpit : ModProjectile {
 
     public override bool PreDraw(ref Color lightColor) {
         var shader = Assets.Assets.Effects.Compiled.Trail.Fire.Value;
-
         
         shader.Parameters["transformationMatrix"].SetValue(MathUtilities.WorldTransformationMatrix);
         shader.Parameters["amp"].SetValue(0.15f);

@@ -2,20 +2,16 @@ using AllBeginningsMod.Common.Bestiary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using AllBeginningsMod.Common.PrimitiveDrawing;
-using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Content.Biomes;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Utilities;
-using ReLogic.Content;
 using System.Linq;
 using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
-using Terraria.Localization;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
@@ -69,8 +65,6 @@ public sealed class DevilOWarNPC : ModNPC {
         NPC.buffImmune[BuffID.CursedInferno] = true;
         NPC.buffImmune[BuffID.OnFire] = true;
         NPC.lavaImmune = true;
-        
-        
     }
     
     public override void Load() {
@@ -88,7 +82,7 @@ public sealed class DevilOWarNPC : ModNPC {
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) => bestiaryEntry.AddInfo(this, "");
     
     public override float SpawnChance(NPCSpawnInfo spawnInfo) {
-        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.1f : 0;
+        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.2f : 0;
     }
 
     public override void AI() {
@@ -394,4 +388,6 @@ public sealed class DevilOWarNPC : ModNPC {
 
         pointsArray[segments - 1] = end;
     }
+
+    public int SwarmSize() => 10;
 }

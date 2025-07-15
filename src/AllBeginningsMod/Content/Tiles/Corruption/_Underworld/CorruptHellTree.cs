@@ -76,7 +76,7 @@ public class CorruptHellTreeSapling : ModTile {
         TileObjectData.newTile.AnchorValidTiles = [ModContent.TileType<OvergrownCorruptAsh>()];
         TileObjectData.newTile.StyleHorizontal = true;
         TileObjectData.newTile.DrawFlipHorizontal = true;
-        TileObjectData.newTile.WaterPlacement = LiquidPlacement.NotAllowed;
+        TileObjectData.newTile.WaterPlacement = LiquidPlacement.Allowed;
         TileObjectData.newTile.LavaDeath = true;
         TileObjectData.newTile.RandomStyleRange = 3;
         TileObjectData.newTile.StyleMultiplier = 3;
