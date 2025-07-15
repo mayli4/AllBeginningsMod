@@ -97,6 +97,8 @@ Mods: {
 
 			DevilOWarNPC.DisplayName: Devil O' War
 			TerrorBatNPC.DisplayName: Terror Bat
+			CursedSpiritNPC.DisplayName: Cursed Spirit
+			EffigyNPC.DisplayName: Effigy
 		}
 
 		Projectiles: {
