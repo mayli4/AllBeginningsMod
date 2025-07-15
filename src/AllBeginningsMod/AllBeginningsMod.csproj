@@ -38,7 +38,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Core\" />
+        <AdditionalFiles Include="Assets/**/*.png" />
+        <AdditionalFiles Include="Assets/**/*.fxc" />
+        <AdditionalFiles Include="Assets/**/*.wav" />
+        <AdditionalFiles Include="Assets/**/*.ogg" />
+        <AdditionalFiles Include="Assets/**/*.mp3" />
     </ItemGroup>
     
 </Project>

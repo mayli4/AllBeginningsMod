@@ -54,7 +54,7 @@ public sealed class DevilOWarNPC : ModNPC {
     public override void SetDefaults() {
         NPC.width = 36;
         NPC.height = 36;
-        NPC.lifeMax = 120;
+        NPC.lifeMax = 320;
         NPC.value = 250f;
         NPC.noTileCollide = false;
         NPC.aiStyle = -1;
@@ -65,6 +65,12 @@ public sealed class DevilOWarNPC : ModNPC {
         NPC.HitSound = SoundID.NPCHit23;
         
         SpawnModBiomes = [ModContent.GetInstance<UnderworldCorruptionBiome>().Type];
+        
+        NPC.buffImmune[BuffID.CursedInferno] = true;
+        NPC.buffImmune[BuffID.OnFire] = true;
+        NPC.lavaImmune = true;
+        
+        
     }
     
     public override void Load() {
