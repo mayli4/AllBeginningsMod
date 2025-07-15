@@ -433,7 +433,7 @@ internal class NightgauntNPC : ModNPC {
         };
         offset.X *= -NPC.direction;
 
-        SpriteBatchData snapshot = Main.spriteBatch.Capture();
+        SpriteBatchSnapshot snapshot = Main.spriteBatch.Capture();
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
         for(int i = 0; i < NPC.oldPos.Length; i++) {

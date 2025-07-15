@@ -89,8 +89,8 @@ internal class NightgauntForceField : ModProjectile {
         Renderer.QueueRenderAction(
             () =>
             {
-                Main.spriteBatch.End(out SpriteBatchData snapshot);
-                Main.spriteBatch.Begin(snapshot with { Effect = effect });
+                Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
+                Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
                 Main.spriteBatch.Draw(
                     noiseTexture,
                     Projectile.Hitbox.Modified((int)-Main.screenPosition.X, (int)-Main.screenPosition.Y, 0, 0),

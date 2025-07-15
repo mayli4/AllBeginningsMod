@@ -173,9 +173,9 @@ internal class DevilVampireNPC : VampireNPC {
         fishEyeEffect.Parameters["uSourceRect"].SetValue(new Vector4(NPC.frame.X, NPC.frame.Y, NPC.frame.Width, NPC.frame.Height));
         fishEyeEffect.Parameters["center"].SetValue(new Vector2(0.5f, 0.5f));
 
-        SpriteBatchData snapshot = spriteBatch.Capture();
+        SpriteBatchSnapshot snapshot = spriteBatch.Capture();
         spriteBatch.End();
-        spriteBatch.Begin(snapshot with { Effect = fishEyeEffect });
+        spriteBatch.Begin(snapshot with { CustomEffect = fishEyeEffect });
 
         spriteBatch.Draw(
             texture,

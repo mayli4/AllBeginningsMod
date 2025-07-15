@@ -66,7 +66,7 @@ internal class Renderer : ILoadable {
     private static void RunRenderActions(RenderLayer layer, RenderOrder order, bool shouldStartSpriteBatch) {
         int idx = (int)layer * 2 + (order == RenderOrder.Over ? 1 : 0);
         if(shouldStartSpriteBatch) {
-            Main.spriteBatch.Begin(SpriteBatchData.Default());
+            Main.spriteBatch.Begin(SpriteBatchSnapshot.Default());
         }
 
         foreach((Action action, RenderStyle style) in RenderActions[idx]) {
@@ -111,7 +111,7 @@ internal class Renderer : ILoadable {
             );
         }
 
-        spriteBatch.End(out SpriteBatchData data);
+        spriteBatch.End(out SpriteBatchSnapshot data);
         RenderTargetBinding[] bindings = device.GetRenderTargets();
 
         // This is so that the already drawn stuff doesn't magically dissapear when changing render targets.
@@ -123,7 +123,7 @@ internal class Renderer : ILoadable {
         device.SetRenderTarget(effectTarget);
         device.Clear(Color.Transparent);
 
-        spriteBatch.Begin(SpriteBatchData.Default() with { TransformMatrix = Main.GameViewMatrix.EffectMatrix });
+        spriteBatch.Begin(SpriteBatchSnapshot.Default() with { TransformMatrix = Main.GameViewMatrix.EffectMatrix });
         action();
         spriteBatch.End();
 
@@ -133,7 +133,7 @@ internal class Renderer : ILoadable {
             RenderTargetUsageProperty.SetValue(bindings[0].RenderTarget, RenderTargetUsage.DiscardContents);
         }
 
-        spriteBatch.Begin(SpriteBatchData.Default() with { Effect = effect });
+        spriteBatch.Begin(SpriteBatchSnapshot.Default() with { CustomEffect = effect });
         spriteBatch.Draw(effectTarget, Vector2.Zero, Color.White);
         spriteBatch.End();
 

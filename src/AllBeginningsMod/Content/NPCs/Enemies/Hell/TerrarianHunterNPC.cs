@@ -464,7 +464,7 @@ internal class TerrarianHunterNPC : ModNPC {
                 0f
             );
 
-            SpriteBatchData snapshot = spriteBatch.Capture();
+            SpriteBatchSnapshot snapshot = spriteBatch.Capture();
             spriteBatch.End();
             spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });
 

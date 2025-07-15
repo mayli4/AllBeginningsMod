@@ -68,9 +68,9 @@ internal class StarWhirlProjectile : ModProjectile {
 
         Color color = Color.CornflowerBlue;
 
-        SpriteBatchData snapshot = Main.spriteBatch.Capture();
+        SpriteBatchSnapshot snapshot = Main.spriteBatch.Capture();
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(snapshot with { Effect = effect, BlendState = BlendState.AlphaBlend });
+        Main.spriteBatch.Begin(snapshot with { CustomEffect = effect, BlendState = BlendState.AlphaBlend });
 
         Main.spriteBatch.Draw(
             sampleTexture1,
@@ -97,7 +97,7 @@ internal class StarWhirlProjectile : ModProjectile {
         effect.Parameters["topHalf"].SetValue(true);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(snapshot with { Effect = effect });
+        Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
 
         Main.spriteBatch.Draw(
             sampleTexture1,

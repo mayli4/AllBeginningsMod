@@ -98,7 +98,7 @@ internal class GardenerNPC : ModNPC {
             0f
         );
 
-        SpriteBatchData capture = spriteBatch.Capture();
+        SpriteBatchSnapshot capture = spriteBatch.Capture();
         spriteBatch.End();
         spriteBatch.Begin(capture);
 

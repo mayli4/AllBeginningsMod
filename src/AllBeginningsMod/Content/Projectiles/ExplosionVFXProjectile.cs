@@ -111,8 +111,8 @@ internal class ExplosionVFXProjectile : ModProjectile {
             effect.Parameters["noiseScale2"].SetValue(0.3f);
             effect.Parameters["edgeColor"].SetValue(Color.Black.ToVector4());
 
-            Main.spriteBatch.End(out SpriteBatchData snapshot);
-            Main.spriteBatch.Begin(snapshot with { Effect = effect });
+            Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
+            Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
             Main.spriteBatch.Draw(
                 smokeTexture,
                 Projectile.Center - Main.screenPosition,
@@ -131,7 +131,7 @@ internal class ExplosionVFXProjectile : ModProjectile {
 
         float flashScale = 1f - MathF.Min(0.15f, Progress) / 0.15f;
 
-        Main.spriteBatch.End(out SpriteBatchData snapshot);
+        Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
         Main.spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });
         Main.spriteBatch.Draw(
             glowTexture,

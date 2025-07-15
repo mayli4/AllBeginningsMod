@@ -337,7 +337,7 @@ public sealed class DevilOWarNPC : ModNPC {
             
             Vector2 bodyDrawPosition = NPC.Center + offset - Main.screenPosition;
             
-            SpriteBatchData capture = spriteBatch.Capture();
+            SpriteBatchSnapshot capture = spriteBatch.Capture();
             spriteBatch.End();
             spriteBatch.Begin(capture);
 

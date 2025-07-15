@@ -4,55 +4,38 @@ using Terraria;
 
 namespace AllBeginningsMod.Utilities;
 
-public readonly struct SpriteBatchData {
-    public SpriteSortMode SortMode { get; init; }
-    public BlendState BlendState { get; init; }
-    public SamplerState SamplerState { get; init; }
-    public DepthStencilState DepthStencilState { get; init; }
-    public RasterizerState RasterizerState { get; init; }
-    public Effect Effect { get; init; }
-    public Matrix TransformMatrix { get; init; }
-
-    public SpriteBatchData(
-        SpriteSortMode sortMode,
-        BlendState blendState,
-        SamplerState samplerState,
-        DepthStencilState depthStencilState,
-        RasterizerState rasterizerState,
-        Effect effect,
-        Matrix transformMatrix
-    ) {
-        SortMode = sortMode;
-        BlendState = blendState;
-        SamplerState = samplerState;
-        DepthStencilState = depthStencilState;
-        RasterizerState = rasterizerState;
-        Effect = effect;
-        TransformMatrix = transformMatrix;
-    }
-
-    public static SpriteBatchData Capture(SpriteBatch spriteBatch) {
-        SpriteSortMode sortMode = (SpriteSortMode)SpriteBatchCache.SortMode.GetValue(spriteBatch);
-        BlendState blendState = (BlendState)SpriteBatchCache.BlendState.GetValue(spriteBatch);
-        SamplerState samplerState = (SamplerState)SpriteBatchCache.SamplerState.GetValue(spriteBatch);
-        DepthStencilState depthStencilState = (DepthStencilState)SpriteBatchCache.DepthStencilState.GetValue(spriteBatch);
-        RasterizerState rasterizerState = (RasterizerState)SpriteBatchCache.RasterizerState.GetValue(spriteBatch);
-        Effect effect = (Effect)SpriteBatchCache.Effect.GetValue(spriteBatch);
-        Matrix transformMatrix = (Matrix)SpriteBatchCache.TransformMatrix.GetValue(spriteBatch);
-
-        return new SpriteBatchData(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
-    }
-
-    public static SpriteBatchData Default() {
-        return new SpriteBatchData
+public readonly struct SpriteBatchSnapshot(SpriteBatch spriteBatch) {
+    public SpriteSortMode SortMode { get; init; } = spriteBatch.sortMode;
+    public BlendState BlendState { get; init; } = spriteBatch.blendState;
+    public SamplerState SamplerState { get; init; } = spriteBatch.samplerState;
+    public DepthStencilState DepthStencilState { get; init; } = spriteBatch.depthStencilState;
+    public RasterizerState RasterizerState { get; init; } = spriteBatch.rasterizerState;
+    public Effect? CustomEffect { get; init; } = spriteBatch.customEffect;
+    public Matrix TransformMatrix { get; init; } = spriteBatch.transformMatrix;
+    
+    public static SpriteBatchSnapshot Default() {
+        return new SpriteBatchSnapshot
         {
             SortMode = default,
             BlendState = default,
             SamplerState = Main.DefaultSamplerState,
             DepthStencilState = default,
             RasterizerState = Main.Rasterizer,
-            Effect = null,
+            CustomEffect = null,
             TransformMatrix = Main.GameViewMatrix.TransformationMatrix
         };
     }
+    
+    public static SpriteBatchSnapshot Capture(SpriteBatch spriteBatch) {
+        return new SpriteBatchSnapshot
+        {
+            SortMode = spriteBatch.sortMode,
+            BlendState = spriteBatch.blendState,
+            SamplerState = spriteBatch.samplerState,
+            DepthStencilState = spriteBatch.depthStencilState,
+            RasterizerState = spriteBatch.rasterizerState,
+            CustomEffect = spriteBatch.customEffect,
+            TransformMatrix = spriteBatch.transformMatrix
+        };
+     }
 }

@@ -106,14 +106,14 @@ internal class NightgauntReverseGravityProjectile : ModProjectile {
             0f
         );
 
-        SpriteBatchData snapshot = Main.spriteBatch.Capture();
+        SpriteBatchSnapshot snapshot = Main.spriteBatch.Capture();
         Main.spriteBatch.End();
 
         Effect effect = EffectLoader.GetEffect("Pixel::JellyfishYe");
         effect.Parameters["time"].SetValue(Projectile.timeLeft * 0.05f + RotationOffset * 4f);
         effect.Parameters["uImageSize0"].SetValue(colorMaskTexture.Size());
         effect.Parameters["uSourceRect"].SetValue(new Vector4(source.X, source.Y, source.Width, source.Height));
-        Main.spriteBatch.Begin(snapshot with { Effect = effect });
+        Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
 
         Main.spriteBatch.Draw(
             colorMaskTexture,

@@ -109,9 +109,9 @@ public sealed class HellVampireNPC : VampireNPC {
         fishEyeEffect.Parameters["uSourceRect"].SetValue(new Vector4(0f, 0f, texture.Width, texture.Height));
         fishEyeEffect.Parameters["center"].SetValue(Vector2.One * 0.5f);
 
-        SpriteBatchData snapshot = spriteBatch.Capture();
+        SpriteBatchSnapshot snapshot = spriteBatch.Capture();
         spriteBatch.End();
-        spriteBatch.Begin(snapshot with { Effect = fishEyeEffect });
+        spriteBatch.Begin(snapshot with { CustomEffect = fishEyeEffect });
 
         spriteBatch.Draw(
             texture,

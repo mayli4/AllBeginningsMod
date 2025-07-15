@@ -99,8 +99,8 @@ internal class DevilVampireAuraProjectile : ModProjectile {
 
             float size = Projectile.width + 250;
 
-            Main.spriteBatch.End(out SpriteBatchData snapshot);
-            Main.spriteBatch.Begin(snapshot with { Effect = effect });
+            Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
+            Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
             Main.spriteBatch.Draw(
                 baseTexture,
                 new Rectangle(
