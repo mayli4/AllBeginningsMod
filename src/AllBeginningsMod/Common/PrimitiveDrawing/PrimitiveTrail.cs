@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Core.Loaders;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Immutable;
@@ -92,7 +91,7 @@ public class PrimitiveTrail {
     }
 
     public void Draw(Texture2D texture, Color color, Matrix? transformationMatrix = null, bool blackAsAlpha = false) {
-        Effect effect = EffectLoader.GetEffect("Trail::Default");
+        Effect effect = Assets.Assets.Effects.Compiled.Trail.Default.Value;
         effect.Parameters["sampleTexture"].SetValue(texture);
         effect.Parameters["color"].SetValue(color.ToVector4());
         effect.Parameters["transformationMatrix"].SetValue(transformationMatrix ?? Matrix.Identity);

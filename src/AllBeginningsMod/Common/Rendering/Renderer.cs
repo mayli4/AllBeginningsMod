@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Core.Loaders;
-using AllBeginningsMod.Utilities;
+﻿using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -75,7 +74,7 @@ internal class Renderer : ILoadable {
                     action();
                     break;
                 case RenderStyle.Pixelated:
-                    Effect effect = EffectLoader.GetEffect("Pixel::Pixelate");
+                    Effect effect = Assets.Assets.Effects.Compiled.Pixel.Pixelate.Value;
                     effect.Parameters["size"].SetValue(Main.ScreenSize.ToVector2());
                     effect.Parameters["resolution"].SetValue(2);
                     effect.Parameters["stepMin"].SetValue(0.3f);

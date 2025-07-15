@@ -1,5 +1,4 @@
 ﻿using AllBeginningsMod.Common.Bases.NPCs;
-using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Content.CameraModifiers;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Content.Items.Materials;
@@ -103,7 +102,7 @@ public sealed class HellVampireNPC : VampireNPC {
         Vector2 scale = Vector2.One * (1f + 0.25f * explodingProgress);
         float rotation = NPC.rotation + MathF.Sin(Main.GameUpdateCount * 0.3f) * 0.4f * shake;
 
-        Effect fishEyeEffect = EffectLoader.GetEffect("Pixel::FishEye");
+        Effect fishEyeEffect = Assets.Assets.Effects.Compiled.Pixel.FishEye.Value;
         fishEyeEffect.Parameters["strength"].SetValue(explodingProgress * 2f);
         fishEyeEffect.Parameters["uImageSize0"].SetValue(texture.Size());
         fishEyeEffect.Parameters["uSourceRect"].SetValue(new Vector4(0f, 0f, texture.Width, texture.Height));

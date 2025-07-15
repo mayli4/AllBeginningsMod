@@ -1,5 +1,4 @@
 ﻿using AllBeginningsMod.Common;
-using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
@@ -97,7 +96,7 @@ internal class ExplosionVFXProjectile : ModProjectile {
 
         Renderer.QueueRenderAction(() =>
         {
-            effect ??= EffectLoader.GetEffect("Pixel::ExplosionSmoke");
+            effect ??= Assets.Assets.Effects.Compiled.Pixel.ExplosionSmoke.Value;
 
             effect.Parameters["progress"].SetValue(Progress);
             effect.Parameters["time"].SetValue(Main.GameUpdateCount * 0.002f + Projectile.rotation);
@@ -160,22 +159,22 @@ internal class ExplosionVFXProjectile : ModProjectile {
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(snapshot);
 
-        float blobScale = MathF.Pow(1f - MathF.Min(0.25f, Progress) / 0.25f, 2);
-
-        FilterSystem.ApplyFilter(
-            EffectLoader.GetFilter("Water"),
-            effect =>
-            {
-                effect.Parameters["noise"].SetValue(
-                    ModContent.Request<Texture2D>("AllBeginningsMod/Assets/Textures/Sample/Noise3", AssetRequestMode.ImmediateLoad).Value
-                );
-
-                effect.Parameters["strength"].SetValue(0.4f * blobScale);
-                effect.Parameters["maxLen"].SetValue(0.0001f * Projectile.width);
-                effect.Parameters["maxLenSmooth"].SetValue(0.15f);
-                effect.Parameters["center"].SetValue(Projectile.Center - Main.screenPosition);
-            }
-        );
+        // float blobScale = MathF.Pow(1f - MathF.Min(0.25f, Progress) / 0.25f, 2);
+        //
+        // FilterSystem.ApplyFilter(
+        //     EffectLoader.GetFilter("Water"),
+        //     effect =>
+        //     {
+        //         effect.Parameters["noise"].SetValue(
+        //             ModContent.Request<Texture2D>("AllBeginningsMod/Assets/Textures/Sample/Noise3", AssetRequestMode.ImmediateLoad).Value
+        //         );
+        //
+        //         effect.Parameters["strength"].SetValue(0.4f * blobScale);
+        //         effect.Parameters["maxLen"].SetValue(0.0001f * Projectile.width);
+        //         effect.Parameters["maxLenSmooth"].SetValue(0.15f);
+        //         effect.Parameters["center"].SetValue(Projectile.Center - Main.screenPosition);
+        //     }
+        // );
 
         return false;
     }

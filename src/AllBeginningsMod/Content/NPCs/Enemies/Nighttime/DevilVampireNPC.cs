@@ -1,5 +1,4 @@
 ﻿using AllBeginningsMod.Common.Bases.NPCs;
-using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Content.CameraModifiers;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Content.Items.Materials;
@@ -167,7 +166,7 @@ internal class DevilVampireNPC : VampireNPC {
             );
         }
 
-        Effect fishEyeEffect = EffectLoader.GetEffect("Pixel::FishEye");
+        Effect fishEyeEffect = Assets.Assets.Effects.Compiled.Pixel.FishEye.Value;
         fishEyeEffect.Parameters["strength"].SetValue(explodingProgress * 1.8f);
         fishEyeEffect.Parameters["uImageSize0"].SetValue(texture.Size());
         fishEyeEffect.Parameters["uSourceRect"].SetValue(new Vector4(NPC.frame.X, NPC.frame.Y, NPC.frame.Width, NPC.frame.Height));
