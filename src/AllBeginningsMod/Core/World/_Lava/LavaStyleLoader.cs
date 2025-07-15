@@ -20,7 +20,7 @@ using Terraria.ModLoader.UI;
 
 namespace AllBeginningsMod.Core.World;
 
-//
+//todo: getcornercolors 
 
 public class LavaStyleLoader : ModSystem {
     internal static List<ModLavaStyle> CustomLavaStyles = new List<ModLavaStyle>();

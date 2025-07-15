@@ -33,43 +33,75 @@ public class UnderworldCorruptModLava : ModLavaStyle {
     }
     
     public override void ModifyVertexColors(int x, int y, ref VertexColors colors) {
-        var bottomColor = new Color(124, 169, 19, 255);
-        var topColor = new Color(Color.Yellow.R, Color.Yellow.G, Color.Yellow.B, 255);
-        int topOfLiquidInColumnY = y;
-        
-        //iterate upwards from current tile at y, stop if we hit a tile that is not the same liquid or has no liquid
-        
-        while (topOfLiquidInColumnY > 0 && Main.tile[x, topOfLiquidInColumnY - 1].LiquidType == LiquidID.Lava && Main.tile[x, topOfLiquidInColumnY - 1].LiquidAmount > 0) {
-            topOfLiquidInColumnY--;
+        var bottomColor = Color.Yellow;
+        var topColor = new Color(170, 143, 36, 255);
+
+        int topOfActualLiquidSurfaceY = y;
+        int solidTilesPassedAboveLiquid = 0;
+
+        int currentScanY = y;
+        const int max_scan_range = 250; 
+        const int max_solid_tiles_per_scan = 5;
+
+        for (int i = 0; i < max_scan_range; i++) {
+
+            Tile scanTile = Main.tile[x, currentScanY];
+
+            if (scanTile.LiquidType == LiquidID.Lava && scanTile.LiquidAmount > 0) {
+                solidTilesPassedAboveLiquid = 0;
+                topOfActualLiquidSurfaceY = currentScanY;
+            } else if (scanTile.HasTile) {
+                // found a solid tile thats not lava, increment passed solid tiles
+                solidTilesPassedAboveLiquid++;
+                if (solidTilesPassedAboveLiquid > max_solid_tiles_per_scan) {
+                    // max solid  tiles passthrogh exceeded, top of pool found
+                    break;
+                }
+            } else {
+                // top of pool found
+                break;
+            }
+
+            currentScanY--; // move one tile up for next iteration
         }
-        
-        var gradientDepthTiles = 30f;
-        var gradientDepthPixels = gradientDepthTiles * 16f;
-        
-        var topOfColumnYPixel = topOfLiquidInColumnY * 16f;
 
-        var currentVertexTopYPixel = y * 16f;
-        var currentVertexBottomYPixel = (y + 1) * 16f;
+        float potencyFactor = 1f - ((float)solidTilesPassedAboveLiquid / (max_solid_tiles_per_scan + 1));
+        potencyFactor = MathHelper.Clamp(potencyFactor, 0f, 1f);
         
-        //factor should be 1 when at the top, and 0 at top + gradientdepth, current y - top of colum gives depth in the column
-        var factorForTopVertices = 1f - ((currentVertexTopYPixel - topOfColumnYPixel) / gradientDepthPixels);
-        var factorForBottomVertices = 1f - ((currentVertexBottomYPixel - topOfColumnYPixel) / gradientDepthPixels);
+        var effectiveTopColor = Color.Lerp(bottomColor, topColor, potencyFactor);
+        
+        float maxGradientPixelDepth = 3 * 100;
 
-        factorForTopVertices = MathHelper.Clamp(factorForTopVertices, 0f, 1f);
-        factorForBottomVertices = MathHelper.Clamp(factorForBottomVertices, 0f, 1f);
+        float tileTopYPixel = y * 16f;
+        float tileBottomYPixel = (y + 1) * 16f;
+
+        float poolTopPixel = topOfActualLiquidSurfaceY * 16f;
+        float depthFactorForTopVertices = (tileTopYPixel - poolTopPixel) / maxGradientPixelDepth;
+        float depthFactorForBottomVertices = (tileBottomYPixel - poolTopPixel) / maxGradientPixelDepth;
+
+        float lerpFactorForTop = 1f - depthFactorForTopVertices;
+        float lerpFactorForBottom = 1f - depthFactorForBottomVertices;
+
+        lerpFactorForTop = MathHelper.Clamp(lerpFactorForTop, 0f, 1f);
+        lerpFactorForBottom = MathHelper.Clamp(lerpFactorForBottom, 0f, 1f);
+
+        byte originalTopLeftAlpha = colors.TopLeftColor.A;
+        byte originalTopRightAlpha = colors.TopRightColor.A;
+        byte originalBottomLeftAlpha = colors.BottomLeftColor.A;
+        byte originalBottomRightAlpha = colors.BottomRightColor.A;
 
         // lerpolate
-        var finalColorForTop = Color.Lerp(bottomColor, topColor, factorForTopVertices);
-        var finalColorForBottom = Color.Lerp(bottomColor, topColor, factorForBottomVertices);
+        var finalColorForTop = Color.Lerp(bottomColor, effectiveTopColor, lerpFactorForTop);
+        var  finalColorForBottom = Color.Lerp(bottomColor, effectiveTopColor, lerpFactorForBottom);
 
-        var originalAlphaTopLeft = colors.TopLeftColor.A;
-        var originalAlphaTopRight = colors.TopRightColor.A;
-        var originalAlphaBottomLeft = colors.BottomLeftColor.A;
-        var originalAlphaBottomRight = colors.BottomRightColor.A;
+        colors.TopLeftColor = finalColorForTop;
+        colors.TopRightColor = finalColorForTop;
+        colors.BottomLeftColor = finalColorForBottom;
+        colors.BottomRightColor = finalColorForBottom;
 
-        colors.TopLeftColor = new Color(finalColorForTop.R, finalColorForTop.G, finalColorForTop.B, originalAlphaTopLeft);
-        colors.TopRightColor = new Color(finalColorForTop.R, finalColorForTop.G, finalColorForTop.B, originalAlphaTopRight);
-        colors.BottomLeftColor = new Color(finalColorForBottom.R, finalColorForBottom.G, finalColorForBottom.B, originalAlphaBottomLeft);
-        colors.BottomRightColor = new Color(finalColorForBottom.R, finalColorForBottom.G, finalColorForBottom.B, originalAlphaBottomRight);
+        colors.TopLeftColor.A = originalTopLeftAlpha;
+        colors.TopRightColor.A = originalTopRightAlpha;
+        colors.BottomLeftColor.A = originalBottomLeftAlpha;
+        colors.BottomRightColor.A = originalBottomRightAlpha;
     }   
 }
