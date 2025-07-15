@@ -1,8 +1,12 @@
+using AllBeginningsMod.Common.Bestiary;
+using AllBeginningsMod.Content.Biomes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent.Bestiary;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
@@ -72,6 +76,8 @@ public class TerrorBatNPC : ModNPC {
         NPC.friendly = false;
         NPC.HitSound = SoundID.NPCHit1;
         NPC.DeathSound = SoundID.NPCDeath2;
+        
+        SpawnModBiomes = [ModContent.GetInstance<UnderworldCorruptionBiome>().Type];
     }
 
     public override void AI() {
@@ -289,6 +295,8 @@ public class TerrorBatNPC : ModNPC {
                 break;
         }
     }
+    
+    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) => bestiaryEntry.AddInfo(this, "");
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
         if (CurrentState == State.IdleOnCeiling || CurrentState == State.WakingUp) {
@@ -314,6 +322,11 @@ public class TerrorBatNPC : ModNPC {
 
             return false;
         }
+
+        if(NPC.IsABestiaryIconDummy) {
+            
+        }
+        
         return true;
     }
 }

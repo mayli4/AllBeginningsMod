@@ -63,6 +63,8 @@ public sealed class DevilOWarNPC : ModNPC {
         NPC.friendly = false;
 
         NPC.HitSound = SoundID.NPCHit23;
+        
+        SpawnModBiomes = [ModContent.GetInstance<UnderworldCorruptionBiome>().Type];
     }
     
     public override void Load() {
@@ -76,16 +78,11 @@ public sealed class DevilOWarNPC : ModNPC {
             _tentacleTrails[i] = new(new Vector2[8], _ => 10);
         }
     }
-
-    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
-        bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
-            SpawnConditions.UnderworldCorruption,
-            new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.AllBeginningsMod.Bestiary.DevilOWarBestiary"))
-        });
-    }
+    
+    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) => bestiaryEntry.AddInfo(this, "");
     
     public override float SpawnChance(NPCSpawnInfo spawnInfo) {
-        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.3f : 0;
+        return spawnInfo.Player.InModBiome<UnderworldCorruptionBiome>() ? 0.1f : 0;
     }
 
     public override void AI() {

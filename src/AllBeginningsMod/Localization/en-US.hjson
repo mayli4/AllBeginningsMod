@@ -157,6 +157,11 @@ Mods: {
 				TownNPCDialogueName: The Underworld Corruption Biome
 			}
 
+			UnderworldCorruption: {
+				DisplayName: Underworld Corruption
+				TownNPCDialogueName: the Underworld Corruption
+			}
+
 			UnderworldCrimsonBiome: {
 				DisplayName: Underworld Crimson Biome
 				TownNPCDialogueName: the Underworld Crimson Biome
@@ -169,6 +174,9 @@ Mods: {
 			UnderworldCorruptLavaDropletSource.MapEntry: Lava Dripping
 		}
 
-		Bestiary.DevilOWarBestiary: Marine life in the underworld? this organism uses hot gases to float in the air, and a sharp stinger to feed off its prey!
+		Bestiary: {
+			DevilOWarNPCBestiary: Marine life in the underworld? this organism uses hot gases to float in the air, and a sharp stinger to feed off its prey!
+			TerrorBatNPCBestiary: The terror bat grooves and dives in the air, while also using its acidic spit as a weapon that you wouldn't want to stain your clothes!
+		}
 	}
 }
