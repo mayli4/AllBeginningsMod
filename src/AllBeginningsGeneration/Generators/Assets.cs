@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace SourceGeneration.Generators;
 
-file enum AssetType {
+public enum AssetType {
     Texture2D,
     Effect
 }
 
-file readonly record struct AssetFile(string Path, string Folder, string Name, string Extension, AssetType AssetType) {
+public readonly record struct AssetFile(string Path, string Folder, string Name, string Extension, AssetType AssetType) {
     public string Path { get; } = Path;
     public string Folder { get; } = Folder;
     public string Name { get; } = Name;
@@ -21,7 +21,7 @@ file readonly record struct AssetFile(string Path, string Folder, string Name, s
 }
 
 [Generator(LanguageNames.CSharp)]
-file sealed class AssetGenerator : IIncrementalGenerator {
+public sealed class AssetGenerator : IIncrementalGenerator {
     private const string image_extension = ".png";
     private const string effect_extension = ".fxc";
 
