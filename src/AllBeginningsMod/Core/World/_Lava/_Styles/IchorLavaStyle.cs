@@ -13,7 +13,7 @@ public class IchorLavafall : ModWaterfallStyle {
     public override string Texture => Assets.Assets.Textures.Lavas.KEY_IchorLavafall;
 }
 
-public class IchorLava : LavaStyle {
+public class IchorModLava : ModLavaStyle {
     public override string LavaTexturePath => Assets.Assets.Textures.Lavas.KEY_IchorLava;
 
     public override string BlockTexturePath => LavaTexturePath + "_Block";

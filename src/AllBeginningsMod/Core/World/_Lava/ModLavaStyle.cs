@@ -25,7 +25,7 @@ public enum LiquidTileType {
     Slope
 }
 
-public abstract class LavaStyle : ModTexturedType {
+public abstract class ModLavaStyle : ModTexturedType {
     internal Texture2D LavaTexture;
     internal Texture2D BlockTexture;
     internal Texture2D SlopeTexture;
@@ -48,7 +48,7 @@ public abstract class LavaStyle : ModTexturedType {
     
     public override void Register() {
         LavaStyleLoader.RegisterStyle(this);
-        ModTypeLookup<LavaStyle>.Register(this);
+        ModTypeLookup<ModLavaStyle>.Register(this);
     }
 
     public abstract string LavaTexturePath { get; }
@@ -59,7 +59,7 @@ public abstract class LavaStyle : ModTexturedType {
 
     public abstract int ChooseWaterfallStyle();
 
-    public virtual int DebuffType() { return BuffID.OnFire; }
+    public virtual int DebuffType() => BuffID.OnFire;
     
     public virtual bool KeepVanillaOnFire() => false;
 

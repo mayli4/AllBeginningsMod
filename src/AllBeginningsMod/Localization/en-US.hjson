@@ -60,6 +60,11 @@ Mods: {
 				DisplayName: Underworld Demonite Item
 				Tooltip: ""
 			}
+
+			DevilOWarHeartPickup: {
+				DisplayName: Devil O War Heart Pickup
+				Tooltip: ""
+			}
 		}
 
 		NPCs: {

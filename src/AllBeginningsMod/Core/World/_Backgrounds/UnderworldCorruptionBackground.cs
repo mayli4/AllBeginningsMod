@@ -15,6 +15,8 @@ namespace AllBeginningsMod.Core.World;
 //this sucks soo bad dude, i dont wanna have to touych this ever again
 // most code taken from lion8cake with permission
 
+//there are a few bugs  with this, and id like to rewrite it again later on but no promises (bugs will get fixed thouhg)
+
 public class UnderworldCorruptionBackground : ModSystem {
     public Asset<Texture2D>[] BackgroundTextures = new Asset<Texture2D>[5];
 

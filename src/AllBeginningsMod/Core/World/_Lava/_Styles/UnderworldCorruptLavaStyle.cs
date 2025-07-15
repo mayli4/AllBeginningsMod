@@ -12,7 +12,7 @@ public class UnderworldCorruptLavafall : ModWaterfallStyle {
     public override string Texture => Assets.Assets.Textures.Lavas.KEY_UnderworldCorruptLavafall;
 }
 
-public class UnderworldCorruptLava : LavaStyle {
+public class UnderworldCorruptModLava : ModLavaStyle {
     public override string LavaTexturePath => Assets.Assets.Textures.Lavas.KEY_UnderworldCorruptLava;
 
     public override string BlockTexturePath => LavaTexturePath + "_Block";

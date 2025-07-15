@@ -23,22 +23,22 @@ namespace AllBeginningsMod.Core.World;
 //
 
 public class LavaStyleLoader : ModSystem {
-    internal static List<LavaStyle> CustomLavaStyles = new List<LavaStyle>();
+    internal static List<ModLavaStyle> CustomLavaStyles = new List<ModLavaStyle>();
     internal static Texture2D LavaBlockTexture;
     internal static Texture2D LavaTexture;
     internal static Texture2D LavaSlopeTexture;
     
-    private static LavaStyle _cachedLavaStyle;
+    private static ModLavaStyle _cachedModLavaStyle;
 
     private static readonly MethodInfo textureGetValueMethod = typeof(Asset<Texture2D>).GetMethod("get_Value", BindingFlags.Public | BindingFlags.Instance);
 
-    public static void RegisterStyle(LavaStyle lavaStyle) {
-        lavaStyle.Type = CustomLavaStyles.Count;
-        CustomLavaStyles.Add(lavaStyle);
+    public static void RegisterStyle(ModLavaStyle modLavaStyle) {
+        modLavaStyle.Type = CustomLavaStyles.Count;
+        CustomLavaStyles.Add(modLavaStyle);
     }
 
     public override void Load() {
-        CustomLavaStyles = new List<LavaStyle>();
+        CustomLavaStyles = new List<ModLavaStyle>();
 
         if (Main.netMode != NetmodeID.Server) {
             LavaBlockTexture = ModContent.Request<Texture2D>("Terraria/Images/Liquid_1", AssetRequestMode.ImmediateLoad).Value;
@@ -49,7 +49,7 @@ public class LavaStyleLoader : ModSystem {
 
     public override void Unload() {
         if (CustomLavaStyles != null)
-            foreach (LavaStyle lavaStyle in CustomLavaStyles)
+            foreach (ModLavaStyle lavaStyle in CustomLavaStyles)
                 lavaStyle?.Unload();
 
         CustomLavaStyles = null;
@@ -85,8 +85,8 @@ public class LavaStyleLoader : ModSystem {
             c.EmitPop();
             c.EmitDelegate(() =>
             {
-                if(_cachedLavaStyle != null)
-                    return _cachedLavaStyle.GetSplashDust();
+                if(_cachedModLavaStyle != null)
+                    return _cachedModLavaStyle.GetSplashDust();
                 else return DustID.Lava;
             });
         }
@@ -99,8 +99,8 @@ public class LavaStyleLoader : ModSystem {
             c.EmitPop();
             c.EmitDelegate(() =>
             {
-                if(_cachedLavaStyle != null)
-                    return _cachedLavaStyle.GetSplashDust();
+                if(_cachedModLavaStyle != null)
+                    return _cachedModLavaStyle.GetSplashDust();
                 else return DustID.Lava;
             });
         }
@@ -120,8 +120,8 @@ public class LavaStyleLoader : ModSystem {
             c.EmitPop();
             c.EmitDelegate(() =>
             {
-                if(_cachedLavaStyle != null)
-                    return _cachedLavaStyle.GetSplashDust();
+                if(_cachedModLavaStyle != null)
+                    return _cachedModLavaStyle.GetSplashDust();
                 else return DustID.Lava;
             });
         }
@@ -139,8 +139,8 @@ public class LavaStyleLoader : ModSystem {
             c.EmitPop();
             c.EmitDelegate(() =>
             {
-                if(_cachedLavaStyle != null)
-                    return _cachedLavaStyle.GetSplashDust();
+                if(_cachedModLavaStyle != null)
+                    return _cachedModLavaStyle.GetSplashDust();
                 else return DustID.Lava;
             });
         }
@@ -159,8 +159,8 @@ public class LavaStyleLoader : ModSystem {
             c.EmitPop();
             c.EmitDelegate(() =>
             {
-                if(_cachedLavaStyle != null)
-                    return _cachedLavaStyle.GetSplashDust();
+                if(_cachedModLavaStyle != null)
+                    return _cachedModLavaStyle.GetSplashDust();
                 else return DustID.Lava;
             });
         }
@@ -179,8 +179,8 @@ public class LavaStyleLoader : ModSystem {
             c.EmitPop();
             c.EmitDelegate(() =>
             {
-                if(_cachedLavaStyle != null)
-                    return _cachedLavaStyle.GetSplashDust();
+                if(_cachedModLavaStyle != null)
+                    return _cachedModLavaStyle.GetSplashDust();
                 else return DustID.Lava;
             });
         }
@@ -190,8 +190,8 @@ public class LavaStyleLoader : ModSystem {
         if (initialLavafallStyle != 1)
             return initialLavafallStyle;
 
-        if (_cachedLavaStyle != default) {
-            int waterfallStyle = _cachedLavaStyle.ChooseWaterfallStyle();
+        if (_cachedModLavaStyle != default) {
+            int waterfallStyle = _cachedModLavaStyle.ChooseWaterfallStyle();
             if (waterfallStyle >= 0)
                 return waterfallStyle;
         }
@@ -203,22 +203,22 @@ public class LavaStyleLoader : ModSystem {
         if (initialLavafallStyle != 1)
             return initialLavafallColor;
 
-        if (_cachedLavaStyle != default) {
-            _cachedLavaStyle.SelectLightColor(ref initialLavafallColor);
+        if (_cachedModLavaStyle != default) {
+            _cachedModLavaStyle.SelectLightColor(ref initialLavafallColor);
             return initialLavafallColor;
         }
 
         return initialLavafallColor;
     }
         
-    public static LavaStyle Get(int type) => CustomLavaStyles[type];
+    public static ModLavaStyle Get(int type) => CustomLavaStyles[type];
 
     private static void CacheLavaStyle(On_Main.orig_RenderWater orig, Main self) {
-        _cachedLavaStyle = default;
+        _cachedModLavaStyle = default;
 
         foreach (ModBiome biome in ModContent.GetContent<ModBiome>()) {
             if (biome is IHasCustomLavaBiome customLavaBiome && Main.LocalPlayer.InModBiome(biome)) {
-                _cachedLavaStyle = customLavaBiome.LavaStyle;
+                _cachedModLavaStyle = customLavaBiome.ModLavaStyle;
                 break;
             }
         }
@@ -282,9 +282,9 @@ public class LavaStyleLoader : ModSystem {
         cursor.Emit(OpCodes.Ldloc, 4);
         
         cursor.EmitDelegate<Func<VertexColors, Texture2D, int, int, int, VertexColors>>((initialColor, initialTexture, liquidType, x, y) => {
-            if (_cachedLavaStyle != default) {
+            if (_cachedModLavaStyle != default) {
                 initialColor = SelectLavaQuadColor(initialTexture, ref initialColor, liquidType == 1);
-                _cachedLavaStyle.ModifyVertexColors(x, y, ref initialColor);
+                _cachedModLavaStyle.ModifyVertexColors(x, y, ref initialColor);
             }
             
             return initialColor;
@@ -304,17 +304,17 @@ public class LavaStyleLoader : ModSystem {
             initialTexture != LavaStyleLoader.LavaSlopeTexture)
             return initialTexture;
 
-        if (_cachedLavaStyle == default)
+        if (_cachedModLavaStyle == default)
             return initialTexture;
 
         switch (type)
         {
             case LiquidTileType.Block:
-                return _cachedLavaStyle.BlockTexture;
+                return _cachedModLavaStyle.BlockTexture;
             case LiquidTileType.Fall:
-                return _cachedLavaStyle.LavaTexture;
+                return _cachedModLavaStyle.LavaTexture;
             case LiquidTileType.Slope:
-                return _cachedLavaStyle.SlopeTexture;
+                return _cachedModLavaStyle.SlopeTexture;
         }
 
         return initialTexture;
@@ -328,21 +328,21 @@ public class LavaStyleLoader : ModSystem {
                 return initialColor;
         }
 
-        if (_cachedLavaStyle == default)
+        if (_cachedModLavaStyle == default)
             return initialColor;
 
-        _cachedLavaStyle.SelectLightColor(ref initialColor.TopLeftColor);
-        _cachedLavaStyle.SelectLightColor(ref initialColor.TopRightColor);
-        _cachedLavaStyle.SelectLightColor(ref initialColor.BottomLeftColor);
-        _cachedLavaStyle.SelectLightColor(ref initialColor.BottomRightColor);
+        _cachedModLavaStyle.SelectLightColor(ref initialColor.TopLeftColor);
+        _cachedModLavaStyle.SelectLightColor(ref initialColor.TopRightColor);
+        _cachedModLavaStyle.SelectLightColor(ref initialColor.BottomLeftColor);
+        _cachedModLavaStyle.SelectLightColor(ref initialColor.BottomRightColor);
         return initialColor;
     }
     
     private void On_TileLightScanner_ApplyLiquidLight(On_TileLightScanner.orig_ApplyLiquidLight orig, TileLightScanner self, Tile tile, ref Vector3 lightColor) {
         orig.Invoke(self, tile, ref lightColor);
-        if (tile.LiquidType == LiquidID.Lava && _cachedLavaStyle != default) {
+        if (tile.LiquidType == LiquidID.Lava && _cachedModLavaStyle != default) {
             var currentLightColor = new Color(lightColor.X, lightColor.Y, lightColor.Z);
-            _cachedLavaStyle.SelectLightColor(ref currentLightColor);
+            _cachedModLavaStyle.SelectLightColor(ref currentLightColor);
             lightColor = new Vector3(currentLightColor.R / 255f, currentLightColor.G / 255f, currentLightColor.B / 255f);
         }
     }
@@ -354,15 +354,15 @@ public class LavaStyleLoader : ModSystem {
         c.EmitLdloc(161);
         c.EmitDelegate((Player player, int onFiretime) =>
         {
-            if(_cachedLavaStyle != default) {
-                player.AddBuff(_cachedLavaStyle.DebuffType(), onFiretime);
+            if(_cachedModLavaStyle != default) {
+                player.AddBuff(_cachedModLavaStyle.DebuffType(), onFiretime);
             }
         });
         
         c.GotoNext(MoveType.Before, i => i.MatchLdloc(161), i => i.MatchLdcI4(1), i => i.MatchLdcI4(0), i => i.MatchCall<Player>("AddBuff"));
         c.EmitDelegate<Func<int, int>>((vanillaOnFireTime) => {
-            if (_cachedLavaStyle != default) {
-                return _cachedLavaStyle.KeepVanillaOnFire() ? vanillaOnFireTime : 0;
+            if (_cachedModLavaStyle != default) {
+                return _cachedModLavaStyle.KeepVanillaOnFire() ? vanillaOnFireTime : 0;
             }
             return vanillaOnFireTime;
         });

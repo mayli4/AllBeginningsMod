@@ -6,7 +6,7 @@ namespace AllBeginningsMod.Utilities;
 /// <summary>
 ///     Caches given positions.
 /// </summary>
-public readonly struct PositionCache(int length) {
+public readonly struct PositionCache(int length) {  
     public readonly Vector2[] Positions = new Vector2[length];
     public int Count => Positions.AsSpan().Length;
 
