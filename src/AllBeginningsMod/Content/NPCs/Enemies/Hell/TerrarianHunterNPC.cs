@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Core.Loaders;
-using AllBeginningsMod.Common.PrimitiveDrawing;
+﻿using AllBeginningsMod.Common.PrimitiveDrawing;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -393,7 +392,7 @@ internal class TerrarianHunterNPC : ModNPC {
             * Main.GameViewMatrix.TransformationMatrix
             * Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
 
-        Effect effect = EffectLoader.GetEffect("Trail::Fire");
+        Effect effect = Assets.Assets.Effects.Compiled.Trail.Fire.Value;
         effect.Parameters["sampleTexture"].SetValue(Mod.Assets.Request<Texture2D>("Assets/Textures/Sample/Noise2", AssetRequestMode.ImmediateLoad).Value);
         effect.Parameters["transformationMatrix"].SetValue(transformationMatrix);
         effect.Parameters["amp"].SetValue(0.15f);
@@ -464,7 +463,7 @@ internal class TerrarianHunterNPC : ModNPC {
                 0f
             );
 
-            SpriteBatchData snapshot = spriteBatch.Capture();
+            SpriteBatchSnapshot snapshot = spriteBatch.Capture();
             spriteBatch.End();
             spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });
 

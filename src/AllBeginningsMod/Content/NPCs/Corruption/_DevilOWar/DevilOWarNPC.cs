@@ -47,6 +47,8 @@ public sealed class DevilOWarNPC : ModNPC {
     public Vector2 DrawScale = Vector2.One;
     public float Pulsation;
 
+    private int _totalLifeDrained;
+
     public override void SetDefaults() {
         NPC.width = 36;
         NPC.height = 36;
@@ -335,7 +337,7 @@ public sealed class DevilOWarNPC : ModNPC {
             
             Vector2 bodyDrawPosition = NPC.Center + offset - Main.screenPosition;
             
-            SpriteBatchData capture = spriteBatch.Capture();
+            SpriteBatchSnapshot capture = spriteBatch.Capture();
             spriteBatch.End();
             spriteBatch.Begin(capture);
 

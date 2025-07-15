@@ -1,5 +1,4 @@
 ﻿using AllBeginningsMod.Common.Bases.NPCs;
-using AllBeginningsMod.Core.Loaders;
 using AllBeginningsMod.Content.CameraModifiers;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Content.Items.Materials;
@@ -112,15 +111,15 @@ internal class MineVampireNPC : VampireNPC {
         Vector2 scale = Vector2.One * (1f + 0.25f * explodingProgress);
         float rotation = NPC.rotation + MathF.Sin(Main.GameUpdateCount * 0.3f) * 0.5f * shake;
 
-        Effect fishEyeEffect = EffectLoader.GetEffect("Pixel::FishEye");
+        Effect fishEyeEffect = Assets.Assets.Effects.Compiled.Pixel.FishEye.Value;
         fishEyeEffect.Parameters["strength"].SetValue(explodingProgress * 2f);
         fishEyeEffect.Parameters["uImageSize0"].SetValue(texture.Size());
         fishEyeEffect.Parameters["uSourceRect"].SetValue(new Vector4(0f, 0f, texture.Width, texture.Height));
         fishEyeEffect.Parameters["center"].SetValue(Vector2.One * 0.5f);
 
-        SpriteBatchData snapshot = spriteBatch.Capture();
+        SpriteBatchSnapshot snapshot = spriteBatch.Capture();
         spriteBatch.End();
-        spriteBatch.Begin(snapshot with { Effect = fishEyeEffect });
+        spriteBatch.Begin(snapshot with { CustomEffect = fishEyeEffect });
 
         spriteBatch.Draw(
             texture,

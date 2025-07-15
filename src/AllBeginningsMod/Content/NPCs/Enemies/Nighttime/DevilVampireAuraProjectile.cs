@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Core.Loaders;
-using AllBeginningsMod.Common.Rendering;
+﻿using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Content.Buffs;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
@@ -84,7 +83,7 @@ internal class DevilVampireAuraProjectile : ModProjectile {
         {
             float effectProgress = MathF.Min(-MathF.Pow(progress / 2f - 1f, 2) + 1f, 1f);
 
-            Effect effect = EffectLoader.GetEffect("Pixel::ExplosionSmoke");
+            Effect effect = Assets.Assets.Effects.Compiled.Pixel.ExplosionSmoke.Value;
             effect.Parameters["progress"].SetValue(effectProgress);
             effect.Parameters["time"].SetValue(Main.GameUpdateCount * 0.0001f + offsetRotation);
 
@@ -99,8 +98,8 @@ internal class DevilVampireAuraProjectile : ModProjectile {
 
             float size = Projectile.width + 250;
 
-            Main.spriteBatch.End(out SpriteBatchData snapshot);
-            Main.spriteBatch.Begin(snapshot with { Effect = effect });
+            Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
+            Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
             Main.spriteBatch.Draw(
                 baseTexture,
                 new Rectangle(

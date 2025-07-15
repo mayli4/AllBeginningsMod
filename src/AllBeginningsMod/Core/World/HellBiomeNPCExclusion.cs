@@ -29,7 +29,7 @@ internal sealed class HellBiomeExclusionGlobalNPC : ModSystem {
         c.EmitLdloc(14);
         c.EmitDelegate((int k) =>
         {
-            return !Main.player[k].InModBiome<UnderworldCorruptionBiome>();
+            return !Main.player[k].InModBiome<UnderworldCorruptionBiome>() || Main.player[k].InModBiome<UnderworldCrimsonBiome>();
         });
         c.EmitBrfalse(IL_10d3d);
     }

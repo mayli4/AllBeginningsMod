@@ -20,7 +20,7 @@ public sealed class DevilOWarStingerProjectile : ModProjectile {
     private int _healthDrained;
     private int _healthDrainTimer;
     private const int health_drain_interval = 30;
-    private const int health_drain_amount = 5;
+    private const int health_drain_amount = 10;
     private const float health_return_percentage = 0.75f;
 
     public override void SetDefaults() {
@@ -37,9 +37,6 @@ public sealed class DevilOWarStingerProjectile : ModProjectile {
 
     public override void AI() {
         if (!ParentNPC.active || ParentNPC.life <= 0 || ParentNPC.type != ModContent.NPCType<DevilOWarNPC>()) {
-            if (!IsRetracting)
-                ReturnHealthOnKill();
-            
             Projectile.Kill();
             return;
         }
@@ -105,17 +102,7 @@ public sealed class DevilOWarStingerProjectile : ModProjectile {
         }
     }
 
-    private void ReturnHealthOnKill() {
-        if (_healthDrained > 0 && TargetPlayer.active) {
-            int healthToReturn = (int)(_healthDrained * health_return_percentage);
-            TargetPlayer.statLife += healthToReturn;
-            TargetPlayer.HealEffect(healthToReturn, true);
-            
-        }
-    }
-
     private void DespawnIntoDangling() {
-        ReturnHealthOnKill();
         if (ParentNPC.active 
             && ParentNPC.ModNPC is DevilOWarNPC devilOWarNPC) {
             if (devilOWarNPC._stingerProjectileId == Projectile.whoAmI) {
@@ -128,14 +115,27 @@ public sealed class DevilOWarStingerProjectile : ModProjectile {
 
 
     public override void OnKill(int timeLeft) {
+        if (_healthDrained > 0 && TargetPlayer.active) {
+            int healthToReturn = (int)(_healthDrained * health_return_percentage);
+            if (healthToReturn > 0) {
+                int newItemIndex = Item.NewItem(
+                    Projectile.GetSource_OnHit(TargetPlayer),
+                    ParentNPC.Center,
+                    1,
+                    1,
+                    ModContent.ItemType<DevilOWarHeartPickup>()
+                );
+
+                if (newItemIndex != -1) {
+                    Main.item[newItemIndex].damage = healthToReturn;
+                }
+            }
+        }
+
         if (ParentNPC.active 
             && ParentNPC.ModNPC is DevilOWarNPC devilOWarNPC 
             && devilOWarNPC._stingerProjectileId == Projectile.whoAmI) {
-            ReturnHealthOnKill();
             devilOWarNPC._stingerProjectileId = -1;
-        }
-        else if (!ParentNPC.active) {
-             ReturnHealthOnKill();
         }
     }
 

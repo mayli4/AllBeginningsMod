@@ -178,7 +178,7 @@ internal sealed class PlasmicRepeaterHeldProjectile : ModProjectile {
         Vector2 origin = new(75f - recoilOffset, 26f);
         float rotation = Projectile.rotation + (Player.direction == -1 ? MathHelper.Pi : 0);
 
-        Main.spriteBatch.End(out SpriteBatchData snapshot);
+        Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
         Main.spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });
 
         Texture2D glowTexture = Mod.Assets.Request<Texture2D>("Assets/Textures/Misc/Glow2", AssetRequestMode.ImmediateLoad).Value;

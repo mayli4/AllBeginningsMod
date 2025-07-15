@@ -1,7 +1,6 @@
 using AllBeginningsMod.Content.Tiles.Corruption;
 using AllBeginningsMod.Content.Tiles.Crimson;
 using System;
-using Terraria;
 using Terraria.ModLoader;
 using CorruptAsh = AllBeginningsMod.Content.Tiles.Corruption.CorruptAsh;
 

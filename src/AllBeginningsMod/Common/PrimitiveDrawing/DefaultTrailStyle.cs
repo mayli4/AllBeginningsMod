@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using Terraria;
 
 namespace AllBeginningsMod.Common.PrimitiveDrawing; 
+
 internal class DefaultTrailStyle : ITrailStyle {
     public int VertexCount(int trailPositionCount) => trailPositionCount * 2;
 

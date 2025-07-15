@@ -23,7 +23,7 @@ internal class MistaBombProjectile : ModProjectile {
     private float Progress => 1f - (float)Projectile.timeLeft / maxTimeLeft;
     private PrimitiveTrail trail;
     private PrimitiveTrail sparkleTrail;
-    private OldPositionCache positionCache;
+    private PositionCache positionCache;
     private bool trailInit;
     private readonly float explodingTime = 0.85f;
 
