@@ -8,7 +8,7 @@ using Terraria.GameContent;
 namespace AllBeginningsMod.Utilities;
 
 public static class SpritebatchExtensions {
-        public static void Begin(this SpriteBatch spriteBatch, SpriteBatchSnapshot data) {
+    public static void Begin(this SpriteBatch spriteBatch, SpriteBatchSnapshot data) {
         spriteBatch.Begin(
             data.SortMode,
             data.BlendState,
@@ -48,7 +48,7 @@ public static class SpritebatchExtensions {
     }
 
     public static SpriteBatchSnapshot Capture(this SpriteBatch spriteBatch) {
-        return SpriteBatchSnapshot.Capture(spriteBatch);
+        return new(spriteBatch);
     }
 
     public static void DrawAdditive(this SpriteBatch spriteBatch,
@@ -84,7 +84,7 @@ public static class SpritebatchExtensions {
         snapshot = spriteBatch.Capture();
         spriteBatch.End();
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void DrawLine(this SpriteBatch sb, Vector2 start, Vector2 end, Color? color = null, int width = 1, Texture2D? texture = null) {
         var offset = end - start;
@@ -96,7 +96,7 @@ public static class SpritebatchExtensions {
 
         sb.Draw(texture ?? TextureAssets.BlackTile.Value, rect, null, color ?? Color.White, angle, Vector2.Zero, SpriteEffects.None, 0f);
     }
-    
+
     public static void DrawRect(this SpriteBatch sb, Rectangle rect, Color? color = null, int thickness = 1, Texture2D? texture = null) {
         var finalColor = color ?? Color.White;
 

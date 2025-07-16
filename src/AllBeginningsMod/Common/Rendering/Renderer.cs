@@ -8,7 +8,7 @@ using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace AllBeginningsMod.Common.Rendering; 
+namespace AllBeginningsMod.Common.Rendering;
 internal enum RenderLayer : byte {
     Tiles,
     Projectiles,
@@ -65,7 +65,7 @@ internal class Renderer : ILoadable {
     private static void RunRenderActions(RenderLayer layer, RenderOrder order, bool shouldStartSpriteBatch) {
         int idx = (int)layer * 2 + (order == RenderOrder.Over ? 1 : 0);
         if(shouldStartSpriteBatch) {
-            Main.spriteBatch.Begin(SpriteBatchSnapshot.Default());
+            Main.spriteBatch.Begin(new());
         }
 
         foreach((Action action, RenderStyle style) in RenderActions[idx]) {
@@ -122,7 +122,7 @@ internal class Renderer : ILoadable {
         device.SetRenderTarget(effectTarget);
         device.Clear(Color.Transparent);
 
-        spriteBatch.Begin(SpriteBatchSnapshot.Default() with { TransformMatrix = Main.GameViewMatrix.EffectMatrix });
+        spriteBatch.Begin(new() { TransformMatrix = Main.GameViewMatrix.EffectMatrix });
         action();
         spriteBatch.End();
 
@@ -132,7 +132,7 @@ internal class Renderer : ILoadable {
             RenderTargetUsageProperty.SetValue(bindings[0].RenderTarget, RenderTargetUsage.DiscardContents);
         }
 
-        spriteBatch.Begin(SpriteBatchSnapshot.Default() with { CustomEffect = effect });
+        spriteBatch.Begin(new() { CustomEffect = effect });
         spriteBatch.Draw(effectTarget, Vector2.Zero, Color.White);
         spriteBatch.End();
 
