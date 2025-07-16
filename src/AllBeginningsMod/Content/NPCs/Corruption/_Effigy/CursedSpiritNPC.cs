@@ -4,7 +4,10 @@ using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -13,12 +16,54 @@ using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.NPCs.Corruption;
 
+public enum SpiritType {
+    Splitter,
+    Exploder,
+    Ram,
+}
+
+public enum RamState {
+    FlyAround,
+    Dash,
+    Concussion,
+    Charge
+}
+
+[StructLayout(LayoutKind.Explicit)]
+public struct SpiritData {
+    [FieldOffset(0)]
+    public RamData Ram;
+
+    public struct RamData {
+        public Vector2 DashDirection;
+    }
+}
+
 public sealed class CursedSpiritNPC : ModNPC {
-    byte _spiritType;
+    SpiritType SpiritType {
+        get => Unsafe.BitCast<float, SpiritType>(NPC.ai[0]);
+        set => NPC.ai[0] = Unsafe.BitCast<SpiritType, float>(value);
+    }
+    SpiritData _data;
+
+    ref float Timer => ref NPC.ai[1];
+
     PrimitiveTrail _ghostTrail;
     Vector2 _directionToTarget;
 
+    float _lookOffset;
+    Vector2 _lookDirection;
     Player Target => Main.player[NPC.target];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    T State<T>() where T : struct => Unsafe.BitCast<float, T>(NPC.ai[2]);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void SetState<T>(T state) where T : struct {
+        NPC.ai[2] = Unsafe.BitCast<T, float>(state);
+        NPC.netUpdate = true;
+        Timer = 0;
+    }
 
     public override string Texture => Assets.Assets.Textures.NPCs.Corruption.Effigy.KEY_CursedSpiritMasks;
 
@@ -35,6 +80,7 @@ public sealed class CursedSpiritNPC : ModNPC {
         NPC.noGravity = true;
         NPC.knockBackResist = 0.05f;
         NPC.friendly = false;
+        NPC.damage = 20;
 
         NPC.HitSound = SoundID.NPCHit23;
 
@@ -46,13 +92,19 @@ public sealed class CursedSpiritNPC : ModNPC {
     }
 
     public override void OnSpawn(IEntitySource source) {
-        _spiritType = (byte)Main.rand.Next(0, 3);
+        // _type = (SpiritType)Main.rand.Next(0, 3);
+        SpiritType = SpiritType.Ram;
+        switch(SpiritType) {
+            case SpiritType.Ram:
+                SetState(RamState.FlyAround);
+                break;
+        }
     }
 
     public override void AI() {
         const float TrailSize = 55;
         _ghostTrail ??= new(
-            Enumerable.Repeat(NPC.Center, 14).ToArray(),
+            Enumerable.Repeat(NPC.Center, 12).ToArray(),
             static t => TrailSize,
             static t => Color.Lerp(_ghostColor1, _ghostColor2, t + 0.7f)
         );
@@ -60,15 +112,67 @@ public sealed class CursedSpiritNPC : ModNPC {
         NPC.TargetClosest();
         if(Target != null) _directionToTarget = NPC.Center.DirectionTo(Target.Center);
 
-        NPC.velocity += _directionToTarget * 0.2f;
-        switch(_spiritType) {
-            case 0:
+        var moveSpeed = NPC.velocity.Length();
+        var moveDirection = NPC.velocity / moveSpeed;
+
+        switch(SpiritType) {
+            case SpiritType.Splitter:
                 break;
-            case 1:
+            case SpiritType.Exploder:
                 break;
-            case 2:
+            case SpiritType.Ram:
+                switch(State<RamState>()) {
+                    case RamState.FlyAround:
+                        UpdateLookDirection(_directionToTarget);
+                        _lookOffset = MathF.Min(_lookOffset + 0.1f, 0.6f);
+
+                        var targetPosition = Target.Center + (Main.GameUpdateCount * 0.04f + NPC.whoAmI).ToRotationVector2() * 520;
+                        NPC.velocity += NPC.Center.DirectionTo(targetPosition) * 0.3f;
+                        NPC.velocity *= 0.95f;
+
+                        if(Timer > 60 * 5 && Main.netMode != NetmodeID.MultiplayerClient) {
+                            SetState(RamState.Charge);
+                        }
+
+                        break;
+                    case RamState.Charge:
+                        UpdateLookDirection(_directionToTarget);
+
+                        NPC.velocity *= 0.99f;
+                        if(Timer > 60 * 1.5f && Main.netMode != NetmodeID.MultiplayerClient) {
+                            _data.Ram.DashDirection = _directionToTarget;
+                            NPC.velocity = _data.Ram.DashDirection * 0.8f;
+                            SetState(RamState.Dash);
+                        }
+
+                        break;
+                    case RamState.Dash:
+                        UpdateLookDirection(moveDirection);
+                        _lookOffset = MathF.Min(moveSpeed * 0.25f, 1f);
+
+                        NPC.velocity += _data.Ram.DashDirection * 0.7f;
+                        NPC.velocity *= 0.97f;
+
+                        if(Timer > 120) {
+                            SetState(RamState.FlyAround);
+                        }
+
+                        break;
+                    case RamState.Concussion:
+                        NPC.rotation += 1.2f / (Timer * 0.1f + 1f);
+                        _lookOffset = 0f;
+
+                        NPC.velocity *= 0.97f;
+                        if(Timer > 120 && Main.netMode != NetmodeID.MultiplayerClient) {
+                            SetState(RamState.FlyAround);
+                        }
+
+                        break;
+                }
                 break;
         }
+
+        Timer += 1;
 
         var i = _ghostTrail.Positions.Length - 1;
         while(i > 0) {
@@ -89,13 +193,43 @@ public sealed class CursedSpiritNPC : ModNPC {
             Lighting.AddLight(NPC.Center, _ghostColor1.ToVector3() * 0.75f);
         }
 
-        var maxRotation = 0.25f;
-        NPC.rotation = Math.Clamp(NPC.velocity.X * 0.025f, -maxRotation, maxRotation);
+    }
 
-        // var moveDirection = NPC.velocity.SafeNormalize(Vector2.UnitX);
-        // var movedCenter = NPC.Center + NPC.velocity;
-        // _ghostTrail.Positions[0] = movedCenter + moveDirection * TrailSize / 2;
-        // _ghostTrail.Positions[1] = movedCenter - moveDirection * TrailSize / 2;
+    void UpdateLookDirection(Vector2 direction) {
+        _lookDirection = direction;
+
+        NPC.direction = _lookDirection.X > 0 ? 1 : -1;
+        NPC.rotation = _lookDirection.ToRotation();
+    }
+
+    public override void SendExtraAI(BinaryWriter writer) {
+        unsafe {
+            var ptr = Unsafe.AsPointer(ref _data);
+            var span = new ReadOnlySpan<byte>(ptr, Unsafe.SizeOf<SpiritData>());
+            writer.Write(span);
+        }
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader) {
+        var bytes = new byte[Unsafe.SizeOf<SpiritData>()];
+
+        var len = reader.Read(bytes);
+        if(len != bytes.Length) throw new Exception("Unexpected byte count..");
+
+        unsafe {
+            fixed(void* ptr = bytes) {
+                _data = Unsafe.Read<SpiritData>(ptr);
+            }
+        }
+    }
+
+    public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo) {
+        switch(SpiritType) {
+            case SpiritType.Ram:
+                NPC.velocity = -NPC.velocity;
+                SetState(RamState.Concussion);
+                break;
+        }
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
@@ -114,7 +248,7 @@ public sealed class CursedSpiritNPC : ModNPC {
         var t = (MathF.Sin(0.1f * Main.GameUpdateCount + 23.2f * NPC.whoAmI) + MathF.Cos(0.06f * Main.GameUpdateCount) + 2f) / 4f;
         spriteBatch.Draw(
             glowTexture,
-            NPC.Center - screenPos,
+            NPC.Center - screenPos - _lookDirection * _lookOffset * 12f,
             null,
             _ghostColor2 * (0.3f + 0.3f * t),
             0f,
@@ -138,40 +272,60 @@ public sealed class CursedSpiritNPC : ModNPC {
 
         spriteBatch.EndBegin(snapshot);
 
-        var maskTexture = TextureAssets.Npc[Type].Value;
+        var maskPositionOffset = _lookDirection * _lookOffset * 10f;
+        if(SpiritType == SpiritType.Ram && State<RamState>() == RamState.Charge) {
+            maskPositionOffset += Main.rand.NextVector2Unit() * Timer * 0.01f;
+        }
+
+        var maskTexture = TextureAssets.Npc[base.Type].Value;
         var maskSource = new Rectangle(
-            _spiritType switch
+            SpiritType switch
             {
-                0 => 0,
-                1 => 44,
+                SpiritType.Splitter => 0,
+                SpiritType.Exploder => 44,
                 _ => 100,
             },
             0,
-            _spiritType switch
+            SpiritType switch
             {
-                0 => 44,
-                1 => 54,
+                SpiritType.Splitter => 44,
+                SpiritType.Exploder => 54,
                 _ => 54,
             },
             44
         );
 
-        var originOffset = _spiritType switch
+        var originOffset = SpiritType switch
         {
-            1 => Vector2.UnitY * 3,
+            SpiritType.Splitter => Vector2.UnitY * -2,
+            SpiritType.Exploder => Vector2.UnitY * 3,
             _ => Vector2.Zero,
         };
 
         Main.EntitySpriteDraw(
             maskTexture,
-            NPC.Center - screenPos,
+            NPC.Center - screenPos + maskPositionOffset,
             maskSource,
             drawColor,
-            NPC.rotation,
+            NPC.direction == 1 ? NPC.rotation : NPC.rotation + MathF.PI,
             maskSource.Size() / 2f + originOffset,
-            NPC.scale,
+            NPC.scale * new Vector2(1f - _lookOffset * 0.15f, 1),
             NPC.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally
         );
+
+        spriteBatch.EndBegin(new() { BlendState = BlendState.Additive });
+        spriteBatch.Draw(
+            glowTexture,
+            NPC.Center - screenPos + maskPositionOffset,
+            null,
+            Color.White,
+            0f,
+            glowTexture.Size() * 0.5f,
+            0.05f,
+            SpriteEffects.None,
+            0
+        );
+        spriteBatch.EndBegin(snapshot);
 
         return false;
     }
