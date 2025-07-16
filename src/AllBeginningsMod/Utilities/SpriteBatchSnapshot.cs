@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 
 namespace AllBeginningsMod.Utilities;
 
-public readonly struct SpriteBatchSnapshot {
+public readonly struct SpriteBatchSnapshot : IEquatable<GraphicsDeviceSnapshot> {
     public SpriteSortMode SortMode { get; init; }
     public BlendState BlendState { get; init; }
     public SamplerState SamplerState { get; init; }
@@ -23,7 +24,6 @@ public readonly struct SpriteBatchSnapshot {
         TransformMatrix = Main.GameViewMatrix.TransformationMatrix;
     }
 
-
     public SpriteBatchSnapshot(SpriteBatch spriteBatch) {
         SortMode = spriteBatch.sortMode;
         BlendState = spriteBatch.blendState;
@@ -32,5 +32,25 @@ public readonly struct SpriteBatchSnapshot {
         RasterizerState = spriteBatch.rasterizerState;
         CustomEffect = spriteBatch.customEffect;
         TransformMatrix = spriteBatch.transformMatrix;
+    }
+
+    public bool Equals(GraphicsDeviceSnapshot other) {
+        throw new NotImplementedException();
+    }
+
+    public override bool Equals(object obj) {
+        return obj is GraphicsDeviceSnapshot other && Equals(other);
+    }
+
+    public static bool operator ==(SpriteBatchSnapshot left, SpriteBatchSnapshot right) {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(SpriteBatchSnapshot left, SpriteBatchSnapshot right) {
+        return !left.Equals(right);
+    }
+
+    public override int GetHashCode() {
+        return HashCode.Combine((int)SortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomEffect, TransformMatrix);
     }
 }
