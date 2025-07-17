@@ -1,9 +1,6 @@
-﻿using AllBeginningsMod.Common;
-using AllBeginningsMod.Common.Rendering;
-using AllBeginningsMod.Utilities;
+﻿using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -11,7 +8,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace AllBeginningsMod.Content.Projectiles; 
+namespace AllBeginningsMod.Content.Projectiles;
 internal class ExplosionVFXProjectile : ModProjectile {
     public override string Texture => "Terraria/Images/Item_0";
     public static void Spawn(IEntitySource source, Vector2 position, Color flashColor, Color glowColor, Func<float, Color> smokeColor, int size, int timeLeft) {
@@ -80,58 +77,42 @@ internal class ExplosionVFXProjectile : ModProjectile {
         overWiresUI.Add(index);
     }
 
-    private Texture2D glowTexture;
-    private Texture2D flareTexture;
-    private Texture2D smokeTexture;
-    private Texture2D noiseTexture1;
-    private Texture2D noiseTexture2;
-    private Effect effect;
-    
     public override bool PreDraw(ref Color lightColor) {
-        glowTexture = Assets.Assets.Textures.Sample.Glow1.Value;
-        flareTexture = Assets.Assets.Textures.Sample.Flare1.Value;
-        smokeTexture = Assets.Assets.Textures.Sample.SmokeGlow.Value;
-        noiseTexture1 = Assets.Assets.Textures.Sample.PerlinNoise.Value;
-        noiseTexture2 = Assets.Assets.Textures.Sample.Noise2.Value;
+        var glowTexture = Assets.Assets.Textures.Sample.Glow1.Value;
+        var flareTexture = Assets.Assets.Textures.Sample.Flare1.Value;
+        var smokeTexture = Assets.Assets.Textures.Sample.SmokeGlow.Value;
+        var noiseTexture1 = Assets.Assets.Textures.Sample.PerlinNoise.Value;
+        var noiseTexture2 = Assets.Assets.Textures.Sample.Noise2.Value;
+        var effect = Assets.Assets.Effects.Compiled.Pixel.ExplosionSmoke.Value;
 
-        Renderer.QueueRenderAction(() =>
-        {
-            effect ??= Assets.Assets.Effects.Compiled.Pixel.ExplosionSmoke.Value;
+        effect.Parameters["progress"].SetValue(Progress);
+        effect.Parameters["time"].SetValue(Main.GameUpdateCount * 0.002f + Projectile.rotation);
 
-            effect.Parameters["progress"].SetValue(Progress);
-            effect.Parameters["time"].SetValue(Main.GameUpdateCount * 0.002f + Projectile.rotation);
+        effect.Parameters["noiseTexture1"].SetValue(noiseTexture1);
+        effect.Parameters["noiseScale1"].SetValue(0.2f);
+        effect.Parameters["smokeCut"].SetValue(0.15f);
+        effect.Parameters["smokeCutSmoothness"].SetValue(0.7f);
 
-            effect.Parameters["noiseTexture1"].SetValue(noiseTexture1);
-            effect.Parameters["noiseScale1"].SetValue(0.2f);
-            effect.Parameters["smokeCut"].SetValue(0.15f);
-            effect.Parameters["smokeCutSmoothness"].SetValue(0.7f);
+        effect.Parameters["noiseTexture2"].SetValue(noiseTexture2);
+        effect.Parameters["noiseScale2"].SetValue(0.3f);
+        effect.Parameters["edgeColor"].SetValue(Color.Black.ToVector4());
 
-            effect.Parameters["noiseTexture2"].SetValue(noiseTexture2);
-            effect.Parameters["noiseScale2"].SetValue(0.3f);
-            effect.Parameters["edgeColor"].SetValue(Color.Black.ToVector4());
-
-            Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
-            Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
-            Main.spriteBatch.Draw(
-                smokeTexture,
-                Projectile.Center - Main.screenPosition,
-                null,
-                smokeColor(Progress),
-                Projectile.rotation,
-                smokeTexture.Size() * 0.5f,
-                Projectile.Size * 0.0015f,
-                SpriteEffects.None,
-                0f
-            );
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(snapshot);
-        }, RenderLayer.Projectiles, style: RenderStyle.Pixelated);
+        var snapshot = Main.spriteBatch.CaptureEndBegin(new() { CustomEffect = effect });
+        Main.spriteBatch.Draw(
+            smokeTexture,
+            Projectile.Center - Main.screenPosition,
+            null,
+            smokeColor(Progress),
+            Projectile.rotation,
+            smokeTexture.Size() * 0.5f,
+            Projectile.Size * 0.0015f,
+            SpriteEffects.None,
+            0f
+        );
 
         float flashScale = 1f - MathF.Min(0.15f, Progress) / 0.15f;
 
-        Main.spriteBatch.End(out SpriteBatchSnapshot snapshot);
-        Main.spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });
+        Main.spriteBatch.EndBegin(new() { BlendState = BlendState.Additive });
         Main.spriteBatch.Draw(
             glowTexture,
             Projectile.Center - Main.screenPosition,
@@ -156,8 +137,7 @@ internal class ExplosionVFXProjectile : ModProjectile {
             0f
         );
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(snapshot);
+        Main.spriteBatch.EndBegin(snapshot);
 
         // float blobScale = MathF.Pow(1f - MathF.Min(0.25f, Progress) / 0.25f, 2);
         //

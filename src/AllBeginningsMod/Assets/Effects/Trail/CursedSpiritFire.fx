@@ -1,6 +1,7 @@
 ﻿matrix mat;
 float time;
 float stepY;
+float scale = 1;
 
 texture texture1;
 sampler2D sampler1 = sampler_state
@@ -52,8 +53,8 @@ const float PI = 3.14;
 
 float4 PixelShaderFunction(VSOutput output) : COLOR0
 {
-    float s1 = tex2D(sampler1, output.coords - float2(time, 0)).r;
-    float s2 = tex2D(sampler2, output.coords + float2(time, 0)).r;
+    float s1 = tex2D(sampler1, output.coords * scale - float2(time, 0)).r;
+    float s2 = tex2D(sampler2, output.coords * scale + float2(time, 0)).r;
 
     float s2Alpha = lerp(1, s2, output.coords.x);
     float alpha = step(

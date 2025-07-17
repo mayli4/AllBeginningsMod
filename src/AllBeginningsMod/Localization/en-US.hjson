@@ -134,6 +134,7 @@ Mods: {
 			HellbatSpit.DisplayName: Hellbat Spit
 			HellbatSpitProjectile.DisplayName: Hellbat Spit Projectile
 			TerrorBatSpit.DisplayName: Terror Bat Spit
+			SpiritFireball.DisplayName: Spirit Fireball
 		}
 
 		Buffs: {

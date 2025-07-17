@@ -1,5 +1,8 @@
 ﻿using AllBeginningsMod.Common.PrimitiveDrawing;
 using AllBeginningsMod.Content.Biomes;
+using AllBeginningsMod.Content.CameraModifiers;
+using AllBeginningsMod.Content.NPCs.Corruption._Effigy;
+using AllBeginningsMod.Content.Projectiles;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -39,8 +43,15 @@ public struct SpiritData {
     [FieldOffset(0)]
     public RamData Ram;
 
+    [FieldOffset(0)]
+    public ExploderData Exploder;
+
     public struct RamData {
         public Vector2 DashDirection;
+    }
+
+    public struct ExploderData {
+        public float FireballTimer;
     }
 }
 
@@ -54,7 +65,7 @@ public sealed class CursedSpiritNPC : ModNPC {
 
     ref float Timer => ref NPC.ai[1];
 
-    PrimitiveTrail _ghostTrail;
+    PrimitiveTrail trail;
 
     float _lookOffset;
     Vector2 _lookDirection;
@@ -72,12 +83,12 @@ public sealed class CursedSpiritNPC : ModNPC {
 
     public override string Texture => Assets.Assets.Textures.NPCs.Corruption.Effigy.KEY_CursedSpiritMasks;
 
-    static Color _ghostColor1 = new(214, 237, 5);
-    static Color _ghostColor2 = new(181, 200, 4);
+    public readonly static Color GhostColor1 = new(214, 237, 5);
+    public readonly static Color GhostColor2 = new(181, 200, 4);
 
     public override void SetDefaults() {
-        NPC.width = 32;
-        NPC.height = 32;
+        NPC.width = 38;
+        NPC.height = 38;
         NPC.lifeMax = 640;
         NPC.value = 250f;
         NPC.noTileCollide = true;
@@ -97,27 +108,28 @@ public sealed class CursedSpiritNPC : ModNPC {
     }
 
     public override void OnSpawn(IEntitySource source) {
-        // _type = (SpiritType)Main.rand.Next(0, 3);
-        SpiritType = SpiritType.Ram;
+        SpiritType = (SpiritType)Main.rand.Next(0, 3);
         switch(SpiritType) {
             case SpiritType.Exploder:
+                _data.Exploder = new()
+                {
+                    FireballTimer = 0,
+                };
                 SetState(ExploderState.FlyToTarget);
                 break;
             case SpiritType.Ram:
+                _data.Ram = new()
+                {
+                    DashDirection = Vector2.Zero,
+                };
                 SetState(RamState.FlyAround);
                 break;
         }
     }
 
     public override void AI() {
-        const float TrailSize = 55;
-        _ghostTrail ??= new(
-            Enumerable.Repeat(NPC.Center, 12).ToArray(),
-            static t => TrailSize,
-            static t => Color.Lerp(_ghostColor1, _ghostColor2, t + 0.7f)
-        );
-
         NPC.TargetClosest();
+
         var directionToTarget = Vector2.Zero;
         var distanceToTarget = 999_999f;
         if(Target != null) {
@@ -135,11 +147,33 @@ public sealed class CursedSpiritNPC : ModNPC {
             case SpiritType.Exploder:
                 switch(State<ExploderState>()) {
                     case ExploderState.FlyToTarget:
-                        UpdateLookDirection(directionToTarget);
-                        _lookOffset = MathF.Min(_lookOffset + 0.05f, 0.6f);
+                        UpdateLookDirection(moveDirection);
+                        _lookOffset = MathF.Min(_lookOffset + 0.05f, 0.75f);
 
                         NPC.velocity += directionToTarget * 0.1f;
                         NPC.velocity *= 0.98f;
+
+                        _data.Exploder.FireballTimer += 1;
+                        if(_data.Exploder.FireballTimer > 90 && Target != null) {
+                            _data.Exploder.FireballTimer = 0;
+
+                            var position = NPC.Center;
+                            var velocity = MathUtilities.InitialVelocityRequiredToHitPosition(
+                                position,
+                                Target.Center + Target.velocity * 70f,
+                                SpiritFireball.Gravity,
+                                12f
+                            );
+
+                            Projectile.NewProjectile(
+                                NPC.GetSource_FromAI(),
+                                NPC.Center,
+                                velocity,
+                                ModContent.ProjectileType<SpiritFireball>(),
+                                20,
+                                0.3f
+                            );
+                        }
 
                         break;
                     case ExploderState.Exploding:
@@ -147,7 +181,7 @@ public sealed class CursedSpiritNPC : ModNPC {
                         _lookOffset *= 0.95f;
 
                         if(Timer > ExploderExplosionTime) {
-                            const float ExplosionRange = 300;
+                            const float ExplosionRange = 200;
                             if(Main.netMode != NetmodeID.MultiplayerClient) {
                                 MathUtilities.ForEachPlayerInRange(
                                     NPC.Center,
@@ -159,9 +193,23 @@ public sealed class CursedSpiritNPC : ModNPC {
                                         knockback: 8f
                                     )
                                 );
+
+                                ExplosionVFXProjectile.Spawn(
+                                    NPC.GetSource_Death(),
+                                    NPC.Center,
+                                    Color.Yellow,
+                                    Color.Orange,
+                                    t => Color.Lerp(GhostColor1, Color.Black, t),
+                                    400,
+                                    80
+                                );
+
+                                NPC.StrikeInstantKill();
                             }
 
-                            NPC.StrikeInstantKill();
+                            Main.instance.CameraModifiers.Add(new ExplosionShakeCameraModifier(12f, 0.96f));
+                            Lighting.AddLight(NPC.Center, GhostColor1.ToVector3() * 3.5f);
+                            SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode, NPC.Center);
                         }
                         break;
                 }
@@ -170,9 +218,9 @@ public sealed class CursedSpiritNPC : ModNPC {
                 switch(State<RamState>()) {
                     case RamState.FlyAround:
                         UpdateLookDirection(directionToTarget);
-                        _lookOffset = MathF.Min(_lookOffset + 0.05f, 0.6f);
+                        _lookOffset = MathF.Min(_lookOffset + 0.05f, 0.75f);
 
-                        const float CirclingRadius = 520;
+                        const float CirclingRadius = 720;
                         var targetPosition = Target.Center + (Main.GameUpdateCount * 0.04f + NPC.whoAmI).ToRotationVector2() * CirclingRadius;
                         NPC.velocity += NPC.Center.DirectionTo(targetPosition) * 0.3f;
                         NPC.velocity *= 0.95f;
@@ -221,12 +269,19 @@ public sealed class CursedSpiritNPC : ModNPC {
 
         Timer += 1;
 
-        var i = _ghostTrail.Positions.Length - 1;
+        const float TrailSize = 55;
+        trail ??= new(
+            [.. Enumerable.Repeat(NPC.Center, 12)],
+            static t => TrailSize,
+            static t => Color.Lerp(GhostColor1, GhostColor2, t + 0.7f)
+        );
+
+        var i = trail.Positions.Length - 1;
         while(i > 0) {
-            _ghostTrail.Positions[i] = _ghostTrail.Positions[i - 1];
+            trail.Positions[i] = trail.Positions[i - 1];
             i -= 1;
         }
-        _ghostTrail.Positions[0] = NPC.Center;
+        trail.Positions[0] = NPC.Center;
 
         if(!Main.dedServ) {
             if(Main.rand.NextBool(7)) Dust.NewDust(
@@ -234,10 +289,10 @@ public sealed class CursedSpiritNPC : ModNPC {
                 NPC.width,
                 NPC.height,
                 DustID.Pixie,
-                newColor: Main.rand.NextFromList(_ghostColor1, _ghostColor2)
+                newColor: Main.rand.NextFromList(GhostColor1, GhostColor2)
             );
 
-            Lighting.AddLight(NPC.Center, _ghostColor1.ToVector3() * 0.75f);
+            Lighting.AddLight(NPC.Center, GhostColor1.ToVector3() * 0.75f);
         }
     }
 
@@ -246,6 +301,33 @@ public sealed class CursedSpiritNPC : ModNPC {
 
         NPC.direction = _lookDirection.X > 0 ? 1 : -1;
         NPC.rotation = _lookDirection.ToRotation();
+    }
+
+    public override void HitEffect(NPC.HitInfo hit) {
+        if(Main.netMode == NetmodeID.Server || NPC.life > 0) return;
+        if(SpiritType == SpiritType.Exploder && State<ExploderState>() != ExploderState.Exploding) return;
+
+        var name = SpiritType switch
+        {
+            SpiritType.Splitter => "Splitter",
+            SpiritType.Exploder => "Exploder",
+            SpiritType.Ram => "Ram",
+        };
+
+        Gore.NewGoreDirect(
+            NPC.GetSource_Death(),
+            NPC.Center,
+            Main.rand.NextVector2Unit() * 5f,
+            Mod.Find<ModGore>($"CursedSpirit{name}Gore").Type
+        );
+
+        for(var i = 0; i < 10; i += 1) Dust.NewDust(
+            NPC.position,
+            NPC.width,
+            NPC.height,
+            DustID.Pixie,
+            newColor: Main.rand.NextFromList(GhostColor1, GhostColor2)
+        );
     }
 
     public override bool CheckDead() {
@@ -295,15 +377,16 @@ public sealed class CursedSpiritNPC : ModNPC {
             trailEffect.Parameters["time"].SetValue(0.025f * Main.GameUpdateCount);
             trailEffect.Parameters["mat"].SetValue(MathUtilities.WorldTransformationMatrix);
             trailEffect.Parameters["stepY"].SetValue(0.25f);
+            trailEffect.Parameters["scale"].SetValue(0.8f);
             trailEffect.Parameters["texture1"].SetValue(Assets.Assets.Textures.Sample.Pebbles.Value);
             trailEffect.Parameters["texture2"].SetValue(Assets.Assets.Textures.Sample.Noise2.Value);
-            _ghostTrail.Draw(trailEffect);
+            trail.Draw(trailEffect);
         }
 
         var glowTexture = Assets.Assets.Textures.Sample.Glow1.Value;
         var blinker = (MathF.Sin(0.1f * Main.GameUpdateCount + 23.2f * NPC.whoAmI) + MathF.Cos(0.06f * Main.GameUpdateCount) + 2f) / 4f;
-        var bigGlowColor = _ghostColor2 * (0.3f + 0.3f * blinker);
-        var smallGlowColor = _ghostColor1;
+        var bigGlowColor = GhostColor2 * (0.3f + 0.3f * blinker);
+        var smallGlowColor = GhostColor1;
 
         var glowScale = 1f;
         var maskScale = 1f;
@@ -313,8 +396,8 @@ public sealed class CursedSpiritNPC : ModNPC {
 
             bigGlowColor = Color.Lerp(bigGlowColor, Color.Red, factor * 0.7f);
             smallGlowColor = Color.Lerp(smallGlowColor, Color.Red, factor * 0.6f);
-            glowScale = 1 + 0.45f * factor;
-            maskScale = 1 + 0.1f * factor;
+            glowScale = 1 + 0.75f * factor;
+            maskScale = 1 + 0.3f * MathF.Pow(factor, 2);
         }
 
         var snapshot = spriteBatch.CaptureEndBegin(new() { BlendState = BlendState.Additive });
@@ -351,7 +434,7 @@ public sealed class CursedSpiritNPC : ModNPC {
                 break;
             case SpiritType.Exploder:
                 if(State<ExploderState>() == ExploderState.Exploding) {
-                    maskShake += Timer * 0.015f;
+                    maskShake += (Main.GameUpdateCount % 4 == 0 ? 1f : 0f) * Timer * 0.015f;
                     maskRotation += Main.rand.NextFloat(-0.001f, 0.001f) * Timer;
                 }
                 break;
