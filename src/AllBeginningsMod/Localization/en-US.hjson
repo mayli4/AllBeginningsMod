@@ -104,6 +104,7 @@ Mods: {
 			TerrorBatNPC.DisplayName: Terror Bat
 			CursedSpiritNPC.DisplayName: Cursed Spirit
 			EffigyNPC.DisplayName: Effigy
+			PusCarrierGrubNPC.DisplayName: Pus Carrier Grub N P C
 		}
 
 		Projectiles: {
@@ -185,6 +186,7 @@ Mods: {
 		Bestiary: {
 			DevilOWarNPCBestiary: Marine life in the underworld? this organism uses hot gases to float in the air, and a sharp stinger to feed off its prey!
 			TerrorBatNPCBestiary: The terror bat grooves and dives in the air, while also using its acidic spit as a weapon that you wouldn't want to stain your clothes!
+			PusCarrierGrubNPCBestiary: ""
 		}
 	}
 }
