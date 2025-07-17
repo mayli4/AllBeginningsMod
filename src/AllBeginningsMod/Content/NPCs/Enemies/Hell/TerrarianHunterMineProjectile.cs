@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Common.Loaders;
-using AllBeginningsMod.Content.CameraModifiers;
+﻿using AllBeginningsMod.Content.CameraModifiers;
 using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Content.Projectiles;
 using AllBeginningsMod.Utilities;
@@ -116,11 +115,11 @@ internal class TerrarianHunterMineProjectile : ModProjectile {
         int blinkTime = 6;
         Color color = Color.OrangeRed * (1f - Projectile.alpha / 255f) * 0.2f * detectionAlpha * (Main.GameUpdateCount % blinkTime < blinkTime / 2 ? 1f : 0f);
 
-        SpriteBatchData snapshot = Main.spriteBatch.Capture();
-        effect ??= EffectLoader.GetEffect("Pixel::MineDetectionField");
+        SpriteBatchSnapshot snapshot = Main.spriteBatch.Capture();
+        effect ??= Assets.Assets.Effects.Compiled.Pixel.MineDetectionField.Value;
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(snapshot with { Effect = effect });
+        Main.spriteBatch.Begin(snapshot with { CustomEffect = effect });
 
         Main.spriteBatch.Draw(
             TextureAssets.MagicPixel.Value,

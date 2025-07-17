@@ -36,5 +36,13 @@
     <ItemGroup>
       <ProjectReference Include="..\AllBeginningsGeneration\AllBeginningsGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="Assets/**/*.png" />
+        <AdditionalFiles Include="Assets/**/*.fxc" />
+        <AdditionalFiles Include="Assets/**/*.wav" />
+        <AdditionalFiles Include="Assets/**/*.ogg" />
+        <AdditionalFiles Include="Assets/**/*.mp3" />
+    </ItemGroup>
     
 </Project>

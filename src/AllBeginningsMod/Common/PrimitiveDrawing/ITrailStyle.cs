@@ -4,7 +4,8 @@ using System;
 using System.Collections.Immutable;
 
 namespace AllBeginningsMod.Common.PrimitiveDrawing; 
-internal interface ITrailStyle {
+
+public interface ITrailStyle {
     int VertexCount(int trailPositionCount);
     int IndexCount(int trailPositionCount);
     /// <summary>

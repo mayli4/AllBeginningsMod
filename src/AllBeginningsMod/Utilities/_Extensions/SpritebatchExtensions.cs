@@ -8,47 +8,47 @@ using Terraria.GameContent;
 namespace AllBeginningsMod.Utilities;
 
 public static class SpritebatchExtensions {
-        public static void Begin(this SpriteBatch spriteBatch, SpriteBatchData data) {
+    public static void Begin(this SpriteBatch spriteBatch, SpriteBatchSnapshot data) {
         spriteBatch.Begin(
             data.SortMode,
             data.BlendState,
             data.SamplerState,
             data.DepthStencilState,
             data.RasterizerState,
-            data.Effect,
+            data.CustomEffect,
             data.TransformMatrix
         );
     }
 
-    public static void EndBegin(this SpriteBatch spriteBatch, SpriteBatchData data) {
+    public static void EndBegin(this SpriteBatch spriteBatch, SpriteBatchSnapshot data) {
         spriteBatch.End();
         spriteBatch.Begin(data);
     }
 
-    public static SpriteBatchData CaptureEndBegin(this SpriteBatch spriteBatch, SpriteBatchData data) {
-        SpriteBatchData captureData = spriteBatch.Capture();
+    public static SpriteBatchSnapshot CaptureEndBegin(this SpriteBatch spriteBatch, SpriteBatchSnapshot data) {
+        SpriteBatchSnapshot captureData = spriteBatch.Capture();
         spriteBatch.EndBegin(data);
 
         return captureData;
     }
 
-    public static void InsertDraw(this SpriteBatch spriteBatch, SpriteBatchData data, Action<SpriteBatch> drawAction) {/*
+    public static void InsertDraw(this SpriteBatch spriteBatch, SpriteBatchSnapshot data, Action<SpriteBatch> drawAction) {/*
         if ((bool)SpriteBatchCache.BeginCalled.GetValue(spriteBatch)) {
-            SpriteBatchData rebeginData = spriteBatch.CaptureEndBegin(data);
+            SpriteBatchSnapshot rebeginData = spriteBatch.CaptureEndBegin(data);
             drawAction(spriteBatch);
             spriteBatch.EndBegin(rebeginData);
         }
         else {
-            
+
         }*/
 
-        SpriteBatchData initData = spriteBatch.CaptureEndBegin(data);
+        var initData = spriteBatch.CaptureEndBegin(data);
         drawAction(spriteBatch);
         spriteBatch.EndBegin(initData);
     }
 
-    public static SpriteBatchData Capture(this SpriteBatch spriteBatch) {
-        return SpriteBatchData.Capture(spriteBatch);
+    public static SpriteBatchSnapshot Capture(this SpriteBatch spriteBatch) {
+        return new(spriteBatch);
     }
 
     public static void DrawAdditive(this SpriteBatch spriteBatch,
@@ -60,7 +60,7 @@ public static class SpritebatchExtensions {
         Vector2 origin,
         Vector2 scale,
         SpriteEffects effects) {
-        SpriteBatchData data = spriteBatch.Capture();
+        var data = spriteBatch.Capture();
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
@@ -80,11 +80,11 @@ public static class SpritebatchExtensions {
         spriteBatch.Begin(data);
     }
 
-    public static void End(this SpriteBatch spriteBatch, out SpriteBatchData snapshot) {
+    public static void End(this SpriteBatch spriteBatch, out SpriteBatchSnapshot snapshot) {
         snapshot = spriteBatch.Capture();
         spriteBatch.End();
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void DrawLine(this SpriteBatch sb, Vector2 start, Vector2 end, Color? color = null, int width = 1, Texture2D? texture = null) {
         var offset = end - start;
@@ -96,7 +96,7 @@ public static class SpritebatchExtensions {
 
         sb.Draw(texture ?? TextureAssets.BlackTile.Value, rect, null, color ?? Color.White, angle, Vector2.Zero, SpriteEffects.None, 0f);
     }
-    
+
     public static void DrawRect(this SpriteBatch sb, Rectangle rect, Color? color = null, int thickness = 1, Texture2D? texture = null) {
         var finalColor = color ?? Color.White;
 

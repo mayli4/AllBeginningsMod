@@ -1,12 +1,12 @@
-﻿using AllBeginningsMod.Common.Loaders;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Immutable;
 using Terraria;
 
 namespace AllBeginningsMod.Common.PrimitiveDrawing; 
-internal class PrimitiveTrail {
+
+public class PrimitiveTrail {
     public DynamicVertexBuffer VertexBuffer { get; private set; }
     public DynamicIndexBuffer IndexBuffer { get; private set; }
     public ITrailStyle TrailStyle { get; }
@@ -91,7 +91,7 @@ internal class PrimitiveTrail {
     }
 
     public void Draw(Texture2D texture, Color color, Matrix? transformationMatrix = null, bool blackAsAlpha = false) {
-        Effect effect = EffectLoader.GetEffect("Trail::Default");
+        Effect effect = Assets.Assets.Effects.Compiled.Trail.Default.Value;
         effect.Parameters["sampleTexture"].SetValue(texture);
         effect.Parameters["color"].SetValue(color.ToVector4());
         effect.Parameters["transformationMatrix"].SetValue(transformationMatrix ?? Matrix.Identity);
