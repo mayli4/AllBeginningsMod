@@ -14,7 +14,7 @@
     },
     "Terraria (faststart)": {
       "commandName": "Project",
-      "commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect \"tester2:eeworld\""
+      "commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect"
     }
   }
 }
