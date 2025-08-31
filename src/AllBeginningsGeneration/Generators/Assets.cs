@@ -5,11 +5,12 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 
-namespace SourceGeneration.Generators;
+namespace AllBeginningsGeneration.Generators;
 
 public enum AssetType {
     Texture2D,
-    Effect
+    Effect,
+    SoundEffect
 }
 
 public readonly record struct AssetFile(string Path, string Folder, string Name, string Extension, AssetType AssetType) {
@@ -24,12 +25,13 @@ public readonly record struct AssetFile(string Path, string Folder, string Name,
 public sealed class AssetGenerator : IIncrementalGenerator {
     private const string image_extension = ".png";
     private const string effect_extension = ".fxc";
+    private const string sound_extension = ".ogg";
 
     private const string build_manifest_filename = "build.txt";
 
     private const string mod_name = "AllBeginningsMod";
 
-    private static readonly string[] supported_extensions = new[] { image_extension, effect_extension };
+    private static readonly string[] supported_extensions = new[] { image_extension, effect_extension, sound_extension };
 
     private static readonly string initial_file_header;
 
@@ -45,6 +47,7 @@ using System;
 
 using ImageAsset = ReLogic.Content.Asset<Microsoft.Xna.Framework.Graphics.Texture2D>;
 using EffectAsset = ReLogic.Content.Asset<Microsoft.Xna.Framework.Graphics.Effect>;
+using SoundEffectAsset = Terraria.Audio.SoundStyle;
 ");
 
         writer.WriteLine($"namespace {mod_name}.Assets;");
@@ -100,11 +103,10 @@ using EffectAsset = ReLogic.Content.Asset<Microsoft.Xna.Framework.Graphics.Effec
 
                 //determine asset type based on file extension
                 //exception should never be thrown in any case, but defensive anyways
-                AssetType assetType = extension.Equals(image_extension, StringComparison.OrdinalIgnoreCase)
-                    ? AssetType.Texture2D
-                    : extension.Equals(effect_extension, StringComparison.OrdinalIgnoreCase)
-                        ? AssetType.Effect
-                        : throw new InvalidOperationException("how");
+                AssetType assetType = extension.Equals(image_extension, StringComparison.OrdinalIgnoreCase) ? AssetType.Texture2D
+                    : extension.Equals(effect_extension, StringComparison.OrdinalIgnoreCase) ? AssetType.Effect
+                    : extension.Equals(sound_extension, StringComparison.OrdinalIgnoreCase) ? AssetType.SoundEffect
+                    : throw new InvalidOperationException("how");
 
                 return new AssetFile(
                     path,
@@ -139,24 +141,25 @@ using EffectAsset = ReLogic.Content.Asset<Microsoft.Xna.Framework.Graphics.Effec
                     writer.Indent++;
                 }
 
-                foreach (var file in assetFiles) {
+                foreach(var file in assetFiles) {
                     string assetPath = $"{mod_name}/{file.Path}";
 
                     writer.WriteLine($"public const string KEY_{file.Name} = \"{assetPath}\";");
 
-                    string typeLazy = file.AssetType switch {
-                        AssetType.Texture2D =>
-                            $"public readonly static Lazy<ImageAsset> {file.Name}_lazy = new(() => ModContent.Request<Texture2D>(\"{assetPath}\"));",
-                        AssetType.Effect =>
-                            $"public readonly static Lazy<EffectAsset> {file.Name}_lazy = new(() => ModContent.Request<Effect>(\"{assetPath}\", AssetRequestMode.ImmediateLoad));",
+                    // 6. Modified asset generation logic for SoundEffect
+                    string typeLazy = file.AssetType switch
+                    {
+                        AssetType.Texture2D => $"public readonly static Lazy<ImageAsset> {file.Name}_lazy = new(() => ModContent.Request<Texture2D>(\"{assetPath}\"));",
+                        AssetType.Effect => $"public readonly static Lazy<EffectAsset> {file.Name}_lazy = new(() => ModContent.Request<Effect>(\"{assetPath}\", AssetRequestMode.ImmediateLoad));",
+                        AssetType.SoundEffect => $"public readonly static Lazy<SoundEffectAsset> {file.Name}_lazy = new(() => new SoundEffectAsset(\"{assetPath}\"));",
                         _ => throw new ArgumentOutOfRangeException()
                     };
 
-                    string type = file.AssetType switch {
-                        AssetType.Texture2D =>
-                            $"public static ImageAsset {file.Name} {{ get; }} = {file.Name}_lazy.Value;",
-                        AssetType.Effect =>
-                            $"public static EffectAsset {file.Name} {{ get; }} = ModContent.Request<Effect>(\"{assetPath}\", AssetRequestMode.ImmediateLoad);",
+                    string type = file.AssetType switch
+                    {
+                        AssetType.Texture2D => $"public static ImageAsset {file.Name} {{ get; }} = {file.Name}_lazy.Value;",
+                        AssetType.Effect => $"public static EffectAsset {file.Name} {{ get; }} = ModContent.Request<Effect>(\"{assetPath}\", AssetRequestMode.ImmediateLoad);",
+                        AssetType.SoundEffect => $"public static SoundEffectAsset {file.Name} {{ get; }} = {file.Name}_lazy.Value;",
                         _ => throw new ArgumentOutOfRangeException()
                     };
 
