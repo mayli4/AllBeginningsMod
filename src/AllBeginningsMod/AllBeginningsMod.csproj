@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     
     <Import Project="..\..\..\tModLoader.targets" />
+
+    <Import Project="..\Build\KBOFXC\KBOFXCTask.props" />
+    <Import Project="..\Build\KBOFXC\KBOFXCTask.targets" />
     
     <PropertyGroup>
         <AssemblyName>AllBeginningsMod</AssemblyName>
@@ -13,13 +16,6 @@
     <PropertyGroup>
         <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     </PropertyGroup>
-    
-    <ItemGroup>
-        <AdditionalFiles Remove="Assets\Effects\.compile\**" />
-        <Compile Remove="Assets\Effects\.compile\**" />
-        <EmbeddedResource Remove="Assets\Effects\.compile\**" />
-        <None Remove="Assets\Effects\.compile\**" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" ExcludeAssets="runtime"/>
