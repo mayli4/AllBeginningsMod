@@ -6,11 +6,16 @@
     <Import Project="..\Build\KBOFXC\KBOFXCTask.targets" />
     
     <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+        <DefineConstants>$(DefineConstants);BUILDINGFROMCSPROJ_MOD</DefineConstants>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        
         <AssemblyName>AllBeginningsMod</AssemblyName>
         <TargetFramework>net8.0</TargetFramework>
         <PlatformTarget>AnyCPU</PlatformTarget>
         <LangVersion>latest</LangVersion>
-        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     </PropertyGroup>
     
     <PropertyGroup>
@@ -39,7 +44,15 @@
         <AdditionalFiles Include="Assets/**/*.wav" />
         <AdditionalFiles Include="Assets/**/*.ogg" />
         <AdditionalFiles Include="Assets/**/*.mp3" />
+    </ItemGroup>
+    
+    <ItemGroup>
 
+        <None Remove="..\Build/**/*" />
+        <Compile Remove="..\Build/**/*" />
+        <AdditionalFiles Remove="..\Build/**" />
+        
+        <Compile Include="..\Build\Common.cs" />
     </ItemGroup>
     
 </Project>

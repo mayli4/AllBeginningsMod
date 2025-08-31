@@ -61,7 +61,6 @@ internal sealed class IndentedStringWriter : IDisposable {
     }
     public void EndScope() {
         Indent--;
-        WriteLine();
         WriteLine("}");
 
     }
