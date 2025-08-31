@@ -10,7 +10,7 @@ public class ModImplGenerator : IIncrementalGenerator {
     void IIncrementalGenerator.Initialize(
         IncrementalGeneratorInitializationContext context) {
         context.RegisterSourceOutput(context.AnalyzerConfigOptionsProvider, (x, options) => {
-                if(GeneratorUtilities.GetRootNamespaceOrRaiseDiagnostic(x, options.GlobalOptions) is not { } rootNamespace)
+                if(GeneratorUtils.GetRootNamespaceOrRaiseDiagnostic(x, options.GlobalOptions) is not { } rootNamespace)
                     return;
 
                 x.AddSource(

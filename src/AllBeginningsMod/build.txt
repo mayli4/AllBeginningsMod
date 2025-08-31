@@ -1,6 +1,6 @@
 ﻿displayName = All Beginnings
-author = LolXD the one and only
-version = 0.1.0
+author = a
+version = 0.0.1
 hideCode = true
 hideResources = true
 includeSource = false

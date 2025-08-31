@@ -10,7 +10,7 @@ public class GlobalUsingsGenerator : IIncrementalGenerator {
     void IIncrementalGenerator.Initialize(
         IncrementalGeneratorInitializationContext context) {
         context.RegisterSourceOutput(context.AnalyzerConfigOptionsProvider, (x, options) => {
-                if(GeneratorUtilities.GetRootNamespaceOrRaiseDiagnostic(x, options.GlobalOptions) is not { } rootNamespace)
+                if(GeneratorUtils.GetRootNamespaceOrRaiseDiagnostic(x, options.GlobalOptions) is not { } rootNamespace)
                     return;
 
                 x.AddSource(
@@ -22,7 +22,9 @@ public class GlobalUsingsGenerator : IIncrementalGenerator {
 
         string GenerateUsings(string rootNamespace) {
             var sb = new StringBuilder();
-            sb.Append("global using AllBeginningsMod.Assets;");
+            sb.Append("global using static AllBeginningsMod.Assets.Assets;");
+            sb.Append("global using AllBeginningsMod.Localization;");
+            sb.Append("namespace AllBeginningsMod;");
             return sb.ToString();
         }
     }

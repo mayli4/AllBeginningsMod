@@ -1,319 +1,106 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Generators.Utilities;
 
-internal sealed class IndentedStringWriter : IDisposable
-{
-    [SuppressMessage("Style", "IDE1006:Naming rule violation",
-        Justification = "'PascalCase' naming style required for preservation of original source.")]
-    public const string DefaultIndentString = "    ";
-
-    public readonly StringBuilder Builder;
-    public readonly string IndentString;
+internal sealed class IndentedStringWriter : IDisposable {
+    public StringBuilder Builder;
     public int Indent;
-
     private bool tabsPending;
-
-    public IndentedStringWriter()
-    {
-        Builder = StringBuilderPool.Rent(8192);
-        Indent = 0;
-        IndentString = DefaultIndentString;
-        tabsPending = false;
-    }
-
-    public IndentedStringWriter(int capacity)
-    {
-        Builder = StringBuilderPool.Rent(capacity);
-        Indent = 0;
-        IndentString = DefaultIndentString;
-        tabsPending = false;
-    }
-
-    public IndentedStringWriter(StringBuilder builder)
-    {
+    public IndentedStringWriter() => Builder = new();
+    public IndentedStringWriter(int initialCapacity) => Builder = new(initialCapacity);
+    
+    public IndentedStringWriter(StringBuilder builder) {
         Builder = builder;
-        Indent = 0;
-        IndentString = DefaultIndentString;
-        tabsPending = false;
     }
-
-    private void WriteTabs()
-    {
-        if (tabsPending)
-        {
-            if (ReferenceEquals(IndentString, DefaultIndentString))
-            {
-                Builder.Append(' ', 4 * Indent);
-            }
-            else
-            {
-                for (int i = 0; i < Indent; i++)
-                {
-                    Builder.Append(IndentString);
-                }
-            }
-
+    
+    private StringBuilder WritePendingTabs() {
+        if (tabsPending) {
+            Builder.Append(' ', Indent * 4);
             tabsPending = false;
         }
+        return Builder;
     }
 
-    public override string ToString()
-    {
-        return Builder.ToString();
+    public void Write([InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolationHandler handler) { }
+    public void Write(byte value) => WritePendingTabs().Append(value);
+    public void Write(sbyte value) => WritePendingTabs().Append(value);
+    public void Write(short value) => WritePendingTabs().Append(value);
+    public void Write(ushort value) => WritePendingTabs().Append(value);
+    public void Write(int value) => WritePendingTabs().Append(value);
+    public void Write(uint value) => WritePendingTabs().Append(value);
+    public void Write(long value) => WritePendingTabs().Append(value);
+    public void Write(ulong value) => WritePendingTabs().Append(value);
+    public void Write(string value) => WritePendingTabs().Append(value);
+    public void Write(char value) => WritePendingTabs().Append(value.ToString(CultureInfo.InvariantCulture));
+    public void Write(float value) => WritePendingTabs().Append(value.ToString(CultureInfo.InvariantCulture));
+    public void Write(double value) => WritePendingTabs().Append(value.ToString(CultureInfo.InvariantCulture));
+
+    public void WriteLine() {
+        Builder.AppendLine(); 
+        tabsPending = true;
     }
 
-    public IndentedStringWriter Clear()
-    {
-        Builder.Clear();
-        return this;
+    public void WriteLine(string text) {
+        WritePendingTabs().Append(text).AppendLine(); 
+        tabsPending = true;
     }
 
-    /// <summary>Generates a string with the contents on the writer and clears the string builder for reusing it.</summary>
-    /// <returns></returns>
-    public string ToStringAndClear()
-    {
+    public void WriteLine([InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolationHandler handler) {
+        Builder.AppendLine(); 
+        tabsPending = true;
+    }
+
+    /// <summary>Writes the specified text, writes a '{' character in a new line and increases indentation.</summary>
+    public void BeginScope([InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolationHandler handler) {
+        WriteLine(" {");
+        Indent++;
+    }
+    public void EndScope() {
+        Indent--;
+        WriteLine();
+        WriteLine("}");
+
+    }
+    public void EndScope([InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolationHandler handler) => EndScope();
+    
+    public void Dispose() { }
+    
+    public string ToStringAndClear() {
         string result = Builder.ToString();
-        Clear();
+        Builder.Clear();
+        tabsPending = true;
         return result;
     }
 
-    #region Write methods
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(byte value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
+    [InterpolatedStringHandler]
+    internal readonly struct IndentedStringWriterInterpolationHandler {
+        private readonly IndentedStringWriter writer;
+        public IndentedStringWriterInterpolationHandler(int literalLength, int formattedCount, IndentedStringWriter writer) {
+            this.writer = writer;
         }
 
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(sbyte value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(short value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(ushort value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(int value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(uint value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(long value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(ulong value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(float value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(double value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(char value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(string value)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(value);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public unsafe IndentedStringWriter Write(ReadOnlySpan<char> values)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        fixed (char* ptr = values)
-        {
-            Builder.Append(ptr, values.Length);
-        }
-
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(char[] values)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(values);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(char[] values, int start, int count)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.Append(values, start, count);
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter Write(
-        [InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolatedStringHandler handler)
-    {
-        tabsPending = false;
-        return this;
-    }
-
-    public IndentedStringWriter WriteLine()
-    {
-        Builder.AppendLine();
-        tabsPending = true;
-        return this;
-    }
-
-    public IndentedStringWriter WriteLine(string text)
-    {
-        if (tabsPending)
-        {
-            WriteTabs();
-        }
-
-        Builder.AppendLine(text);
-        tabsPending = true;
-        return this;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IndentedStringWriter WriteLine(
-        [InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolatedStringHandler handler)
-    {
-        WriteLine();
-        return this;
-    }
-
-
-    /// <summary>
-    /// Returns resources to pools. <br/>
-    /// This instance MUST NOT be used for ANYTHING (not even ToString()) after being disposed.
-    /// </summary>
-    public void Dispose()
-    {
-        if (Builder != null)
-        {
-            StringBuilderPool.Return(Builder);
+        public void AppendLiteral(string literal) => writer.Write(literal);
+        public void AppendFormatted(byte value) => writer.Write(value);
+        public void AppendFormatted(sbyte value) => writer.Write(value);
+        public void AppendFormatted(short value) => writer.Write(value);
+        public void AppendFormatted(ushort value) => writer.Write(value);
+        public void AppendFormatted(int value) => writer.Write(value);
+        public void AppendFormatted(uint value) => writer.Write(value);
+        public void AppendFormatted(long value) => writer.Write(value);
+        public void AppendFormatted(ulong value) => writer.Write(value);
+        public void AppendFormatted(char value) => writer.Write(value);
+        public void AppendFormatted(string value) => writer.Write(value);
+        public void AppendFormatted(float value) => writer.Write(value);
+        public void AppendFormatted(double value) => writer.Write(value);
+        public void AppendFormatted<T>(T value) {
+            if (value is IFormattable t)
+                writer.Write(t.ToString(null, CultureInfo.InvariantCulture));
+            else
+                writer.Write(value?.ToString() ?? "");
         }
     }
-
-    #endregion // Write methods
 }

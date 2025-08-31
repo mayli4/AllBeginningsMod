@@ -1,192 +1,21 @@
 Mods: {
 	AllBeginningsMod: {
 		Items: {
-			PlasmicRepeaterItem: {
-				DisplayName: Plasmic Repeater
-				Tooltip: ""
-			}
-
-			ExothermicSoulItem: {
-				DisplayName: Exothermic Soul
-				Tooltip: ""
-			}
-
-			MistaBombItem: {
-				DisplayName: Mista Bomb
-				Tooltip: ""
-			}
-
-			StoneStatueItem: {
-				DisplayName: Stone Statue
-				Tooltip: ""
-			}
-
-			PocketSnowmanItem: {
-				DisplayName: Pocket Snowman
-				Tooltip: ""
-			}
-
-			SandStoneStatueItem: {
-				DisplayName: Sandstone Statue
-				Tooltip: ""
-			}
-
-			BIGGunItem: {
-				DisplayName: BIG Gun
-				Tooltip: ""
+			AccentedBlueDynastyShinglesItem: {
+				DisplayName: Accented Blue Dynasty Shingles Item
+				Tooltip:
+					'''
+					    Wow!
+					    A two line tooltip!
+					'''
 			}
 
 			BigPotItem: {
 				DisplayName: Big Pot Item
 				Tooltip: ""
 			}
-
-			AccentedBlueDynastyShinglesItem: {
-				DisplayName: Accented Blue Dynasty Shingles Item
-				Tooltip: ""
-			}
-
-			CorruptAshItem: {
-				DisplayName: Corrupt Ash Item
-				Tooltip: ""
-			}
-
-			CrimsonAshItem: {
-				DisplayName: Crimson Ash Item
-				Tooltip: ""
-			}
-
-			UnderworldDemoniteItem: {
-				DisplayName: Underworld Demonite Item
-				Tooltip: ""
-			}
-
-			DevilOWarHeartPickup: {
-				DisplayName: Devil O War Heart Pickup
-				Tooltip: ""
-			}
 		}
 
-		NPCs: {
-			HellVampireNPC.DisplayName: Hell Vampire
-			BastroboyNPC.DisplayName: Bastroboy
-			GardenerNPC.DisplayName: Gardener
-			MineVampireNPC.DisplayName: Mine Vampire
-			NightgauntNPC.DisplayName: Nightgaunt
-			DevilVampireNPC.DisplayName: Devil Vampire
-			TerrarianHunterNPC.DisplayName: Terrarian Hunter
-			NPCHitboxNPC.DisplayName: Hitbox
-
-			StrangeTreeNPC: {
-				DisplayName: Gleeful Tree
-
-				TownNPCMood: {
-					Content: I am content.
-					NoHome: I hate not having a home.
-					FarFromHome: I am too far from home.
-					LoveSpace: I love having so much space.
-					DislikeCrowded: I dislike how crowded I am.
-					HateCrowded: I hate how crowded I am.
-					LikeNPC_Princess: I like {NPCName}.
-					Princess_LovesNPC: I like {NPCName}.
-					LoveBiome: I love {BiomeName}.
-				}
-
-				Dialogue: {
-					Line0: Can you believe it, a talking tree.
-					Line1: This place is STUNNING! Im so glad i could get a chance to dig my roots in this soil.
-					Line2: I'm glad you're here mister, we seem to share alot. Everything down from the bark, to our destiny.
-					Line3: Give this guy 5 golden coins, and get yourself a bunch of grass seeds.
-				}
-			}
-
-			DevilOWarNPC.DisplayName: Devil O' War
-			TerrorBatNPC.DisplayName: Terror Bat
-			CursedSpiritNPC.DisplayName: Cursed Spirit
-			EffigyNPC.DisplayName: Effigy
-			PusCarrierGrubNPC.DisplayName: Pus Carrier Grub N P C
-		}
-
-		Projectiles: {
-			BastroboyNPCOrbitingProjectile.DisplayName: Bastroboy Orbiting Projectile
-			BastroboyNPCExplodingStarProjectile.DisplayName: Bastroboy Exploding Star Projectile
-			BastroboyExplodingStarProjectile.DisplayName: Bastroboy Exploding Star Projectile
-			BastroboyOrbitingProjectile.DisplayName: Bastroboy Orbiting Projectile
-			BastroboyExplodingProjectile.DisplayName: Bastroboy Exploding Projectile
-			BastroboyStarWhirlProjectile.DisplayName: Bastroboy Star Whirl Projectile
-			NightgauntReverseGravityProjectile.DisplayName: Nightgaunt's Jellyfish
-			NightgauntForceField.DisplayName: Nightgaunt's Force Field
-			TerrarianHunterMineProjectile.DisplayName: Terrarian Hunter Mine
-			PlasmicRepeaterHeldProjectile.DisplayName: Plasmic Repeater Held Projectile
-			PlasmicRepeaterLaserProjectile.DisplayName: Plasmic Repeater Laser Projectile
-			ExplosionVFXProjectile.DisplayName: Explosion V F X Projectile
-			DevilVampireAuraProjectile.DisplayName: Devil Vampire Aura
-			MistaBombProjectile.DisplayName: Mista Bomb Projectile
-			BIGGunHeldProjectile.DisplayName: B I G Gun Held Projectile
-			BIGGunBigRocketProjectile.DisplayName: B I G Gun Big Rocket Projectile
-			BIGGunSmallRocketProjectile.DisplayName: B I G Gun Small Rocket Projectile
-			BastroboyPhantomProjectile.DisplayName: Bastroboy Phantom Projectile
-			NeutralSunProjectile.DisplayName: Neutral Sun Projectile
-			PhantomProjectile.DisplayName: Phantom Projectile
-			StarWhirlProjectile.DisplayName: Star Whirl Projectile
-			GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
-			TestProj.DisplayName: Test Proj
-			DevilOWarStingerProjectile.DisplayName: Devil O War Stinger Projectile
-			HellbatSpit.DisplayName: Hellbat Spit
-			HellbatSpitProjectile.DisplayName: Hellbat Spit Projectile
-			TerrorBatSpit.DisplayName: Terror Bat Spit
-			SpiritFireball.DisplayName: Spirit Fireball
-		}
-
-		Buffs: {
-			NoFlightDebuff: {
-				Description: Player can't use wings for the duration of this debuff.
-				DisplayName: No Flight Debuff
-			}
-
-			OnGasDebuff: {
-				DisplayName: On Gas Debuff
-				Description: Mods.AllBeginningsMod.Buffs.OnGasDebuff.Description
-			}
-		}
-
-		Biomes: {
-			Garden: {
-				DisplayName: Garden
-				TownNPCDialogueName: the Garden
-			}
-
-			GardenBiome: {
-				DisplayName: Garden Biome
-				TownNPCDialogueName: the Garden Biome
-			}
-
-			UnderworldCorruptionBiome: {
-				DisplayName: Underworld Corruption Biome
-				TownNPCDialogueName: The Underworld Corruption Biome
-			}
-
-			UnderworldCorruption: {
-				DisplayName: Underworld Corruption
-				TownNPCDialogueName: the Underworld Corruption
-			}
-
-			UnderworldCrimsonBiome: {
-				DisplayName: Underworld Crimson Biome
-				TownNPCDialogueName: the Underworld Crimson Biome
-			}
-		}
-
-		Tiles: {
-			BigPotTile.MapEntry: Big Pot Tile
-			UnderworldDemonite.MapEntry: Underworld Demonite
-			UnderworldCorruptLavaDropletSource.MapEntry: Lava Dripping
-		}
-
-		Bestiary: {
-			DevilOWarNPCBestiary: Marine life in the underworld? this organism uses hot gases to float in the air, and a sharp stinger to feed off its prey!
-			TerrorBatNPCBestiary: The terror bat grooves and dives in the air, while also using its acidic spit as a weapon that you wouldn't want to stain your clothes!
-			PusCarrierGrubNPCBestiary: ""
-		}
+		Projectiles.GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
 	}
 }

@@ -17,7 +17,7 @@ namespace AllBeginningsMod.Content.Tiles.Forest;
 //okk so, if were gonna have lots of tiles that have stuff like this i should probably come up with a dummy system or something
 
 public sealed class GiantShroom : ModTile {
-    public override string Texture => Assets.Assets.Textures.Tiles.Forest.KEY_GiantShroomStem;
+    public override string Texture => Textures.Tiles.Forest.KEY_GiantShroomStem;
 
     public override void SetStaticDefaults() {
         Main.tileSolid[Type] = false;
@@ -107,7 +107,6 @@ internal sealed class GiantShroomCapDummy : ModProjectile {
         if (_bounceState == 0 && Main.LocalPlayer.velocity.Y > 0 && Main.LocalPlayer.Hitbox.Intersects(Projectile.Hitbox)) {
             _bounceState = 1;
             _leanDirection = Math.Sign(Main.LocalPlayer.velocity.X);
-            
 
             for (int i = 0; i < 15; i++) {
                 Dust.NewDust(

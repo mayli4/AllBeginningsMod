@@ -39,6 +39,7 @@
         <AdditionalFiles Include="Assets/**/*.wav" />
         <AdditionalFiles Include="Assets/**/*.ogg" />
         <AdditionalFiles Include="Assets/**/*.mp3" />
+
     </ItemGroup>
     
 </Project>
