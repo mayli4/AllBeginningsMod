@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllBeginningsMod", "src\AllBeginningsMod\AllBeginningsMod.csproj", "{644522F7-0D31-4206-8027-C102BEEE21D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllBeginningsGeneration", "src\AllBeginningsGeneration\AllBeginningsGeneration.csproj", "{6B190FF7-3790-41F2-83B1-64445229364F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generators", "src\Generators\Generators.csproj", "{6B190FF7-3790-41F2-83B1-64445229364F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{44108FA2-423D-4BFF-960B-6E0418F5BC4E}"
 	ProjectSection(SolutionItems) = preProject
