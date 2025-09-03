@@ -1,0 +1,502 @@
+using AllBeginningsMod.Common.Camera;
+using AllBeginningsMod.Common.Graphics;
+using AllBeginningsMod.Content.Dusts;
+using AllBeginningsMod.Utilities;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Terraria;
+using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.GameContent;
+using Terraria.ID;
+
+namespace AllBeginningsMod.Content.Items.Misc;
+
+internal sealed class GrabbityGunItem : ModItem {
+    public sealed override string Texture => Textures.Tiles.Decoration.KEY_AccentedBlueDynastyShinglesItem;
+
+    public override void SetDefaults() {
+        Item.width = 40;
+        Item.height = 40;
+        Item.rare = ItemRarityID.Yellow;
+        Item.value = Item.sellPrice(gold: 5);
+
+        Item.useTurn = true;    
+        Item.useTime = 5;
+        Item.useAnimation = 5;
+        Item.useStyle = ItemUseStyleID.Shoot; 
+        Item.channel = true;
+        Item.noMelee = true;
+        Item.noUseGraphic = true;
+
+        Item.shoot = ModContent.ProjectileType<GrabbityGunProjectile>();
+        Item.shootSpeed = 10f;
+    }
+
+    public override bool AltFunctionUse(Player player) {
+        return true;
+    }
+
+    public override bool CanUseItem(Player player) {
+        return player.ownedProjectileCounts[ModContent.ProjectileType<GrabbityGunProjectile>()] <= 0;
+    }
+
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
+        Projectile.NewProjectile(
+            player.GetSource_ItemUse(Item),
+            Main.MouseWorld,
+            Vector2.Zero,
+            type,
+            (int)player.GetTotalDamage(DamageClass.Magic).ApplyTo(damage),
+            knockback,
+            player.whoAmI
+        );
+        
+        Projectile.NewProjectile(
+            source,
+            player.Center,
+            Vector2.Zero,
+            ModContent.ProjectileType<GrabbityGunItemHeldProjectile>(),
+            0,
+            0,
+            player.whoAmI
+        );
+        
+        return false;
+    }
+}
+
+//lazy :\\
+internal sealed class GrabbityGunItemHeldProjectile : ModProjectile {
+    public override string Texture => Textures.Items.Misc.GrabbityGun.KEY_GrabbityGunHeld;
+    
+    public int GrabbityGunID => (int)Projectile.ai[0];
+    public ref float ShakeTimer => ref Projectile.ai[1];
+
+    public const float SHAKE_TIME = 15f;
+
+    public override void SetStaticDefaults() {
+        ProjectileID.Sets.DontAttachHideToAlpha[Type] = true;
+    }
+
+    public override void SetDefaults() {
+        Projectile.width = 30;
+        Projectile.height = 28;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.ignoreWater = true;
+        Projectile.penetrate = -1;
+        Projectile.aiStyle = -1;
+        Projectile.alpha = 0;
+        Projectile.ownerHitCheck = true;
+        Projectile.hide = true;
+    }
+
+    public override bool ShouldUpdatePosition() => false;
+
+    public override void AI() {
+        var player = Main.player[Projectile.owner];
+        
+        Projectile logicProjectile = null;
+        if (GrabbityGunID >= 0 && GrabbityGunID < Main.maxProjectiles) {
+            logicProjectile = Main.projectile[GrabbityGunID];
+        }
+
+        if (!player.channel || player.dead || !player.active || player.HeldItem.type != ModContent.ItemType<GrabbityGunItem>()) {
+            Projectile.Kill();
+            return;
+        }
+        
+        Projectile.velocity = (Main.MouseWorld - player.MountedCenter).SafeNormalize(Vector2.UnitY);
+
+        player.heldProj = Projectile.whoAmI;
+        player.ChangeDir(Math.Sign(Projectile.velocity.X));
+        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation() * player.gravDir - MathHelper.PiOver2);
+        player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation() * player.gravDir - MathHelper.PiOver2 - MathHelper.PiOver4 * 0.5f * player.direction);
+
+        player.SetDummyItemTime(2);
+        Projectile.rotation = Projectile.velocity.ToRotation();
+        Projectile.Center = player.MountedCenter;
+        Projectile.timeLeft = 2;
+
+        Projectile.spriteDirection = player.direction;
+        
+        if (ShakeTimer > 0) {
+            ShakeTimer--;
+        }
+    }
+    
+    public void TriggerShake() {
+        ShakeTimer = SHAKE_TIME;
+        Projectile.netUpdate = true;
+    }
+
+    public override bool? CanCutTiles() => false;
+
+    public override bool PreDraw(ref Color lightColor) {
+        var player = Main.player[Projectile.owner];
+        
+        Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+        Vector2 origin = new Vector2(10, texture.Height / 2f);
+        SpriteEffects effect = SpriteEffects.None;
+        if (player.direction * player.gravDir < 0) {
+            effect = SpriteEffects.FlipVertically;
+        }
+        
+        var shakeOffset = Vector2.Zero;
+        if (ShakeTimer > 0) {
+            float shakeIntensity = Math.Clamp(ShakeTimer / SHAKE_TIME, 0f, 1f);
+            shakeOffset = Main.rand.NextVector2Circular(5f, 5f) * shakeIntensity;
+        }
+        var position = player.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 10f + Vector2.UnitY * player.gfxOffY;
+        Vector2 direction = Projectile.velocity.SafeNormalize(Vector2.Zero);
+        
+        Main.EntitySpriteDraw(texture, position - Main.screenPosition + shakeOffset, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, effect, 0);
+
+        return false;
+    }
+}
+
+internal sealed class GrabbityGunProjectile : ModProjectile {
+    public sealed override string Texture => Helper.PlaceholderTextureKey;
+
+    private const float grab_range = 16 * 25;
+
+    public override void SetDefaults() {
+        Projectile.width = 1;
+        Projectile.height = 1;
+        Projectile.friendly = true;
+        Projectile.hostile = false;
+        Projectile.penetrate = -1;
+        Projectile.tileCollide = false;
+        Projectile.ignoreWater = true;
+        Projectile.aiStyle = -1;
+        Projectile.timeLeft = 3600;
+        Projectile.ownerHitCheck = true;
+        Projectile.extraUpdates = 1;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = -1;
+    }
+
+    public override bool ShouldUpdatePosition() => false;
+
+    public override void AI() {
+        Player player = Main.player[Projectile.owner];
+
+        if (player.dead || !player.active || !player.channel || player.noItems || player.CCed) {
+            Projectile.Kill();
+            return;
+        }
+
+        player.heldProj = Projectile.whoAmI;
+
+        Vector2 gunOffset = new Vector2(player.direction * 14f, -4f); 
+        Projectile.Center = player.Center + gunOffset; 
+        
+        Projectile.rotation = (Main.MouseWorld - Projectile.Center).ToRotation(); 
+        
+        Projectile.spriteDirection = player.direction;
+        if (Main.MouseWorld.X < Projectile.Center.X) {
+            Projectile.spriteDirection = -1;
+        }
+        
+        if (Projectile.ai[2] > 0) {
+            Projectile.ai[2]--;
+        }
+
+        NPC grabbedNPC = null;
+        if (Projectile.ai[0] == 1) {
+            grabbedNPC = Main.npc[(int)Projectile.ai[1]];
+
+            if (!grabbedNPC.active || grabbedNPC.lifeMax <= 0) {
+                ReleaseGrab(); 
+                return;
+            }
+
+            float currentDistanceFromGun = Vector2.Distance(grabbedNPC.Center, Projectile.Center);
+            if (currentDistanceFromGun > grab_range) {
+                Vector2 directionToNPC = (grabbedNPC.Center - Projectile.Center).SafeNormalize(Vector2.Zero);
+                Vector2 clampedPosition = Projectile.Center + directionToNPC * grab_range;
+
+                grabbedNPC.Center = clampedPosition;
+                grabbedNPC.velocity = Vector2.Zero;
+                grabbedNPC.netUpdate = true;
+            }
+        }
+
+        if (Projectile.ai[0] == 0) {
+            if (Projectile.ai[2] > 0) {
+                return;
+            }
+            
+            if (player.controlUseItem) {
+                if (Vector2.Distance(player.MountedCenter, Main.MouseWorld) > grab_range) {
+                    return;
+                }
+                
+                foreach (NPC npc in Main.npc) {
+                    if (npc.active && npc.lifeMax > 0 && !npc.boss) {
+                        if (npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.Distance(Main.MouseWorld) < grab_range) {
+                            Projectile.ai[0] = 1;
+                            Projectile.ai[1] = npc.whoAmI;
+                            Projectile.netUpdate = true;
+
+                            npc.GetGlobalNPC<GrabbityGunGlobalNPC>().IsGrabbed = true;
+
+                            SoundEngine.PlaySound(Sounds.Item.GrabbityGun.GrabbityGunGrab with { Pitch = 0.0f, PitchVariance = 0.5f }, Projectile.Center);
+                            npc.netUpdate = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if (grabbedNPC != null) {
+                if (!player.controlUseItem) {
+                    ReleaseGrab(true); 
+                    return;
+                }
+                
+                Vector2 dragTarget = Main.MouseWorld;
+                Vector2 directionToMouse = (dragTarget - grabbedNPC.Center);
+
+                grabbedNPC.velocity += directionToMouse * 0.1f;
+
+                if (grabbedNPC.velocity.Length() > 20) {
+                    grabbedNPC.velocity = Vector2.Normalize(grabbedNPC.velocity) * 20;
+                }
+
+                grabbedNPC.velocity *= 0.92f;
+                grabbedNPC.netUpdate = true;
+                
+                if (Main.mouseRight) {
+                    Vector2 pushDirection = (Main.MouseWorld - player.MountedCenter).SafeNormalize(Vector2.UnitX * player.direction);
+                    grabbedNPC.velocity = pushDirection * 20;
+
+                    ReleaseGrab(false);
+                }
+            }
+        }
+    }
+
+    private void ReleaseGrab(bool withPushback = false) {
+        Player player = Main.player[Projectile.owner];
+        Projectile heldGunVisualProjectile = null;
+        if (Projectile.owner >= 0 && Projectile.owner < Main.maxProjectiles) {
+            foreach (Projectile proj in Main.projectile) {
+                if (proj.active && proj.owner == Projectile.owner && proj.type == ModContent.ProjectileType<GrabbityGunItemHeldProjectile>()) {
+                    heldGunVisualProjectile = proj;
+                    break;
+                }
+            }
+        }
+
+        if (Projectile.ai[0] == 1) {
+            NPC grabbedNPC = Main.npc[(int)Projectile.ai[1]];
+            if (grabbedNPC.active && grabbedNPC.lifeMax > 0) { 
+                Vector2 flingDirection = (Main.MouseWorld - player.MountedCenter).SafeNormalize(Vector2.UnitX * player.direction); 
+                    
+                for (int i = 0; i < 10; i++) {
+                    Vector2 dustPosition = grabbedNPC.Center + Main.rand.NextVector2Circular(grabbedNPC.width / 2f, grabbedNPC.height / 2f);
+                
+                    var dustVelocity = -flingDirection.RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * Main.rand.NextFloat(-30 * 0.5f, -30);
+                
+                    Dust.NewDustPerfect(
+                        dustPosition,
+                        ModContent.DustType<ImpactLineDust>(),
+                        dustVelocity,
+                        0,
+                        new Color(255, 120, 0, 5),
+                        1f
+                    );
+                }
+                
+                if (withPushback) {
+                    grabbedNPC.velocity = flingDirection * 15;
+                }
+                
+                grabbedNPC.GetGlobalNPC<GrabbityGunGlobalNPC>().IsGrabbed = false; 
+                grabbedNPC.netUpdate = true;
+            }
+        }
+        Projectile.ai[0] = 0;
+        Projectile.ai[1] = -1;
+        Projectile.netUpdate = true;
+        SoundEngine.PlaySound(Sounds.Item.GrabbityGun.GrabbityGunLaunch with { Pitch = 0.0f, PitchVariance = 0.5f }, Projectile.Center);
+        
+        GrabbityGunItemHeldProjectile heldGun = heldGunVisualProjectile?.ModProjectile as GrabbityGunItemHeldProjectile;
+        heldGun?.TriggerShake();
+        Main.instance.CameraModifiers.Add(new ExplosionShakeCameraModifier(10, 0.5f));
+        
+        Projectile.ai[2] = 60;
+    }
+    
+    public override unsafe bool PreDraw(ref Color lightColor) {
+        Projectile heldGunVisualProjectile = null;
+        foreach (Projectile proj in Main.projectile) {
+            if (proj.active && proj.owner == Projectile.owner && proj.type == ModContent.ProjectileType<GrabbityGunItemHeldProjectile>()) {
+                heldGunVisualProjectile = proj;
+                break;
+            }
+        }
+
+        if (heldGunVisualProjectile == null) {
+            return false;
+        }
+
+        if (Projectile.ai[0] == 1) {
+            NPC grabbedNPC = Main.npc[(int)Projectile.ai[1]];
+            if (grabbedNPC.active) {
+                var heldGunTexture = ModContent.Request<Texture2D>(heldGunVisualProjectile.ModProjectile.Texture).Value;
+                
+                Vector2 heldGunVisualOrigin = new Vector2(10, heldGunTexture.Height / 2f);
+
+                float muzzleOffsetXFromOriginPivot = (heldGunTexture.Width - 5f) - heldGunVisualOrigin.X;
+                float muzzleOffsetYFromOriginPivot = 0f;
+
+                Vector2 muzzleLocalOffsetFromPivot = new Vector2(muzzleOffsetXFromOriginPivot, muzzleOffsetYFromOriginPivot);
+                
+                Vector2 rotatedMuzzleOffset = muzzleLocalOffsetFromPivot.RotatedBy(heldGunVisualProjectile.rotation);
+
+                Vector2 beamStart = heldGunVisualProjectile.Center + rotatedMuzzleOffset;
+                Vector2 beamEnd = grabbedNPC.Center;
+
+                int segments = 20;
+                var trailPoints = new List<Vector2>(segments + 1);
+
+                var midControlPoint = Vector2.Lerp(beamStart, beamEnd, 0.5f);
+                
+                float curveInfluence = 0.35f; 
+                midControlPoint += (Main.MouseWorld - grabbedNPC.Center) * curveInfluence;
+
+                ReadOnlySpan<Vector2> controlPoints = stackalloc Vector2[] { beamStart, midControlPoint, beamEnd };
+                using (var curve = new BezierCurve(controlPoints)) {
+                    trailPoints = curve.GetPoints(segments + 1);
+                }
+
+                var shader = Shaders.Trail.GrabbityGunBeam.Value;
+                
+                Graphics.BeginPipeline(0.5f)
+                    .DrawTrail(
+                        trailPoints.ToArray(), 
+                        _ => 20f, 
+                        _ => Color.OrangeRed,
+                        shader,
+                        ("transformMatrix", Graphics.WorldTransformMatrix),
+                        ("time", Main.GameUpdateCount * -0.025f),
+                        ("sampleTexture", Textures.Sample.GlowTrail.Value),
+                        ("repeats", 0)
+                        )
+                    .Flush();
+                
+                Graphics.BeginPipeline(0.5f)    
+                    .DrawTrail(
+                        trailPoints.ToArray(), 
+                        _ => 15f, 
+                        _ => Color.OrangeRed,
+                        shader,
+                        ("transformMatrix", Graphics.WorldTransformMatrix),
+                        ("time", Main.GameUpdateCount * -0.025f),
+                        ("sampleTexture", Textures.Sample.EnergyTrail.Value),
+                        ("repeats", 2)
+                    )
+                    .ApplyOutline(Color.Yellow)
+                    .Flush();
+                
+                var snapshot = Main.spriteBatch.CaptureEndBegin(new() { BlendState = BlendState.Additive });
+
+                Main.spriteBatch.Draw(
+                    Textures.Sample.Glow1.Value,
+                    beamEnd - Main.screenPosition,
+                    null,
+                    new Color(255, 106, 0) * 0.25f,
+                    0f,
+                    Textures.Sample.Glow1.Value.Size() / 2f,
+                    0.6f,
+                    SpriteEffects.None,
+                    0f
+                );
+                
+                Main.spriteBatch.Draw(
+                    Textures.Sample.Glow1.Value,
+                    beamEnd - Main.screenPosition,
+                    null,
+                    new Color(255, 106, 0) * 0.35f,
+                    0f,
+                    Textures.Sample.Glow1.Value.Size() / 2f,
+                    0.3f,
+                    SpriteEffects.None,
+                    0f
+                );
+
+                Main.spriteBatch.EndBegin(snapshot);
+            }
+        }
+
+        return false;
+    }
+}   
+
+
+internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
+    public override bool InstancePerEntity => true;
+    public bool IsGrabbed { get; set; }
+
+    public override void ResetEffects(NPC npc) {
+        if (IsGrabbed) {
+            bool foundActiveGrabber = Main.projectile.Any(proj =>
+                proj.active
+                && proj.type == ModContent.ProjectileType<GrabbityGunProjectile>()
+                && proj.ai[0] == 1f
+                && (int)proj.ai[1] == npc.whoAmI
+            );
+
+            if (!foundActiveGrabber) {
+                IsGrabbed = false;
+            }
+        }
+    }
+
+    public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+        if (IsGrabbed) {
+            var npcTexture = Terraria.GameContent.TextureAssets.Npc[npc.type].Value;
+            var frame = npc.frame;
+            var origin = frame.Size() / 2f;
+            var effects = npc.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            
+            var npcDrawingColor = npc.GetAlpha(drawColor);
+            
+            var pos = npc.townNPC 
+                ? (npc.Center + Vector2.UnitY * npc.gfxOffY - new Vector2(0, 4)) - screenPos
+                : npc.Center - screenPos;
+
+            var shader = Shaders.Tint.Value;
+            shader.Parameters["color"].SetValue(Color.Orange.ToVector4());
+            
+            var snapshot = spriteBatch.CaptureEndBegin(new SpriteBatchSnapshot() with { CustomEffect = shader });
+
+            spriteBatch.Draw(npcTexture, pos + new Vector2(2, 0), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
+            spriteBatch.Draw(npcTexture, pos - new Vector2(2, 0), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
+            
+            spriteBatch.Draw(npcTexture, pos + new Vector2(0, 2), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
+            spriteBatch.Draw(npcTexture, pos - new Vector2(0, 2), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
+
+            spriteBatch.EndBegin(snapshot);
+
+            //orugh... ughhhr... fuuckkk..
+            // var pipeline = Graphics.BeginPipeline();
+            //     pipeline
+            //     .SetBlendState(BlendState.AlphaBlend)
+            //     .DrawSprite(npcTexture, pos, drawColor, npc.frame, npc.rotation, npc.frame.Size() / 2, new Vector2(npc.scale), npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally)
+            //     .Flush();
+        }
+
+        return true;
+    }
+}

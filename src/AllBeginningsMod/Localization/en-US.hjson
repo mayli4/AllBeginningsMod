@@ -2,20 +2,25 @@ Mods: {
 	AllBeginningsMod: {
 		Items: {
 			AccentedBlueDynastyShinglesItem: {
-				DisplayName: Accented Blue Dynasty Shingles Item
-				Tooltip:
-					'''
-					    Wow!
-					    A two line tooltip!
-					'''
+				DisplayName: Accented Blue Dynasty Shingles
+				Tooltip: ""
 			}
 
 			BigPotItem: {
-				DisplayName: Big Pot Item
+				DisplayName: Big Pot
+				Tooltip: ""
+			}
+
+			GrabbityGunItem: {
+				DisplayName: Grabbity Gun
 				Tooltip: ""
 			}
 		}
 
-		Projectiles.GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
+		Projectiles: {
+			GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
+			GrabbityGunItemHeldProjectile.DisplayName: ""
+			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
+		}
 	}
 }
