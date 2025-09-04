@@ -1,0 +1,8 @@
+#ifndef INCLUDEDCOMMON
+#define INCLUDEDCOMMON
+
+#define PI 3.14159265359f
+#define TWO_PI 6.28318530718f
+#define HALF_PI 1.57079632679f
+
+#endif

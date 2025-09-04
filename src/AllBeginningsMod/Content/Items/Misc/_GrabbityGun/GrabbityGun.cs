@@ -476,7 +476,7 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
                 ? (npc.Center + Vector2.UnitY * npc.gfxOffY - new Vector2(0, 4)) - screenPos
                 : npc.Center - screenPos;
 
-            var shader = Shaders.Tint.Value;
+            var shader = Shaders.Fragment.Tint.Value;
             shader.Parameters["color"].SetValue(Color.Orange.ToVector4());
             
             var snapshot = spriteBatch.CaptureEndBegin(new SpriteBatchSnapshot() with { CustomEffect = shader });

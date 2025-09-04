@@ -1,6 +1,9 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Runtime.CompilerServices;
 using Terraria;
+using Terraria.GameContent;
 
 namespace AllBeginningsMod.Utilities;
 
@@ -49,5 +52,111 @@ public static partial class Helper {
         }
 
         return true;
+    }
+    
+    public static Point ToSafeTileCoordinates(this Vector2 vec) {
+        return new Point((int)MathHelper.Clamp((int)vec.X >> 4, 0, Main.maxTilesX), (int)MathHelper.Clamp((int)vec.Y >> 4, 0, Main.maxTilesY));
+    }
+    
+    public static Vector2 InverseKinematic(Vector2 start, Vector2 end, float A, float B, bool flip) {
+        float C = Vector2.Distance(start, end);
+        float angle = (float)Math.Acos(Math.Clamp((C * C + A * A - B * B) / (2f * C * A), -1f, 1));
+        if (flip)
+            angle *= -1;
+        return start + (angle + start.AngleTo(end)).ToRotationVector2() * A;
+    }
+    
+    public static Point? RaytraceToFirstSolid(this Vector2 pos1, Vector2 pos2) {
+        Point point1 = pos1.ToSafeTileCoordinates();
+        Point point2 = pos2.ToSafeTileCoordinates();
+        return RaytraceToFirstSolid(point1, point2);
+    }
+
+    public static Point? RaytraceToFirstSolid(this Point pos1, Point pos2) {
+        return RaytraceToFirstSolid(pos1.X, pos1.Y, pos2.X, pos2.Y);
+    }
+
+    public static Point? RaytraceToFirstSolid(int x0, int y0, int x1, int y1) {
+        //Bresenham's algorithm
+        int horizontalDistance = Math.Abs(x1 - x0); //Delta X
+        int verticalDistance = Math.Abs(y1 - y0); //Delta Y
+        int horizontalIncrement = (x1 > x0) ? 1 : -1; //S1
+        int verticalIncrement = (y1 > y0) ? 1 : -1; //S2
+
+        int x = x0;
+        int y = y0;
+        int i = 1 + horizontalDistance + verticalDistance;
+        int E = horizontalDistance - verticalDistance;
+        horizontalDistance *= 2;
+        verticalDistance *= 2;
+
+        while (i > 0)
+        {
+            if (Main.tile[x, y].IsTileSolidOrPlatform())
+                return new Point(x, y);
+
+            if (E > 0)
+            {
+                x += horizontalIncrement;
+                E -= verticalDistance;
+            }
+            else
+            {
+                y += verticalIncrement;
+                E += horizontalDistance;
+            }
+            i--;
+        }
+        return null;
+    }
+    
+    public static Point? RaytraceToFirstSolid(Vector2 start, Vector2 end, int steps) {
+        float stepLength = Vector2.Distance(start, end) / steps;
+        Vector2 stepDirection = (end - start).SafeNormalize(Vector2.Zero);
+
+        for (int i = 0; i <= steps; i++) {
+            Vector2 currentCheckPos = start + stepDirection * stepLength * i;
+            Point tileCoords = currentCheckPos.ToSafeTileCoordinates(); // Use ToSafeTileCoordinates
+
+            if (tileCoords.X < 0 || tileCoords.X >= Main.maxTilesX || tileCoords.Y < 0 || tileCoords.Y >= Main.maxTilesY) {
+                return null; // Out of world bounds
+            }
+
+            Tile tile = Main.tile[tileCoords.X, tileCoords.Y];
+            if (tile.HasTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType]) {
+                return tileCoords;
+            }
+        }
+        return null;
+    }
+
+    
+    public static bool IsTileSolidOrPlatform(this Tile tile) => tile != null && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float NormalizeAngle(float angle) {
+        angle %= (2 * MathF.PI);
+        if (angle > MathF.PI) angle -= 2 * MathF.PI;
+        else if (angle <= -MathF.PI) angle += 2 * MathF.PI;
+        return angle;
+    }
+    
+    public static void DrawLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end, Color color, float thickness)
+    {
+        Vector2 edge = end - start;
+        float angle = (float)Math.Atan2(edge.Y, edge.X);
+        float length = edge.Length();
+
+        spriteBatch.Draw(
+            TextureAssets.MagicPixel.Value,
+            start,
+            null,
+            color,
+            angle,
+            Vector2.Zero,
+            new Vector2(length, thickness),
+            SpriteEffects.None,
+            0
+        );
     }
 }

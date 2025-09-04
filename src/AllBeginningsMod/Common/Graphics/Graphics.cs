@@ -357,7 +357,7 @@ public class Graphics : ModSystem {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly Pipeline ApplyOutline(Color color, float threshold = 0.001f) {
             ApplyEffect(
-                Shaders.Outline.Value,
+                Shaders.Fragment.Outline.Value,
                 ("uColor", color.ToVector4()),
                 ("uSize", Main.ScreenSize.ToVector2()),
                 ("uThreshold", threshold)
@@ -625,7 +625,7 @@ public class Graphics : ModSystem {
         }
 
         public readonly Pipeline ApplyTint(Color color) {
-            ApplyEffect(Shaders.Tint.Value, ("color", color.ToVector4()));
+            ApplyEffect(Shaders.Fragment.Tint.Value, ("color", color.ToVector4()));
             return this;
         }
 
