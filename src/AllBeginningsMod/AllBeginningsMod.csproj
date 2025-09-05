@@ -53,6 +53,12 @@
         <AdditionalFiles Remove="..\Build/**" />
         
         <Compile Include="..\Build\Common.cs" />
+        
+        <None Remove="Assets\Textures\NPCs\Bosses\Nightgaunt\LimbEnd.png" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Common\Dialogue\" />
     </ItemGroup>
     
 </Project>

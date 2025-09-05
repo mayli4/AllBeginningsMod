@@ -4,6 +4,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
 
 namespace AllBeginningsMod.Utilities;
 
@@ -110,27 +111,6 @@ public static partial class Helper {
         return null;
     }
     
-    public static Point? RaytraceToFirstSolid(Vector2 start, Vector2 end, int steps) {
-        float stepLength = Vector2.Distance(start, end) / steps;
-        Vector2 stepDirection = (end - start).SafeNormalize(Vector2.Zero);
-
-        for (int i = 0; i <= steps; i++) {
-            Vector2 currentCheckPos = start + stepDirection * stepLength * i;
-            Point tileCoords = currentCheckPos.ToSafeTileCoordinates(); // Use ToSafeTileCoordinates
-
-            if (tileCoords.X < 0 || tileCoords.X >= Main.maxTilesX || tileCoords.Y < 0 || tileCoords.Y >= Main.maxTilesY) {
-                return null; // Out of world bounds
-            }
-
-            Tile tile = Main.tile[tileCoords.X, tileCoords.Y];
-            if (tile.HasTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType]) {
-                return tileCoords;
-            }
-        }
-        return null;
-    }
-
-    
     public static bool IsTileSolidOrPlatform(this Tile tile) => tile != null && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -140,15 +120,14 @@ public static partial class Helper {
         else if (angle <= -MathF.PI) angle += 2 * MathF.PI;
         return angle;
     }
-    
-    public static void DrawLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end, Color color, float thickness)
-    {
+
+    public static void DrawLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end, Color color, float thickness) {
         Vector2 edge = end - start;
         float angle = (float)Math.Atan2(edge.Y, edge.X);
         float length = edge.Length();
 
         spriteBatch.Draw(
-            TextureAssets.MagicPixel.Value,
+            Textures.Sample.Pixel.Value,
             start,
             null,
             color,

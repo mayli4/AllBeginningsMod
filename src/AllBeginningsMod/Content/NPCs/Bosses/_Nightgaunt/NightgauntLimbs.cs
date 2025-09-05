@@ -113,7 +113,7 @@ public class NightgauntLimb {
 
             bone.StartPosition = currentStartPoint;
             //parents absolute angle + current bone relative angle
-            bone.WorldAngle = Helpers.NormalizeAngle(parentWorldAngle + bone.RelativeAngle);
+            bone.WorldAngle = Helper.NormalizeAngle(parentWorldAngle + bone.RelativeAngle);
             //start position + lemgth + worldangle dir
             bone.EndPosition = bone.StartPosition + new Vector2(
                     bone.Length * MathF.Cos(bone.WorldAngle),

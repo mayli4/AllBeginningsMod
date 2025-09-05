@@ -25,6 +25,7 @@ public class GlobalUsingsGenerator : IIncrementalGenerator {
             sb.Append("global using static AllBeginningsMod.Assets.Assets;");
             sb.Append("global using AllBeginningsMod.Localization;");
             sb.Append("global using Terraria.ModLoader;");
+            sb.Append("global using Terraria;");
             sb.Append("");
             sb.Append("namespace AllBeginningsMod;");
             return sb.ToString();
