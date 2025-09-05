@@ -396,16 +396,14 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                     grabbedNPC.velocity = flingDirection * 15;
                 }
                 
-                int impactDamage = 111; // Or derive it from the player's damage
-                float knockback = Projectile.knockBack; // You might want to use this too
-
+                int impactDamage = 111;
+                float knockback = Projectile.knockBack;
                 GrabbityGunGlobalNPC globalNPC = grabbedNPC.GetGlobalNPC<GrabbityGunGlobalNPC>();
                 globalNPC.IsGrabbed = false;
 
-                // Mark the NPC as launched and store relevant information
                 globalNPC.IsLaunched = true;
                 globalNPC.LauncherProjectileIdentity = Projectile.whoAmI;
-                globalNPC.LaunchDamage = impactDamage; // Store the damage
+                globalNPC.LaunchDamage = impactDamage;
 
                 grabbedNPC.netUpdate = true;
                 
