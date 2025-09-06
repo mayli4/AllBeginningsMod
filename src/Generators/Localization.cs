@@ -136,13 +136,13 @@ using System.Linq;
 
                 string fileName = $"_Localization.Keys.{topLevelCategory}.g.cs";
 
-                string emptyCategoryContent = $"{initial_file_header.Trim()}\n\npublic static partial class Keys {{\n\n}}\n"; // Adjusted to match potential output
+                string emptyCategoryContent = $"{initial_file_header.Trim()}\n\npublic static partial class Keys {{\n\n}}\n";
                 if (categoryEntries.Length == 0 || string.IsNullOrWhiteSpace(sourceText) || sourceText.Trim().Equals(emptyCategoryContent.Trim(), StringComparison.OrdinalIgnoreCase)) {
                     sourceContext.ReportDiagnostic(Diagnostic.Create(
                         new DiagnosticDescriptor(
                             id: "LGEN201",
                             title: "Localization Generator produced empty category file",
-                            messageFormat: "The Localization Generator created an empty file for category '{0}' in mod '{1}'. No valid localization keys were found for this category.",
+                            messageFormat: "Localization Generator created an empty file for category '{0}' in mod '{1}'. No valid localization keys were found for this category.",
                             category: "LocalizationGenerator",
                             defaultSeverity: DiagnosticSeverity.Warning,
                             isEnabledByDefault: true),

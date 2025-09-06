@@ -4,22 +4,18 @@ using AllBeginningsMod.Content.Dusts;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ID;
 
 namespace AllBeginningsMod.Content.Items.Misc;
 
 internal sealed class GrabbityGunItem : ModItem {
-    public sealed override string Texture => Textures.Items.Misc.GrabbityGun.KEY_GrabbityGunItem;
+    public override string Texture => Textures.Items.Misc.GrabbityGun.KEY_GrabbityGunItem;
 
     private static float tooltipProgress;
     
@@ -87,16 +83,10 @@ internal sealed class GrabbityGunItem : ModItem {
             if (effect is null)
                 return true;
 
-            Texture2D tex = Textures.Sample.Glow.Value;
 
             effect.Parameters["speed"].SetValue(1);
             effect.Parameters["power"].SetValue(0.011f * tooltipProgress);
             effect.Parameters["uTime"].SetValue(Main.GameUpdateCount / 10f);
-
-            int measure = (int)(line.Font.MeasureString(line.Text).X * 1.1f);
-            int offset = (int)(Math.Sin(Main.GameUpdateCount / 25f) * 5);
-            var target = new Rectangle(line.X + measure / 2, line.Y + 10, (int)(measure * 1.5f) + offset, 34 + offset);
-            //Main.spriteBatch.Draw(tex, target, new Rectangle(4, 4, tex.Width - 4, tex.Height - 4), Color.Black * (0.675f * tooltipProgress + (float)Math.Sin(Main.GameUpdateCount / 25f) * -0.1f), 0, (tex.Size() - Vector2.One * 8) / 2, 0, 0);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(default, default, SamplerState.PointClamp, default, default, effect, Main.UIScaleMatrix);
@@ -146,11 +136,6 @@ internal sealed class GrabbityGunItemHeldProjectile : ModProjectile {
 
     public override void AI() {
         var player = Main.player[Projectile.owner];
-        
-        Projectile logicProjectile = null;
-        if (GrabbityGunID >= 0 && GrabbityGunID < Main.maxProjectiles) {
-            logicProjectile = Main.projectile[GrabbityGunID];
-        }
 
         if (!player.channel || player.dead || !player.active || player.HeldItem.type != ModContent.ItemType<GrabbityGunItem>()) {
             Projectile.Kill();
@@ -199,16 +184,15 @@ internal sealed class GrabbityGunItemHeldProjectile : ModProjectile {
             shakeOffset = Main.rand.NextVector2Circular(10f, 10f) * shakeIntensity;
         }
         var position = player.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 10f + Vector2.UnitY * player.gfxOffY;
-        Vector2 direction = Projectile.velocity.SafeNormalize(Vector2.Zero);
         
-        Main.EntitySpriteDraw(texture, position - Main.screenPosition + shakeOffset, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, effect, 0);
+        Main.EntitySpriteDraw(texture, position - Main.screenPosition + shakeOffset, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, effect);
 
         return false;
     }
 }
 
 internal sealed class GrabbityGunProjectile : ModProjectile {
-    public sealed override string Texture => Helper.PlaceholderTextureKey;
+    public override string Texture => Helper.PlaceholderTextureKey;
 
     private const float grab_range = 16 * 25;
     
@@ -354,7 +338,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                     Vector2 pushDirection = (Main.MouseWorld - player.MountedCenter).SafeNormalize(Vector2.UnitX * player.direction);
                     grabbedNPC.velocity = pushDirection * 20;
 
-                    ReleaseGrab(false);
+                    ReleaseGrab();
                 }
             }
         }
@@ -387,8 +371,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                         ModContent.DustType<ImpactLineDust>(),
                         dustVelocity,
                         0,
-                        new Color(255, 120, 0, 5),
-                        1f
+                        new Color(255, 120, 0, 5)
                     );
                 }
                 
@@ -397,7 +380,6 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                 }
                 
                 int impactDamage = 111;
-                float knockback = Projectile.knockBack;
                 GrabbityGunGlobalNPC globalNPC = grabbedNPC.GetGlobalNPC<GrabbityGunGlobalNPC>();
                 globalNPC.IsGrabbed = false;
 
@@ -607,11 +589,10 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
                     }
 
                     int wallImpactDamage = (int)(LaunchDamage * 0.75f);
-                    Player player = Main.player[Main.projectile[LauncherProjectileIdentity].owner];
 
                     Projectile sourceProjectile = Main.projectile[LauncherProjectileIdentity];
 
-                    npc.StrikeNPC(wallImpactDamage, sourceProjectile.knockBack * 0.5f, npc.direction, true, true, false);
+                    npc.StrikeNPC(wallImpactDamage, sourceProjectile.knockBack * 0.5f, npc.direction, true, true);
 
                     npc.velocity *= -0.5f;
 
@@ -716,7 +697,7 @@ public class GrabbityGunOutline : ILoadable {
 
             if (NPC.active && NPC.GetGlobalNPC<GrabbityGunGlobalNPC>().IsGrabbed) {
                 if (NPC.ModNPC != null) {
-                    if (NPC.ModNPC != null && NPC.ModNPC is ModNPC ModNPC) {
+                    if (NPC.ModNPC != null && NPC.ModNPC is { } ModNPC) {
                         if (ModNPC.PreDraw(spriteBatch, Main.screenPosition, NPC.GetAlpha(Color.White)))
                             Main.instance.DrawNPC(i, false);
 
