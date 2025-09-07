@@ -603,45 +603,14 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
                 }
             }
         }
-
         return true;
     }
 
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
-        // if (IsGrabbed) {
-        //     var npcTexture = Terraria.GameContent.TextureAssets.Npc[npc.type].Value;
-        //     var frame = npc.frame;
-        //     var origin = frame.Size() / 2f;
-        //     var effects = npc.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        //     
-        //     var npcDrawingColor = npc.GetAlpha(drawColor);
-        //     
-        //     var pos = npc.townNPC 
-        //         ? (npc.Center + Vector2.UnitY * npc.gfxOffY - new Vector2(0, 4)) - screenPos
-        //         : npc.Center - screenPos;
-        //
-        //     var shader = Shaders.Fragment.Tint.Value;
-        //     shader.Parameters["color"].SetValue(Color.Orange.ToVector4());
-        //     
-        //     var snapshot = spriteBatch.CaptureEndBegin(new SpriteBatchSnapshot() with { CustomEffect = shader });
-        //
-        //     spriteBatch.Draw(npcTexture, pos + new Vector2(2, 0), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
-        //     spriteBatch.Draw(npcTexture, pos - new Vector2(2, 0), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
-        //     
-        //     spriteBatch.Draw(npcTexture, pos + new Vector2(0, 2), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
-        //     spriteBatch.Draw(npcTexture, pos - new Vector2(0, 2), npc.frame, drawColor, npc.rotation, npc.frame.Size() / 2, npc.scale, npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally, 0);
-        //
-        //     spriteBatch.EndBegin(snapshot);
-        //
-        //     //orugh... ughhhr... fuuckkk..
-        //     // var pipeline = Graphics.BeginPipeline();
-        //     //     pipeline
-        //     //     .SetBlendState(BlendState.AlphaBlend)
-        //     //     .DrawSprite(npcTexture, pos, drawColor, npc.frame, npc.rotation, npc.frame.Size() / 2, new Vector2(npc.scale), npc.spriteDirection == -1 ? 0 : SpriteEffects.FlipHorizontally)
-        //     //     .Flush();
-        // }
-
-        if(IsGrabbed) {
+        if (IsGrabbed) {
+            if (Main.graphics.GraphicsDevice.GetRenderTargets().Any(rtb => rtb.RenderTarget == GrabbityGunOutline.NPCTarget)) {
+                return true;
+            }
             return false;
         }
 
@@ -669,6 +638,8 @@ public class GrabbityGunOutline : ILoadable {
 
         if (AnyGrabbed)
             DrawNPCTarget();
+        
+        AnyGrabbed = false; 
     }
 
     public static void ResizeTarget() {
@@ -677,6 +648,7 @@ public class GrabbityGunOutline : ILoadable {
 
     public void Unload() {
         Main.OnPreDraw -= On_PreDraw;
+        On_Main.DrawNPCs -= DrawOutline;
     }
 
     private void On_PreDraw(GameTime obj) {
@@ -686,27 +658,21 @@ public class GrabbityGunOutline : ILoadable {
         if (Main.gameMenu || Main.dedServ || spriteBatch is null || NPCTarget is null || graphicsDevice is null)
             return;
 
-        RenderTargetBinding[] bindings = graphicsDevice.GetRenderTargets();
+        if (!AnyGrabbed) {
+             return;
+        }
+
+        var bindings = graphicsDevice.GetRenderTargets();
         graphicsDevice.SetRenderTarget(NPCTarget);
         graphicsDevice.Clear(Color.Transparent);
 
-        Main.spriteBatch.Begin(default, default, default, default, default, null, Main.GameViewMatrix.ZoomMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
 
         for (int i = 0; i < Main.npc.Length; i++) {
             NPC NPC = Main.npc[i];
 
             if (NPC.active && NPC.GetGlobalNPC<GrabbityGunGlobalNPC>().IsGrabbed) {
-                if (NPC.ModNPC != null) {
-                    if (NPC.ModNPC != null && NPC.ModNPC is { } ModNPC) {
-                        if (ModNPC.PreDraw(spriteBatch, Main.screenPosition, NPC.GetAlpha(Color.White)))
-                            Main.instance.DrawNPC(i, false);
-
-                        ModNPC.PostDraw(spriteBatch, Main.screenPosition, NPC.GetAlpha(Color.White));
-                    }
-                }
-                else {
-                    Main.instance.DrawNPC(i, false);
-                }
+                Main.instance.DrawNPC(i, false);
             }
         }
 
@@ -724,12 +690,11 @@ public class GrabbityGunOutline : ILoadable {
         var shader = Shaders.Fragment.Outline.Value;
             
         shader.Parameters["uColor"].SetValue(Color.Orange.ToVector4());
-        shader.Parameters["uSize"].SetValue(Main.ScreenSize.ToVector2());
-        shader.Parameters["uThreshold"].SetValue(0f);
+        shader.Parameters["uSize"].SetValue(new Vector2(Main.screenWidth, Main.screenHeight));
+        shader.Parameters["uThreshold"].SetValue(0.4f);
+        var snapshot = spriteBatch.CaptureEndBegin(new SpriteBatchSnapshot() with { CustomEffect = shader, BlendState = BlendState.AlphaBlend, TransformMatrix = Main.UIScaleMatrix });
             
-        var snapshot = spriteBatch.CaptureEndBegin(new SpriteBatchSnapshot() with { CustomEffect = shader });
-            
-        spriteBatch.Draw(NPCTarget, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
+        spriteBatch.Draw(NPCTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
         spriteBatch.EndBegin(snapshot);
     }

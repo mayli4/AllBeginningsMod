@@ -23,8 +23,6 @@ Mods: {
 			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
 		}
 
-		NPCs: {
-			NightgauntNPC.DisplayName: Nightgaunt N P C
-		}
+		NPCs.NightgauntNPC.DisplayName: Nightgaunt N P C
 	}
 }
