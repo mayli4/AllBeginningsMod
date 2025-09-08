@@ -15,14 +15,21 @@ Mods: {
 				DisplayName: Grabbity Gun
 				Tooltip: ""
 			}
+
+			PotGrave: {
+				DisplayName: Pot Grave
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
 			GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
 			GrabbityGunItemHeldProjectile.DisplayName: ""
 			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
+			PotGraveProjectile.DisplayName: Pot Grave Projectile
 		}
 
 		NPCs.NightgauntNPC.DisplayName: Nightgaunt N P C
+		Tiles.PotGraveTile.MapEntry: Pot Grave Tile
 	}
 }
