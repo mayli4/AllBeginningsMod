@@ -1,9 +1,12 @@
 ﻿using AllBeginningsMod.Content.Items.Misc;
 using AllBeginningsMod.Utilities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
@@ -21,6 +24,8 @@ internal sealed class PotGrave : ModItem {
     }
 
     public override void SetDefaults() {
+        Item.DefaultToPlaceableTile(ModContent.TileType<PotGraveTile>());
+        
         Item.width = 20;
         Item.height = 20;
         Item.maxStack = 1;
@@ -46,9 +51,13 @@ internal sealed class PotGraveTile : ModTile {
         Main.tileNoAttach[Type] = true;
         TileID.Sets.TileInteractRead[Type] = true;
         Main.tileSign[Type] = true;
+        
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
-        TileObjectData.newTile.LavaDeath = true;
+        TileObjectData.newTile.CoordinateHeights = [16, 16];
+
+        TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<PotGraveTileEntity>().Generic_HookPostPlaceMyPlayer; 
+        
         TileObjectData.addTile(Type);
         
         AddMapEntry(Color.Gray, Keys.Items.PotGrave.DisplayName.GetText());
@@ -59,6 +68,39 @@ internal sealed class PotGraveTile : ModTile {
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY) {
         Sign.KillSign(i, j);
+        ModContent.GetInstance<PotGraveTileEntity>().Kill(i, j);
+    }
+    
+    public override void NearbyEffects(int i, int j, bool closer) {
+        if ((!Main.gamePaused && Main.instance.IsActive) && Main.rand.NextBool(240)) {
+            ParticleOrchestrator.RequestParticleSpawn(clientOnly: true, ParticleOrchestraType.PaladinsHammer, new ParticleOrchestraSettings {
+                PositionInWorld = new Vector2(i * 16 + 8, j * 16 - 8)
+            });
+        }
+    }
+}
+
+internal sealed class PotGraveTileEntity : ModTileEntity {
+    public override bool IsTileValidForEntity(int x, int y) {
+        Tile tile = Main.tile[x, y];
+        return tile.HasTile && tile.TileType == ModContent.TileType<PotGraveTile>();
+    }
+
+    public override void SaveData(TagCompound tag) {
+    }
+
+    public override void LoadData(TagCompound tag) {
+    }
+
+    public override void NetSend(BinaryWriter writer) {
+    }
+
+    public override void NetReceive(BinaryReader reader) {
+    }
+
+    public override void Update() {
+        //Main.NewText("FUUUCK");
+        Dust.NewDust(Position.ToVector2() * 16, 1, 1, DustID.GemAmber);
     }
 }
 
@@ -102,6 +144,7 @@ internal sealed class PotGraveProjectile : ModProjectile {
 
         if (placementSuccessful) {
             NetMessage.SendObjectPlacement(-1, potentialPlacementX, potentialPlacementY, objectData.type, objectData.style, objectData.alternate, objectData.random, Projectile.direction);
+            TileEntity.PlaceEntityNet(potentialPlacementX, potentialPlacementY - 1, ModContent.TileEntityType<PotGraveTileEntity>());
             SoundEngine.PlaySound(SoundID.Dig, new Vector2(potentialPlacementX * 16, potentialPlacementY * 16));
 
             int signID = Sign.ReadSign(potentialPlacementX, potentialPlacementY);
@@ -132,7 +175,6 @@ internal sealed class PotGravePlayer : ModPlayer {
     }
 
     private void On_Player_DropTombstone(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, NetworkText deathText, int hitDirection) {
-        Main.NewText(PotGraveEquipped);
         if (self.GetModPlayer<PotGravePlayer>().PotGraveEquipped) {
             if (Main.netMode != NetmodeID.MultiplayerClient) {
                 var spawnPosition = self.Center;
