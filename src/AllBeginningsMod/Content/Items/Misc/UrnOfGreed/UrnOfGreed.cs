@@ -14,18 +14,14 @@ using Terraria.ObjectData;
 
 namespace AllBeginningsMod.Content.Items.Misc;
 
-//todo: money storage
-
-internal sealed class PotGrave : ModItem {
-    public override string Texture => Textures.Items.Misc.PotGrave.KEY_PotGraveTile;
+internal sealed class UrnOfGreedItem : ModItem {
+    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_UrnOfGreedItem;
 
     public override void SetStaticDefaults() {
         Item.ResearchUnlockCount = 1;
     }
 
     public override void SetDefaults() {
-        Item.DefaultToPlaceableTile(ModContent.TileType<PotGraveTile>());
-        
         Item.width = 20;
         Item.height = 20;
         Item.maxStack = 1;
@@ -35,12 +31,12 @@ internal sealed class PotGrave : ModItem {
     }
 
     public override void UpdateAccessory(Player player, bool hideVisual) {
-        player.GetModPlayer<PotGravePlayer>().PotGraveEquipped = true;
+        player.GetModPlayer<UrnOfGreedPlayer>().UrnOfGreedEquipped = true;
     }
 }
 
 internal sealed class PotGraveTile : ModTile {
-    public override string Texture => Textures.Items.Misc.PotGrave.KEY_PotGraveTile;
+    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_UrnOfGreedTile;
 
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;
@@ -51,7 +47,6 @@ internal sealed class PotGraveTile : ModTile {
         Main.tileNoAttach[Type] = true;
         TileID.Sets.TileInteractRead[Type] = true;
         Main.tileSign[Type] = true;
-        
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
         TileObjectData.newTile.CoordinateHeights = [16, 16];
@@ -60,7 +55,7 @@ internal sealed class PotGraveTile : ModTile {
         
         TileObjectData.addTile(Type);
         
-        AddMapEntry(Color.Gray, Keys.Items.PotGrave.DisplayName.GetText());
+        AddMapEntry(Color.Gray, Keys.Items.UrnOfGreedItem.DisplayName.GetText());
 
         DustType = DustID.Pot;
         HitSound = SoundID.Shatter;
@@ -68,6 +63,16 @@ internal sealed class PotGraveTile : ModTile {
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY) {
         Sign.KillSign(i, j);
+        
+        int tileEntityX = i - (frameX / 18) % 2;
+        int tileEntityY = j - (frameY / 18) % 2;
+
+        Point16 tileEntityOrigin = new Point16(tileEntityX, tileEntityY);
+        
+        if (TileEntity.ByPosition.TryGetValue(tileEntityOrigin, out TileEntity entity) && entity is PotGraveTileEntity potGraveEntity) {
+            potGraveEntity.DropCoins();
+        }
+        
         ModContent.GetInstance<PotGraveTileEntity>().Kill(i, j);
     }
     
@@ -81,6 +86,8 @@ internal sealed class PotGraveTile : ModTile {
 }
 
 internal sealed class PotGraveTileEntity : ModTileEntity {
+    public long StoredCoins { get; set; } = 0;
+    
     public override bool IsTileValidForEntity(int x, int y) {
         Tile tile = Main.tile[x, y];
         return tile.HasTile && tile.TileType == ModContent.TileType<PotGraveTile>();
@@ -99,13 +106,45 @@ internal sealed class PotGraveTileEntity : ModTileEntity {
     }
 
     public override void Update() {
-        //Main.NewText("FUUUCK");
-        Dust.NewDust(Position.ToVector2() * 16, 1, 1, DustID.GemAmber);
+    }
+    
+    public void DropCoins() {
+        if (Main.netMode == NetmodeID.Server) {
+            NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, ID, Position.X, Position.Y);
+        }
+
+        if (StoredCoins <= 0) {
+            return;
+        }
+
+        Vector2 worldPosition = new Vector2(Position.X * 16 + 16, Position.Y * 16 + 16);
+        
+        long tempCoins = StoredCoins;
+
+        int platinum = (int)(tempCoins / 1000000);
+        tempCoins %= 1000000;
+        int gold = (int)(tempCoins / 10000);
+        tempCoins %= 10000;
+        int silver = (int)(tempCoins / 100);
+        tempCoins %= 100;
+        int copper = (int)tempCoins;
+
+        if (platinum > 0)
+            Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), (int)worldPosition.X, (int)worldPosition.Y, 0, 0, ItemID.PlatinumCoin, platinum);
+        if (gold > 0)
+            Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), (int)worldPosition.X, (int)worldPosition.Y, 0, 0, ItemID.GoldCoin, gold);
+        if (silver > 0)
+            Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), (int)worldPosition.X, (int)worldPosition.Y, 0, 0, ItemID.SilverCoin, silver);
+        if (copper > 0)
+            Item.NewItem(new EntitySource_TileBreak(Position.X, Position.Y), (int)worldPosition.X, (int)worldPosition.Y, 0, 0, ItemID.CopperCoin, copper);
+        
+
+        StoredCoins = 0;
     }
 }
 
-internal sealed class PotGraveProjectile : ModProjectile {
-    public override string Texture => Textures.Items.Misc.PotGrave.KEY_PotGraveTile;
+internal sealed class UrnOfGreedProjectile : ModProjectile {
+    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_UrnOfGreedTile;
 
     public long storedCoins;
 
@@ -145,6 +184,14 @@ internal sealed class PotGraveProjectile : ModProjectile {
         if (placementSuccessful) {
             NetMessage.SendObjectPlacement(-1, potentialPlacementX, potentialPlacementY, objectData.type, objectData.style, objectData.alternate, objectData.random, Projectile.direction);
             TileEntity.PlaceEntityNet(potentialPlacementX, potentialPlacementY - 1, ModContent.TileEntityType<PotGraveTileEntity>());
+            if (TileEntity.ByPosition.TryGetValue(new Point16(potentialPlacementX, potentialPlacementY - 1), out TileEntity entity) && entity is PotGraveTileEntity newTileEntity) {
+                newTileEntity.StoredCoins = storedCoins;
+                if (Main.netMode == NetmodeID.Server) {
+                    NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, newTileEntity.ID, potentialPlacementX, potentialPlacementY - 1);
+                }
+            }
+            
+            
             SoundEngine.PlaySound(SoundID.Dig, new Vector2(potentialPlacementX * 16, potentialPlacementY * 16));
 
             int signID = Sign.ReadSign(potentialPlacementX, potentialPlacementY);
@@ -159,15 +206,16 @@ internal sealed class PotGraveProjectile : ModProjectile {
     }
 }
 
-internal sealed class PotGravePlayer : ModPlayer {
-    public bool PotGraveEquipped { get; set; }
+internal sealed class UrnOfGreedPlayer : ModPlayer {
+    public bool UrnOfGreedEquipped { get; set; }
 
     public override void ResetEffects() {
-        PotGraveEquipped = false;
+        UrnOfGreedEquipped = false;
     }
 
     public override void Load() {
         On_Player.DropTombstone += On_Player_DropTombstone;
+        On_Player.DropCoins += On_Player_DropCoins;
     }
 
     public override void Unload() {
@@ -175,7 +223,7 @@ internal sealed class PotGravePlayer : ModPlayer {
     }
 
     private void On_Player_DropTombstone(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, NetworkText deathText, int hitDirection) {
-        if (self.GetModPlayer<PotGravePlayer>().PotGraveEquipped) {
+        if (self.GetModPlayer<UrnOfGreedPlayer>().UrnOfGreedEquipped) {
             if (Main.netMode != NetmodeID.MultiplayerClient) {
                 var spawnPosition = self.Center;
                 float graveHorizontalSpeed = Math.Min(Main.rand.NextFloat(3.5f), 2f);
@@ -185,7 +233,7 @@ internal sealed class PotGravePlayer : ModPlayer {
                 Vector2 graveVelocity = new Vector2(Main.rand.NextFloat(1f, 3f) * hitDirection + graveHorizontalSpeed, Main.rand.NextFloat(-4f, -2f));
 
                 var source = self.GetSource_Misc("PlayerDeath_PotGrave");
-                var projectileSpawned = Projectile.NewProjectile(source, spawnPosition, graveVelocity, ModContent.ProjectileType<PotGraveProjectile>(), 0, 0f, Main.myPlayer);
+                var projectileSpawned = Projectile.NewProjectile(source, spawnPosition, graveVelocity, ModContent.ProjectileType<UrnOfGreedProjectile>(), 0, 0f, Main.myPlayer);
 
                 var now = DateTime.Now;
                 string str = now.ToString("D");
@@ -194,17 +242,34 @@ internal sealed class PotGravePlayer : ModPlayer {
                 string miscText = deathText.ToString() + "\n" + str;
                 Main.projectile[projectileSpawned].miscText = miscText;
                 
-                if (projectileSpawned >= 0 && projectileSpawned < Main.maxProjectiles && Main.projectile[projectileSpawned].ModProjectile is PotGraveProjectile potGraveProj) {
+                if (projectileSpawned >= 0 && projectileSpawned < Main.maxProjectiles && Main.projectile[projectileSpawned].ModProjectile is UrnOfGreedProjectile potGraveProj) {
                     potGraveProj.storedCoins = coinsOwned;
 
                     if (Main.netMode == NetmodeID.Server) {
                         NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, projectileSpawned);
                     }
                 }
+                
+                self.lostCoins = 0;
             }
         }
         else {
             orig(self, coinsOwned, deathText, hitDirection);
         }
+    }
+    
+    private static long On_Player_DropCoins(On_Player.orig_DropCoins orig, Player self) {
+        if (self.GetModPlayer<UrnOfGreedPlayer>().UrnOfGreedEquipped) {
+            long totalCoinsRemoved = 0;
+            for (int i = 0; i < 59; i++) {
+                Item item = self.inventory[i];
+                if (item.stack > 0 && item.IsACoin) {
+                    totalCoinsRemoved += (long)item.stack * item.value;
+                    item.TurnToAir();
+                }
+            }
+            return totalCoinsRemoved; 
+        }
+        return orig(self);
     }
 }

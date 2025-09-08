@@ -16,8 +16,8 @@ Mods: {
 				Tooltip: ""
 			}
 
-			PotGrave: {
-				DisplayName: Pot Grave
+			UrnOfGreedItem: {
+				DisplayName: Urn Of Greed Item
 				Tooltip: ""
 			}
 		}
@@ -26,10 +26,9 @@ Mods: {
 			GiantShroomCapDummy.DisplayName: Giant Shroom Cap Dummy
 			GrabbityGunItemHeldProjectile.DisplayName: ""
 			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
-			PotGraveProjectile.DisplayName: Pot Grave Projectile
+			UrnOfGreedProjectile.DisplayName: Urn Of Greed Projectile
 		}
 
 		NPCs.NightgauntNPC.DisplayName: Nightgaunt N P C
-		Tiles.PotGraveTile.MapEntry: Pot Grave Tile
 	}
 }
