@@ -6,9 +6,10 @@ using System.Runtime.CompilerServices;
 namespace AllBeginningsMod.Common;
 
 public struct IKConstraints {
+    [Flags]
     enum Flags {
-        AngleDifference = 1,
-        UpwardOnlyAngle = 2,
+        AngleDifference,
+        UpwardOnlyAngle,
     }
     record struct AngleDifference(float MaxAngle);
     record struct UpwardOnlyAngle(float UpAngle);
