@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework.Graphics;
 using System;
 
 namespace AllBeginningsMod.Utilities;
@@ -8,7 +7,7 @@ public readonly struct GraphicsDeviceSnapshot(GraphicsDevice graphicsDevice) : I
     public DepthStencilState DepthStencilState { get; init; } = graphicsDevice.DepthStencilState;
     public SamplerState SamplerState { get; init; } = graphicsDevice.SamplerStates[0];
     public RasterizerState RasterizerState { get; init; } = graphicsDevice.RasterizerState;
-    
+
     public bool Equals(GraphicsDeviceSnapshot other) {
         return BlendState == other.BlendState &&
                SamplerState == other.SamplerState &&

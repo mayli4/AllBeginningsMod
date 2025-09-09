@@ -1,10 +1,8 @@
 using AllBeginningsMod.Utilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terraria;
 using Terraria.GameContent;
 
 namespace AllBeginningsMod.Content.NPCs.Bosses;
@@ -45,9 +43,9 @@ public class NightgauntBone {
     public float Length { get; }
     public NightgauntBone Parent { get; }
     public IConstraint Constraint { get; }
-    
+
     public BoneTexture BoneTexture { get; set; }
-    
+
     public NightgauntBone(
         float length,
         NightgauntBone parent = null,
@@ -67,7 +65,7 @@ public class NightgauntLimb {
 
     public Vector2 BasePosition;
     public readonly List<NightgauntBone> Bones = new();
-    
+
     public float TotalLength { get; private set; }
 
     public Vector2 EndEffector => Bones.Count > 0 ? Bones.Last().EndPosition : BasePosition;
@@ -77,7 +75,7 @@ public class NightgauntLimb {
     }
 
     public void AddBone(float length, BoneTexture texture, IConstraint constraint = null) {
-        if (length <= 0) {
+        if(length <= 0) {
             return;
         }
 
@@ -88,7 +86,7 @@ public class NightgauntLimb {
             texture,
             constraint
         );
-        
+
         Bones.Add(newBone);
         TotalLength += length;
 
@@ -99,8 +97,8 @@ public class NightgauntLimb {
         float parentWorldAngle;
         Vector2 currentStartPoint;
 
-        foreach (var bone in Bones) {
-            if (bone.Parent != null) {
+        foreach(var bone in Bones) {
+            if(bone.Parent != null) {
                 //bone is attached to parent
                 currentStartPoint = bone.Parent.EndPosition;
                 parentWorldAngle = bone.Parent.WorldAngle;
@@ -123,22 +121,22 @@ public class NightgauntLimb {
     }
 
     public void Solve(Vector2 target) {
-        if (Bones.Count == 0) {
+        if(Bones.Count == 0) {
             return;
         }
 
         float distToBase = Vector2.Distance(BasePosition, target);
-        if (distToBase > TotalLength) {
+        if(distToBase > TotalLength) {
             //point the limb at the target
             Vector2 direction = Vector2.Normalize(target - BasePosition);
             float targetAngle = MathF.Atan2(direction.Y, direction.X);
             float parentAngle = 0f;
 
-            foreach (var bone in Bones) {
+            foreach(var bone in Bones) {
                 //angle for this bone is the diff between the absolute target angle, and the accumulated angle of ALL its parents
                 float targetRelative = Helper.NormalizeAngle(targetAngle - parentAngle);
                 bone.RelativeAngle = ApplyConstraint(bone, targetRelative);
-                
+
                 //accumulate angle for the next bone on the limb
                 parentAngle = Helper.NormalizeAngle(parentAngle + bone.RelativeAngle);
             }
@@ -147,8 +145,8 @@ public class NightgauntLimb {
             int iterations = 0;
             float distToTarget = Vector2.Distance(EndEffector, target);
 
-            while (distToTarget > tolerance_amount && iterations < max_iterations) {
-                for (int i = Bones.Count - 1; i >= 0; i--) {
+            while(distToTarget > tolerance_amount && iterations < max_iterations) {
+                for(int i = Bones.Count - 1; i >= 0; i--) {
                     var currentNightgauntBone = Bones[i];
                     Vector2 endEffectorPos = EndEffector;
 
@@ -159,11 +157,11 @@ public class NightgauntLimb {
                     float angleCurrent = MathF.Atan2(vecJointToEnd.Y, vecJointToEnd.X);
                     float angleTarget = MathF.Atan2(vecJointToTarget.Y, vecJointToTarget.X);
                     float angleDelta = Helper.NormalizeAngle(angleTarget - angleCurrent);
-                    
+
                     //apply transforms and constraints yo!
                     float targetRelativeAngle = Helper.NormalizeAngle(currentNightgauntBone.RelativeAngle + angleDelta);
                     currentNightgauntBone.RelativeAngle = ApplyConstraint(currentNightgauntBone, targetRelativeAngle);
-                    
+
                     UpdateTransforms();
                 }
                 iterations++;
@@ -174,35 +172,35 @@ public class NightgauntLimb {
     }
 
     private float ApplyConstraint(NightgauntBone nightgauntBone, float targetRelativeAngle) {
-        if (nightgauntBone.Constraint != null) {
+        if(nightgauntBone.Constraint != null) {
             return nightgauntBone.Constraint.Apply(targetRelativeAngle);
         }
         return Helper.NormalizeAngle(targetRelativeAngle);
     }
-    
+
     public void Draw(SpriteBatch spriteBatch) {
-        foreach (var bone in Bones) {
-            if (bone.BoneTexture.Texture == null) {
+        foreach(var bone in Bones) {
+            if(bone.BoneTexture.Texture == null) {
                 continue;
             }
-            
+
             var visuals = bone.BoneTexture;
 
             Vector2 baseOrigin;
             Rectangle? sourceRect = bone.BoneTexture.SourceRectangle;
             float baseRotation;
-            
+
             float spriteWidth = sourceRect?.Width ?? visuals.Texture.Width;
             float spriteHeight = sourceRect?.Height ?? visuals.Texture.Height;
 
-            if (sourceRect.HasValue) {
+            if(sourceRect.HasValue) {
                 baseOrigin = new Vector2(0, sourceRect.Value.Height / 2f);
             }
             else {
                 baseOrigin = new Vector2(0, bone.BoneTexture.Texture.Height / 2f);
             }
-            
-            switch (visuals.Orientation) {
+
+            switch(visuals.Orientation) {
                 case BoneOrientation.Vertical:
                     baseOrigin = new Vector2(spriteWidth / 2f, 0);
                     baseRotation = -MathHelper.PiOver2;
@@ -214,7 +212,7 @@ public class NightgauntLimb {
                     baseRotation = 0f;
                     break;
             }
-            
+
             Vector2 finalOrigin = baseOrigin - bone.BoneTexture.DrawingOffset;
             float finalRotation = bone.WorldAngle + baseRotation;
 
@@ -235,15 +233,15 @@ public class NightgauntLimb {
                 0f
             );
         }
-        
-        #if DEBUG
-        foreach (var bone in Bones) {
+
+#if DEBUG
+        foreach(var bone in Bones) {
             Vector2 screenStart = bone.StartPosition - Main.screenPosition;
             Vector2 screenEnd = bone.EndPosition - Main.screenPosition;
-        
+
             Vector2 midPoint = (bone.StartPosition + bone.EndPosition) / 2f;
-            Color lightColor = Lighting.GetColor( midPoint.ToTileCoordinates() );
-        
+            Color lightColor = Lighting.GetColor(midPoint.ToTileCoordinates());
+
             spriteBatch.DrawLine(
                 screenStart,
                 screenEnd,
@@ -252,6 +250,6 @@ public class NightgauntLimb {
                 TextureAssets.BlackTile.Value
             );
         }
-        #endif
+#endif
     }
 }

@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ public ref struct BezierCurve : IDisposable {
     private readonly Vector2[] _rentedArray;
 
     private readonly bool _ownsArray;
-    
+
     public readonly Vector2 this[int x] {
         get => _controlPoints[x];
     }
@@ -19,7 +18,7 @@ public ref struct BezierCurve : IDisposable {
     public int ControlPointCount => _controlPoints.Length;
 
     public BezierCurve(params Vector2[] controls) {
-        if (controls == null || controls.Length < 2) {
+        if(controls == null || controls.Length < 2) {
             throw new ArgumentException("beziers require at least two control points.", nameof(controls));
         }
 
@@ -29,17 +28,17 @@ public ref struct BezierCurve : IDisposable {
     }
 
     public BezierCurve(ReadOnlySpan<Vector2> controls) {
-        if (controls.Length < 2) {
+        if(controls.Length < 2) {
             throw new ArgumentException("beziers require at least two control points.", nameof(controls));
         }
 
         _controlPoints = controls;
         _rentedArray = null;
-        _ownsArray = false; 
+        _ownsArray = false;
     }
 
     public void Dispose() {
-        if (_ownsArray && _rentedArray != null) {
+        if(_ownsArray && _rentedArray != null) {
             ArrayPool<Vector2>.Shared.Return(_rentedArray, clearArray: false);
         }
     }
@@ -47,7 +46,7 @@ public ref struct BezierCurve : IDisposable {
     public Vector2 Evaluate(float T) {
         T = Math.Clamp(T, 0f, 1f);
 
-        if (_controlPoints.Length == 2) {
+        if(_controlPoints.Length == 2) {
             return Vector2.Lerp(_controlPoints[0], _controlPoints[1], T);
         }
 
@@ -63,7 +62,7 @@ public ref struct BezierCurve : IDisposable {
         }
     }
     public List<Vector2> GetPoints(int amount) {
-        if (amount < 2) {
+        if(amount < 2) {
             amount = 2;
         }
 
@@ -71,19 +70,19 @@ public ref struct BezierCurve : IDisposable {
 
         var points = new List<Vector2>(amount);
 
-        for (int i = 0; i < amount; i++) {
+        for(int i = 0; i < amount; i++) {
             points.Add(Evaluate(perStep * i));
         }
 
         return points;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Vector2 PrivateEvaluate(Span<Vector2> currentWorkingPoints, float T) {
-        if (currentWorkingPoints.Length == 2) {
+        if(currentWorkingPoints.Length == 2) {
             return Vector2.Lerp(currentWorkingPoints[0], currentWorkingPoints[1], T);
         }
-        for (int k = 0; k < currentWorkingPoints.Length - 1; k++) {
+        for(int k = 0; k < currentWorkingPoints.Length - 1; k++) {
             currentWorkingPoints[k] = Vector2.Lerp(currentWorkingPoints[k], currentWorkingPoints[k + 1], T);
         }
         return PrivateEvaluate(currentWorkingPoints.Slice(0, currentWorkingPoints.Length - 1), T);

@@ -1,10 +1,6 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Runtime.CompilerServices;
-using Terraria;
-using Terraria.GameContent;
-using Terraria.ID;
 
 namespace AllBeginningsMod.Utilities;
 
@@ -54,19 +50,19 @@ public static partial class Helper {
 
         return true;
     }
-    
+
     public static Point ToSafeTileCoordinates(this Vector2 vec) {
         return new Point((int)MathHelper.Clamp((int)vec.X >> 4, 0, Main.maxTilesX), (int)MathHelper.Clamp((int)vec.Y >> 4, 0, Main.maxTilesY));
     }
-    
+
     public static Vector2 InverseKinematic(Vector2 start, Vector2 end, float A, float B, bool flip) {
         float C = Vector2.Distance(start, end);
         float angle = (float)Math.Acos(Math.Clamp((C * C + A * A - B * B) / (2f * C * A), -1f, 1));
-        if (flip)
+        if(flip)
             angle *= -1;
         return start + (angle + start.AngleTo(end)).ToRotationVector2() * A;
     }
-    
+
     public static Point? RaytraceToFirstSolid(this Vector2 pos1, Vector2 pos2) {
         Point point1 = pos1.ToSafeTileCoordinates();
         Point point2 = pos2.ToSafeTileCoordinates();
@@ -91,18 +87,15 @@ public static partial class Helper {
         horizontalDistance *= 2;
         verticalDistance *= 2;
 
-        while (i > 0)
-        {
-            if (Main.tile[x, y].IsTileSolidOrPlatform())
+        while(i > 0) {
+            if(Main.tile[x, y].IsTileSolidOrPlatform())
                 return new Point(x, y);
 
-            if (E > 0)
-            {
+            if(E > 0) {
                 x += horizontalIncrement;
                 E -= verticalDistance;
             }
-            else
-            {
+            else {
                 y += verticalIncrement;
                 E += horizontalDistance;
             }
@@ -110,14 +103,14 @@ public static partial class Helper {
         }
         return null;
     }
-    
+
     public static bool IsTileSolidOrPlatform(this Tile tile) => tile != null && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float NormalizeAngle(float angle) {
         angle %= (2 * MathF.PI);
-        if (angle > MathF.PI) angle -= 2 * MathF.PI;
-        else if (angle <= -MathF.PI) angle += 2 * MathF.PI;
+        if(angle > MathF.PI) angle -= 2 * MathF.PI;
+        else if(angle <= -MathF.PI) angle += 2 * MathF.PI;
         return angle;
     }
 

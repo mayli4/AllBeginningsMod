@@ -1,6 +1,5 @@
 using AllBeginningsMod.Common;
 using AllBeginningsMod.Utilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.ID;
