@@ -220,25 +220,25 @@ internal sealed class UrnOfGreedProjectile : ModProjectile {
 
         switch (UrnToPlace) {
             case UrnType.Copper:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnProj;
                 break;
             case UrnType.CopperRich:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnRichTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnRichProj;
                 break;
             case UrnType.Clay:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnProj;
                 break;
             case UrnType.ClayRich:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_PorcelainUrnTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_PorcelainUrnProj;
                 break;
             case UrnType.Stone:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_StoneUrnTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_StoneUrnProj;
                 break;
             case UrnType.StoneRich:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_GildedGraniteTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_GildedGraniteProj;
                 break;
             default:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnTile;
+                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnProj;
                 break;
         }
         
