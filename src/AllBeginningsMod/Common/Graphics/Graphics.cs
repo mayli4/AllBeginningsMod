@@ -217,7 +217,7 @@ public class Graphics : ModSystem {
             return;
         }
         
-        Main.QueueMainThreadAction(() =>
+        Threading.RunOnMainThread(() =>
         {
             _trailVertexBuffer = new DynamicVertexBuffer(
                 GraphicsDevice,
@@ -250,21 +250,18 @@ public class Graphics : ModSystem {
             _spriteSource = _spriteEffect.Parameters["uSource"].values;
         });
 
-        Main.OnResolutionChanged += (screenSize) =>
+        Threading.RunOnMainThread(() =>
         {
-            Main.QueueMainThreadAction(() =>
-            {
-                _targetSemaphore.WaitOne();
+            _targetSemaphore.WaitOne();
 
-                _activeTarget.Dispose();
-                _inactiveTarget.Dispose();
+            _activeTarget.Dispose();
+            _inactiveTarget.Dispose();
 
-                _activeTarget = InitFullScreenTarget;
-                _inactiveTarget = InitFullScreenTarget;
+            _activeTarget = InitFullScreenTarget;
+            _inactiveTarget = InitFullScreenTarget;
 
-                _targetSemaphore.Release();
-            });
-        };
+            _targetSemaphore.Release();
+        });
 
         On_Main.DrawNPCs += On_Main_DrawNPCs;
         On_Main.DrawSuperSpecialProjectiles += On_Main_DrawSuperSpecialProjectiles;
@@ -282,7 +279,7 @@ public class Graphics : ModSystem {
         On_Main.DrawPlayers_AfterProjectiles -= On_Main_DrawPlayers_AfterProjectiles;
         On_Main.DrawCachedProjs -= On_Main_DrawCachedProjs;
 
-        Main.QueueMainThreadAction(() =>
+        Threading.RunOnMainThread(() =>
         {
             _activeTarget.Dispose();
             _inactiveTarget.Dispose();
