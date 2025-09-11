@@ -1,5 +1,4 @@
 ﻿using AllBeginningsMod.Utilities;
-using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -8,8 +7,8 @@ namespace AllBeginningsMod.Common;
 public struct IKConstraints {
     [Flags]
     enum Flags {
-        AngleDifference,
-        UpwardOnlyAngle,
+        AngleDifference = 1,
+        UpwardOnlyAngle = 2,
     }
     record struct AngleDifference(float MaxAngle);
     record struct UpwardOnlyAngle(float UpAngle);
@@ -32,19 +31,23 @@ public struct IKConstraints {
         if(index == 0) return 0f;
 
         float penalties = 0f;
+
         if((_flags & Flags.AngleDifference) != 0) {
             float rotation = joints[index].Rotation;
             float previousRotation = joints[index - 1].Rotation;
 
-            penalties += Interpolation.InverseLerp(_angleDifference.MaxAngle, MathF.PI, rotation - previousRotation) * 9f;
+            float delta = rotation - previousRotation;
+            delta = (delta + MathF.PI) % (2f * MathF.PI) - MathF.PI;
+
+            penalties += Interpolation.InverseLerp(_angleDifference.MaxAngle, MathHelper.Pi, delta) * 9f;
         }
 
+        // TODO
         if((_flags & Flags.UpwardOnlyAngle) != 0) {
-            float rotation = joints[index].Rotation;
-            float upAngle = _upwardOnlyAngle.UpAngle;
+            // float rotation = joints[index].Rotation;
+            // float upAngle = _upwardOnlyAngle.UpAngle;
 
-            float factor = Interpolation.InverseLerp(0.4f, 0f, completion) * 1500f;
-            penalties += Interpolation.InverseLerp(0.01f, MathF.PI, rotation - upAngle) * factor;
+            // float factor = Interpolation.InverseLerp(0.4f, 0f, completion) * 1500f;
         }
 
         return penalties;
@@ -141,7 +144,9 @@ public struct IKSkeleton {
             float distance = targetEndPosition.Distance(endPosition);
             float penalties = constraints.Penalties(joints, index, completion);
 
-            return Math.Pow(distance + penalties, 0.1f);
+            float total = distance + penalties;
+            if(total <= 0f) return 0f;
+            return MathF.Pow(total, 0.1f);
         }
     }
 

@@ -1,9 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace AllBeginningsMod.Utilities;
 public static class Interpolation {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float InverseLerp(float a, float b, float value) {
-        return (value - a) / (b - a);
+        return Math.Clamp((value - a) / (b - a), 0f, 1f);
     }
 }
