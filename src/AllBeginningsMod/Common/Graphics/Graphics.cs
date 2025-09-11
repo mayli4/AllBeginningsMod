@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Common.Graphics;
@@ -207,12 +208,16 @@ public class Graphics : ModSystem {
     static nint _spriteSource;
 
     static VertexBuffer _spriteVertexBuffer;
-
+    
     static GraphicsDevice GraphicsDevice => Main.graphics.GraphicsDevice;
     static RenderTarget2D InitFullScreenTarget => new(GraphicsDevice, Main.screenWidth, Main.screenHeight);
 
     public override void Load() {
-        Main.QueueMainThreadAction(() =>
+        if (Main.dedServ) {
+            return;
+        }
+        
+        Threading.RunOnMainThread(() =>
         {
             _trailVertexBuffer = new DynamicVertexBuffer(
                 GraphicsDevice,
@@ -245,21 +250,18 @@ public class Graphics : ModSystem {
             _spriteSource = _spriteEffect.Parameters["uSource"].values;
         });
 
-        Main.OnResolutionChanged += (screenSize) =>
+        Threading.RunOnMainThread(() =>
         {
-            Main.QueueMainThreadAction(() =>
-            {
-                _targetSemaphore.WaitOne();
+            _targetSemaphore.WaitOne();
 
-                _activeTarget.Dispose();
-                _inactiveTarget.Dispose();
+            _activeTarget.Dispose();
+            _inactiveTarget.Dispose();
 
-                _activeTarget = InitFullScreenTarget;
-                _inactiveTarget = InitFullScreenTarget;
+            _activeTarget = InitFullScreenTarget;
+            _inactiveTarget = InitFullScreenTarget;
 
-                _targetSemaphore.Release();
-            });
-        };
+            _targetSemaphore.Release();
+        });
 
         On_Main.DrawNPCs += On_Main_DrawNPCs;
         On_Main.DrawSuperSpecialProjectiles += On_Main_DrawSuperSpecialProjectiles;
@@ -268,12 +270,16 @@ public class Graphics : ModSystem {
     }
 
     public override void Unload() {
+        if (Main.dedServ) {
+            return;
+        }
+        
         On_Main.DrawNPCs -= On_Main_DrawNPCs;
         On_Main.DrawSuperSpecialProjectiles -= On_Main_DrawSuperSpecialProjectiles;
         On_Main.DrawPlayers_AfterProjectiles -= On_Main_DrawPlayers_AfterProjectiles;
         On_Main.DrawCachedProjs -= On_Main_DrawCachedProjs;
 
-        Main.QueueMainThreadAction(() =>
+        Threading.RunOnMainThread(() =>
         {
             _activeTarget.Dispose();
             _inactiveTarget.Dispose();

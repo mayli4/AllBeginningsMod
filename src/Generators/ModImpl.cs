@@ -22,7 +22,7 @@ public class ModImplGenerator : IIncrementalGenerator {
 
         string GenerateUsings(string rootNamespace) {
             var sb = new StringBuilder();
-            sb.Append("using Terraria.ModLoader;\nnamespace AllBeginningsMod;\npublic sealed class AllBeginningsModImpl : Mod;");
+            sb.Append("using Terraria.ModLoader;\nnamespace AllBeginningsMod;\npublic partial class AllBeginningsModImpl : Mod;");
             return sb.ToString();
         }
     }

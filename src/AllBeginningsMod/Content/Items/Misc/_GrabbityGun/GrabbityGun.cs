@@ -6,10 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace AllBeginningsMod.Content.Items.Misc;
 
@@ -526,6 +528,24 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
     public bool IsLaunched { get; set; }
     public int LauncherProjectileIdentity { get; set; }
     public int LaunchDamage { get; set; }
+    
+    public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter) {
+        bitWriter.WriteBit(IsGrabbed);
+        bitWriter.WriteBit(IsLaunched);
+        if (IsLaunched) {
+            binaryWriter.Write(LauncherProjectileIdentity);
+            binaryWriter.Write(LaunchDamage);
+        }
+    }
+
+    public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader) {
+        IsGrabbed = bitReader.ReadBit();
+        IsLaunched = bitReader.ReadBit();
+        if (IsLaunched) {
+            LauncherProjectileIdentity = binaryReader.ReadInt32();
+            LaunchDamage = binaryReader.ReadInt32();
+        }
+    }
 
     public override void ResetEffects(NPC npc) {
         if(IsGrabbed) {
@@ -542,9 +562,13 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
         }
 
         if(IsLaunched && npc.velocity.Length() < 7f) {
+            bool wasLaunched = IsLaunched;
             IsLaunched = false;
             LauncherProjectileIdentity = -1;
             LaunchDamage = 0;
+            if (wasLaunched) {
+                npc.netUpdate = true;
+            }
         }
 
         GrabbityGunOutline.AnyGrabbed = true;
@@ -591,10 +615,13 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
 
                     npc.velocity *= -0.5f;
 
+                    bool wasLaunched = IsLaunched;
                     IsLaunched = false;
                     LauncherProjectileIdentity = -1;
                     LaunchDamage = 0;
-                    npc.netUpdate = true;
+                    if (wasLaunched) {
+                        npc.netUpdate = true;
+                    }
                 }
             }
         }
@@ -638,7 +665,7 @@ public class GrabbityGunOutline : ILoadable {
     }
 
     public static void ResizeTarget() {
-        Main.QueueMainThreadAction(() => NPCTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight));
+        Threading.RunOnMainThread(() => NPCTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight));
     }
 
     public void Unload() {
