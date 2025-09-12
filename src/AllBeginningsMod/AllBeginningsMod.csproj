@@ -62,4 +62,10 @@
         <None Remove="Assets\Textures\NPCs\Bosses\Nightgaunt\LimbEnd.png" />
     </ItemGroup>
     
+    <ItemGroup>
+      <Reference Include="StructureHelper">
+        <HintPath>lib\StructureHelper.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    
 </Project>

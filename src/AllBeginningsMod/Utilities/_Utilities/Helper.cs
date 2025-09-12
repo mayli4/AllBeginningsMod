@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -52,7 +51,7 @@ public static partial class Helper {
     }
 
     public static Point ToSafeTileCoordinates(this Vector2 vec) {
-        return new Point((int)MathHelper.Clamp((int)vec.X >> 4, 0, Main.maxTilesX), (int)MathHelper.Clamp((int)vec.Y >> 4, 0, Main.maxTilesY));
+        return new Point(MathHelper.Clamp((int)vec.X >> 4, 0, Main.maxTilesX), MathHelper.Clamp((int)vec.Y >> 4, 0, Main.maxTilesY));
     }
 
     public static Vector2 InverseKinematic(Vector2 start, Vector2 end, float A, float B, bool flip) {

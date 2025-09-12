@@ -5,3 +5,5 @@ hideCode = true
 hideResources = true
 includeSource = false
 includePDB = true
+
+modReferences = StructureHelper
