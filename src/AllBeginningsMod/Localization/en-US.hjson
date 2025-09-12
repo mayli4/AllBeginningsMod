@@ -20,6 +20,21 @@ Mods: {
 				DisplayName: Urn Of Greed Item
 				Tooltip: ""
 			}
+
+			AccentedRedDynastyShinglesItem: {
+				DisplayName: Accented Red Dynasty Shingles Item
+				Tooltip: ""
+			}
+
+			CursorClearer: {
+				DisplayName: Cursor Clearer
+				Tooltip: ""
+			}
+
+			Debug: {
+				DisplayName: Debug
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {

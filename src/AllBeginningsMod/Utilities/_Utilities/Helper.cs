@@ -131,4 +131,13 @@ public static partial class Helper {
             0
         );
     }
+    
+    public static float RadiusAtEllipsePoint(float horizontalSemiAxis, float verticalSemiAxis, Vector2 point) {
+        float angle = AngleAtPoint(point);
+        return (horizontalSemiAxis * verticalSemiAxis) / (float)Math.Sqrt(Math.Pow(horizontalSemiAxis, 2) * Math.Pow(Math.Sin(angle), 2) + Math.Pow(verticalSemiAxis, 2) * Math.Pow(Math.Cos(angle), 2));
+    }
+    
+    public static float AngleAtPoint(Vector2 point) {
+        return (float)Math.Atan2(point.Y, point.X);
+    }
 }

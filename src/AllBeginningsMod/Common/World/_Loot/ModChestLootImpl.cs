@@ -50,7 +50,7 @@ public abstract class ModChestLoot : ModType {
     }
 }
 
-public class ModChestLootImpl : ModSystem {
+internal class ModChestLootImpl : ModSystem {
     private Dictionary<int, RegionFlags> _framingToRegion;
     private Dictionary<RegionFlags, List<LootInfo>> _regionLootInfo;
     private Dictionary<RegionFlags, List<LootInfo>> _regionExclusiveLootInfo;
