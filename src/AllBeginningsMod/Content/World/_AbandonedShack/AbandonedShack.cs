@@ -1,10 +1,16 @@
-﻿using AllBeginningsMod.Common.World;
+﻿using AllBeginningsMod.Common.Graphics;
+using AllBeginningsMod.Common.World;
 using AllBeginningsMod.Utilities;
+using ReLogic.Content;
 using System.Collections.Generic;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Generation;
 using Terraria.ID;
 using Terraria.IO;
+using Terraria.Localization;
+using Terraria.Map;
+using Terraria.UI;
 using Terraria.WorldBuilding;
 
 namespace AllBeginningsMod.Content.World;
@@ -12,10 +18,10 @@ namespace AllBeginningsMod.Content.World;
 //todo reduce magic numbers
 
 internal sealed class AbandonedShackSystem : ModSystem {
-    public static Point16? ShackPos; 
+    private float _overlayAlpha = 1f;
     
     public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight) {
-        int ShiniesIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Pyramids"));
+        int ShiniesIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Sunflowers"));
         if(ShiniesIndex != -1) {
             tasks.Insert(ShiniesIndex + 1, new PassLegacy("aa", CarvePit));
         }
@@ -45,6 +51,22 @@ internal sealed class AbandonedShackSystem : ModSystem {
                         break;
                     }
                 }
+                
+                const int cloudSearchRadius = 15;
+                bool cloudNearby = false;
+                for (int checkX = x - cloudSearchRadius; checkX <= x + cloudSearchRadius; checkX++) {
+                    for (int checkY = y - cloudSearchRadius; checkY <= y + cloudSearchRadius; checkY++) {
+                        if (checkX >= 0 && checkX < Main.maxTilesX && checkY >= 0 && checkY < Main.maxTilesY) {
+                            Tile tile = Framing.GetTileSafely(checkX, checkY);
+                            if (tile.HasTile && (tile.TileType == TileID.Cloud || tile.TileType == TileID.RainCloud)) {
+                                cloudNearby = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (cloudNearby) break;
+                }
+                if (cloudNearby) continue;
         
                 if (y == 0) {
                     continue;
@@ -63,18 +85,56 @@ internal sealed class AbandonedShackSystem : ModSystem {
             }
         }
     }
+
+    #region  rendering
+    public override void PostDrawTiles() {
+        if (PointsOfInterestSystem.ShackPosition == Point.Zero) {
+            return;
+        }
+        
+        var rect1 = new Rectangle(PointsOfInterestSystem.ShackPosition.X + 11, PointsOfInterestSystem.ShackPosition.Y, 18, 11);
+        var rect2 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y + 3, 11, 8);
+
+        bool playerInside = Main.LocalPlayer.Hitbox.Intersects(rect1.ToWorldCoordinates()) 
+                         || Main.LocalPlayer.Hitbox.Intersects(rect2.ToWorldCoordinates());
+
+        float targetAlpha = playerInside ? 0f : 1f;
+        _overlayAlpha = MathHelper.Lerp(_overlayAlpha, targetAlpha, 0.05f);
+
+        if (_overlayAlpha <= 0.01f && !playerInside) {
+            return;
+        }
+        
+        var renderColor = Color.White * _overlayAlpha;
+        
+        Rectangle totalRenderArea = Rectangle.Union(rect1, rect2);
+        
+        var baseArea = LightingBuffer
+            .Prepare(totalRenderArea)
+            .WithColor(Color.White);
+        
+        baseArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackBase.Value);
+
+        var overArea = LightingBuffer
+            .Prepare(totalRenderArea)
+            .WithColor(renderColor);
+        
+        overArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackOver.Value);
+    }
+    #endregion
 }
 
 internal sealed class AbandonedShackMicrobiome : MicroBiome {
     public override bool Place(Point origin, StructureMap structures) {
-        if (Framing.GetTileSafely(origin.X, origin.Y).TileType != TileID.Grass) {
+        if (Framing.GetTileSafely(origin.X, origin.Y).TileType != TileID.Grass || Framing.GetTileSafely(origin.X, origin.Y).LiquidAmount != 0) {
             return false;
         }
 
         int x = origin.X;
         int y = origin.Y;
 
-        y += 16;
+        y += 26;
+        
         ShapeData airData = new();
         ShapeData stoneData = new();
         ShapeData dirtData = new();
@@ -203,24 +263,32 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
 
         WorldUtils.Gen(
             new Point(x, y),
-            new Shapes.Slime(20, 1.2, 1.2),
+            new Shapes.Slime(20, 1.2, 1.4),
             Actions.Chain(
                 new Modifiers.Blotches(2, 0.4),
                 new Actions.PlaceWall(WallID.Rocks1Echo),
                 new Modifiers.Blotches(1, 0.1),
-                new Modifiers.Dither(0.8),
+                new Modifiers.Dither(0.5),
                 new Actions.PlaceWall(WallID.Stone)
 
             )
         );
         
         WorldUtils.Gen(
-            new Point(x, y - 15),
-            new Shapes.Circle(15),
+            new Point(x, y - 12),
+            new Shapes.Circle(14),
             Actions.Chain(
                 new Modifiers.Blotches(2, 0.4),
                 new Actions.ClearWall(true)
-
+            )
+        );
+        
+        WorldUtils.Gen(
+            new Point(x, y - 12),
+            new Shapes.Circle(50),
+            Actions.Chain(
+                new Actions.SetFrames(true),
+                new Actions.Smooth()
             )
         );
         
@@ -238,64 +306,67 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
             floorPoint.Y - structureDimensions.Y
         );
 
-        AbandonedShackSystem.ShackPos = structureOrigin;
+        PointsOfInterestSystem.ShackPosition = structureOrigin.ToPoint();
         StructureHelper.API.Generator.GenerateStructure(structurePath, structureOrigin, mod);
         
+        Rectangle shackBounds = new Rectangle(
+            structureOrigin.X,
+            structureOrigin.Y,
+            structureDimensions.X,
+            structureDimensions.Y
+        );
+        PointsOfInterestSystem.ShackBounds = shackBounds;
+        
         structures.AddProtectedStructure(new Rectangle(origin.X - 40, origin.Y - 40, 80, 80), 10);
+        structures.AddProtectedStructure(shackBounds);
+        
+        ProtectedAreaSystem.AddProtectedRegion(PointsOfInterestSystem.ShackBounds);
 
         return true;
     }
 }
 
-public class Debug : ModItem {
-    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnProj;
+public class AbandonedShackMapIcon : ModMapLayer {
+    public static Asset<Texture2D> MapIcon;
+    public static bool MouseOver;
 
-    public override void SetDefaults() {
-        Item.width = 28;
-        Item.height = 28;
-        Item.rare = ItemRarityID.Green;
-        Item.useAnimation = 20;
-        Item.useTime = 20;
-        Item.useStyle = ItemUseStyleID.Swing;
-        Item.consumable = false;
-        Item.autoReuse = false;
-    }
+    public override void Draw(ref MapOverlayDrawContext context, ref string text) {
+        if (MapIcon == null)
+            MapIcon = ModContent.Request<Texture2D>(Textures.UI.KEY_AbandonedShackIcon);
+        Texture2D icon = MapIcon.Value;
 
-    public override bool AltFunctionUse(Player player) {
-        return true;
-    }
+        bool hasRecallPot = false;
+        bool hasUnityPot = false;
 
-    public override bool CanUseItem(Player player) {
-        return true;
-    }
+        if (Main.LocalPlayer.HasItem(ItemID.RecallPotion))
+            hasRecallPot = true;
+        else if (Main.LocalPlayer.HasItem(ItemID.WormholePotion))
+            hasUnityPot = true;
 
-    public override bool? UseItem(Player player) {
-        Vector2 mouseWorldPosition = Main.MouseWorld;
-        int tileX = (int)(mouseWorldPosition.X / 16f);
-        int tileY = (int)(mouseWorldPosition.Y / 16f);
-        Point spawnPoint = new Point(tileX, tileY);
-        
-        if (player.altFunctionUse != 2) {
-            if(player.altFunctionUse != 2) {
-                WorldUtils.Gen(
-                    spawnPoint,
-                    new Shapes.Rectangle(90, 90),
-                    Actions.Chain(
-                        new Actions.RemoveWall(),
-                        new Actions.ClearTile(),
-                        new Actions.SetFrames(true)
-                    )
-                );
+        float scaleIfNotSelected = 1f;
+        float scaleIfSelected = (hasRecallPot || hasUnityPot) ? 1.15f : 1f;
+
+        if (context.Draw(icon, PointsOfInterestSystem.ShackBounds.Center(), Color.White, new(1, 1, 0, 0), scaleIfNotSelected, scaleIfSelected, Alignment.Center).IsMouseOver) {
+            text = Keys.MapIcons.OldbotShack.GetTextValue();
+
+            if (hasRecallPot || hasUnityPot) {
+                if (!MouseOver) {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    MouseOver = true;
+                }
+
+                text = Language.GetTextValue("Game.TeleportTo", text);
+                if (Main.mouseLeft && Main.mouseLeftRelease) {
+                    Main.mouseLeftRelease = false;
+                    Main.mapFullscreen = false;
+
+                    int consumedPotionID = hasRecallPot ? ItemID.RecallPotion : ItemID.WormholePotion;
+                    Main.LocalPlayer.ConsumeItem(consumedPotionID);
+                }
             }
-            return true;
         }
-        
-        if (player.altFunctionUse == 2) {
-            var biome = GenVars.configuration.CreateBiome<AbandonedShackMicrobiome>();
 
-            biome.Place(spawnPoint, GenVars.structures);
-            return true;
-        }
-        return false;
+        else
+            MouseOver = false;
     }
 }

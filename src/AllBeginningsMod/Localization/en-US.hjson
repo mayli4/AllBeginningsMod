@@ -45,5 +45,6 @@ Mods: {
 		}
 
 		NPCs.NightgauntNPC.DisplayName: Nightgaunt N P C
+		MapIcons.OldbotShack: Oldbot's Shack
 	}
 }

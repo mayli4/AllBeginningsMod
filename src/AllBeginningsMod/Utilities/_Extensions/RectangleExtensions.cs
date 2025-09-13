@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.GameContent;
 
@@ -34,5 +35,15 @@ public static class RectangleExtensions {
         Texture2D texture = TextureAssets.Projectile[projectile.type].Value;
         int sourceHeight = texture.Height / Main.projFrames[projectile.type];
         return new Rectangle(0, projectile.frame * sourceHeight, texture.Width, sourceHeight);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Rectangle ToWorldCoordinates(this Rectangle rect) {
+        return new Rectangle(
+            rect.X * 16,
+            rect.Y * 16,
+            rect.Width * 16,
+            rect.Height * 16
+        );
     }
 }
