@@ -1,7 +1,8 @@
 ﻿using AllBeginningsMod.Common.Graphics;
 using AllBeginningsMod.Common.World;
+using AllBeginningsMod.Core;
 using AllBeginningsMod.Utilities;
-using ReLogic.Content;
+using System;
 using System.Collections.Generic;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -58,7 +59,7 @@ internal sealed class AbandonedShackSystem : ModSystem {
                     for (int checkY = y - cloudSearchRadius; checkY <= y + cloudSearchRadius; checkY++) {
                         if (checkX >= 0 && checkX < Main.maxTilesX && checkY >= 0 && checkY < Main.maxTilesY) {
                             Tile tile = Framing.GetTileSafely(checkX, checkY);
-                            if (tile.HasTile && (tile.TileType == TileID.Cloud || tile.TileType == TileID.RainCloud)) {
+                            if (tile.HasTile && (tile.TileType == TileID.Cloud || tile.TileType == TileID.RainCloud || tile.LiquidAmount > 0)) {
                                 cloudNearby = true;
                                 break;
                             }
@@ -86,28 +87,43 @@ internal sealed class AbandonedShackSystem : ModSystem {
         }
     }
 
-    #region  rendering
+    public override void Load() {
+        CommonHooks.DrawThingsBehindNonSolidSolidTilesEvent += DrawInsideContainer;
+    }
+
+    private void DrawInsideContainer() {
+        var rect1 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y - 2, 29, 13); 
+        
+        var baseArea = LightingBuffer
+            .Prepare(rect1)
+            .WithColor(Color.White);
+        
+        Main.spriteBatch.End(out var snapshot);
+        
+        baseArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackBack.Value);
+        
+        Main.spriteBatch.Begin(snapshot);
+    }
+
+    #region rendering
     public override void PostDrawTiles() {
         if (PointsOfInterestSystem.ShackPosition == Point.Zero) {
             return;
         }
         
-        var rect1 = new Rectangle(PointsOfInterestSystem.ShackPosition.X + 11, PointsOfInterestSystem.ShackPosition.Y, 18, 11);
-        var rect2 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y + 3, 11, 8);
+        var rect1 = new Rectangle(PointsOfInterestSystem.ShackPosition.X + 11, PointsOfInterestSystem.ShackPosition.Y - 1, 18, 12);
+        var rect2 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y - 1, 11, 9); //as
 
-        bool playerInside = Main.LocalPlayer.Hitbox.Intersects(rect1.ToWorldCoordinates()) 
-                         || Main.LocalPlayer.Hitbox.Intersects(rect2.ToWorldCoordinates());
+        float targetAlpha = PointsOfInterestSystem.LocalPlayerInShack ? 0f : 1f;
+        _overlayAlpha = MathHelper.Lerp(_overlayAlpha, targetAlpha, 0.125f);
 
-        float targetAlpha = playerInside ? 0f : 1f;
-        _overlayAlpha = MathHelper.Lerp(_overlayAlpha, targetAlpha, 0.05f);
-
-        if (_overlayAlpha <= 0.01f && !playerInside) {
+        if (_overlayAlpha <= 0.01f && !PointsOfInterestSystem.LocalPlayerInShack) {
             return;
         }
         
         var renderColor = Color.White * _overlayAlpha;
         
-        Rectangle totalRenderArea = Rectangle.Union(rect1, rect2);
+        var totalRenderArea = Rectangle.Union(rect1, rect2);
         
         var baseArea = LightingBuffer
             .Prepare(totalRenderArea)
@@ -120,6 +136,45 @@ internal sealed class AbandonedShackSystem : ModSystem {
             .WithColor(renderColor);
         
         overArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackOver.Value);
+
+        if(Main.rand.NextBool(50)) {
+            Gore.NewGore(
+                new AEntitySource_Tile(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y, null), 
+                PointsOfInterestSystem.ShackPosition.ToVector2() * 16 + new Vector2(395, -50), 
+                Main.rand.NextVector2Circular(0, 2), 
+                GoreID.Smoke2
+            );
+        }
+        
+        
+        // dograys
+        
+        var godrayColor = new Color();
+        float godrayRot = 0;
+        
+        if (Main.dayTime)
+        {
+            godrayColor = Color.Yellow * 0.5f;
+            godrayColor *= (float)Math.Pow(Math.Sin(Main.time / 54000f * 3.14f), 1);
+            godrayRot = -0.5f * 1.57f + (float)Main.time / 54000f * 3.14f;
+        }
+        else
+        {
+            godrayColor = Color.Goldenrod * 0.5f;
+            godrayColor *= (float)Math.Pow(Math.Sin(Main.time / 24000f * 3.14f), 3) * 0.25f;
+            godrayRot = -0.5f * 1.57f + (float)Main.time / 24000f * 3.14f;
+        }
+        
+        Main.spriteBatch.Begin(new SpriteBatchSnapshot() with { BlendState = BlendState.Additive });
+        var ray = Textures.Sample.Godray2.Value;
+        var pos = PointsOfInterestSystem.ShackPosition.ToVector2() * 16 + new Vector2(200, -400);
+        
+        Main.spriteBatch.Draw(ray, pos - Main.screenPosition, null, godrayColor, godrayRot, Vector2.Zero, 1f, 0, 0);
+        Main.spriteBatch.Draw(ray, pos - Main.screenPosition, null, godrayColor, godrayRot + 0.2f, Vector2.Zero, 0.85f, 0, 0);
+        Main.spriteBatch.Draw(ray, pos - Main.screenPosition, null, godrayColor, godrayRot - 0.2f, Vector2.Zero, 0.85f, 0, 0);
+        
+        Main.spriteBatch.End();
+        
     }
     #endregion
 }
@@ -266,17 +321,37 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
             new Shapes.Slime(20, 1.2, 1.4),
             Actions.Chain(
                 new Modifiers.Blotches(2, 0.4),
-                new Actions.PlaceWall(WallID.Rocks1Echo),
-                new Modifiers.Blotches(1, 0.1),
-                new Modifiers.Dither(0.5),
-                new Actions.PlaceWall(WallID.Stone)
-
+                new Actions.PlaceWall(WallID.Stone),
+                new Modifiers.Blotches(2, 0.4),
+                new Modifiers.Dither(),
+                new Actions.PlaceWall(WallID.RocksUnsafe1),
+                new Modifiers.Dither(0.8f),
+                new Actions.PlaceWall(WallID.RocksUnsafe3)
             )
         );
         
+        int amt = WorldGen.genRand.Next(15, 20);
+
+        int blotchSpawnHorizontalExtent = 10;
+        int blotchSpawnVerticalExtent = 10;
+        for (int i = 0; i < amt; ++i) {
+            var o = new Point(
+                x + WorldGen.genRand.Next(-blotchSpawnHorizontalExtent, blotchSpawnHorizontalExtent + 1),
+                y + WorldGen.genRand.Next(-blotchSpawnVerticalExtent, blotchSpawnVerticalExtent + 1)
+            );
+            
+            int blotchRadius = WorldGen.genRand.Next(1, 3);
+            
+            WorldUtils.Gen(
+                o,
+                new Shapes.Circle(blotchRadius, blotchRadius),
+                Actions.Chain(new Modifiers.Blotches(3, 2), new Modifiers.OnlyWalls(WallID.Stone), new Actions.PlaceWall(WallID.RocksUnsafe1))
+            );
+        }
+        
         WorldUtils.Gen(
-            new Point(x, y - 12),
-            new Shapes.Circle(14),
+            new Point(x, y - 17),
+            new Shapes.Circle(11),
             Actions.Chain(
                 new Modifiers.Blotches(2, 0.4),
                 new Actions.ClearWall(true)
@@ -321,19 +396,28 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
         structures.AddProtectedStructure(shackBounds);
         
         ProtectedAreaSystem.AddProtectedRegion(PointsOfInterestSystem.ShackBounds);
+        
+        WorldUtils.Gen(
+            new Point(x, y - 12),
+            new Shapes.Circle(50),
+            Actions.Chain(
+                new Actions.SetFrames(true),
+                new Actions.Smooth()
+            )
+        );
 
         return true;
     }
 }
 
 public class AbandonedShackMapIcon : ModMapLayer {
-    public static Asset<Texture2D> MapIcon;
     public static bool MouseOver;
 
     public override void Draw(ref MapOverlayDrawContext context, ref string text) {
-        if (MapIcon == null)
-            MapIcon = ModContent.Request<Texture2D>(Textures.UI.KEY_AbandonedShackIcon);
-        Texture2D icon = MapIcon.Value;
+        if(!PointsOfInterestSystem.FoundOldbotShack)
+            return;
+        
+        var icon = Textures.UI.AbandonedShackIcon.Value;
 
         bool hasRecallPot = false;
         bool hasUnityPot = false;

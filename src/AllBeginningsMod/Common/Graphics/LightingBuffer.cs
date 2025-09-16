@@ -1,4 +1,6 @@
-﻿namespace AllBeginningsMod.Common.Graphics;
+﻿using AllBeginningsMod.Utilities;
+
+namespace AllBeginningsMod.Common.Graphics;
 
 /// <summary>
 ///     Draws arbitrary meshes that are affected by ingame lighting.
@@ -138,10 +140,17 @@ internal static class LightingBuffer {
             var gd = Main.instance.GraphicsDevice;
 
             var shader = Shaders.Fragment.LightMesh.Value;
+            
+            Matrix projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
+            Matrix view = Main.GameViewMatrix.TransformationMatrix;
+            Matrix renderMatrix = Matrix.CreateTranslation(-Main.screenPosition.Vec3()) * view * projection;
 
-            shader.Parameters["uWorldViewProjection"]?.SetValue(Graphics.WorldTransformMatrix);
+            shader.Parameters["uWorldViewProjection"]?.SetValue(renderMatrix);
             shader.Parameters["layer1Texture"]?.SetValue(texture);
             shader.Parameters["tintColor"]?.SetValue(_color.ToVector4());
+            
+            gd.BlendState = BlendState.AlphaBlend; 
+            gd.SamplerStates[0] = SamplerState.PointClamp;
 
             foreach (EffectPass pass in shader.CurrentTechnique.Passes) {
                 pass.Apply();

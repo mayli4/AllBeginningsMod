@@ -2,7 +2,7 @@
 
 namespace AllBeginningsMod.Content.Tiles.AbandonedShack;
 
-public class ContainerGhostTile : ModTile {
+internal sealed class ContainerGhostTile : ModTile {
     public override string Texture => Helper.PlaceholderTextureKey;
 
     public override void SetStaticDefaults() {
@@ -10,6 +10,16 @@ public class ContainerGhostTile : ModTile {
         Main.tileBlockLight[Type] = true;
         Main.tileSolid[Type] = true;
         
-        AddMapEntry(Color.Gray);
+        AddMapEntry(Color.Red);
+    }
+}
+
+internal sealed class ContainerGhostWall : ModWall {
+    public override string Texture => Helper.PlaceholderTextureKey;
+
+    public override void SetStaticDefaults() {
+        Main.tileBlockLight[Type] = true;
+        
+        AddMapEntry(Color.DarkRed);
     }
 }

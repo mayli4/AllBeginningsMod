@@ -25,16 +25,6 @@ Mods: {
 				DisplayName: Accented Red Dynasty Shingles Item
 				Tooltip: ""
 			}
-
-			CursorClearer: {
-				DisplayName: Cursor Clearer
-				Tooltip: ""
-			}
-
-			Debug: {
-				DisplayName: Debug
-				Tooltip: ""
-			}
 		}
 
 		Projectiles: {

@@ -1,10 +1,37 @@
-﻿namespace AllBeginningsMod.Core;
+﻿using System;
+
+namespace AllBeginningsMod.Core;
 
 internal sealed class CommonHooks : ModSystem {
-    public delegate bool ModifyChestContentsDelegate(Chest chest, Tile chestTile, bool alreadyAddedItem);
-    public static event ModifyChestContentsDelegate ModifyChestContentsEvent;
+    public override void Load() {
+        On_Main.DoDraw_WallsAndBlacks += DrawHook_BehindWalls;
+        On_Main.DoDraw_Tiles_Solid += DrawHook_BehindTiles;
+        On_Main.DoDraw_Tiles_NonSolid += DrawHook_BehindNonSolidTiles;
+    }
+    
+    public override void Unload() {
+        On_Main.DoDraw_WallsAndBlacks -= DrawHook_BehindWalls;
+        On_Main.DoDraw_Tiles_Solid -= DrawHook_BehindTiles;
+        On_Main.DoDraw_Tiles_NonSolid -= DrawHook_BehindNonSolidTiles;
+    }
 
-    public override void PostWorldGen() {
-        if(ModifyChestContentsEvent is null) return;
+    public static event Action DrawThingsBehindWallsEvent;
+    public static event Action DrawThingsOverWallsEvent;
+    private void DrawHook_BehindWalls(On_Main.orig_DoDraw_WallsAndBlacks orig, Main self) {
+        DrawThingsBehindWallsEvent?.Invoke();
+        orig(self);
+        DrawThingsOverWallsEvent?.Invoke();
+    }
+    
+    public static event Action DrawThingsBehindSolidTilesEvent;
+    private void DrawHook_BehindTiles(On_Main.orig_DoDraw_Tiles_Solid orig, Main self) {
+        DrawThingsBehindSolidTilesEvent?.Invoke();
+        orig(self);
+    }
+    
+    public static event Action DrawThingsBehindNonSolidSolidTilesEvent;
+    private void DrawHook_BehindNonSolidTiles(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self) {
+        DrawThingsBehindNonSolidSolidTilesEvent?.Invoke();
+        orig(self);
     }
 }

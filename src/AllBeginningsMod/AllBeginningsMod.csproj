@@ -16,6 +16,9 @@
         <TargetFramework>net8.0</TargetFramework>
         <PlatformTarget>AnyCPU</PlatformTarget>
         <LangVersion>latest</LangVersion>
+
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
     </PropertyGroup>
     
     <PropertyGroup>

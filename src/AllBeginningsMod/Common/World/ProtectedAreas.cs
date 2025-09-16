@@ -6,7 +6,7 @@ using Terraria.ModLoader.IO;
 
 namespace AllBeginningsMod.Common.World;
 
-public class ProtectedAreaSystem : ModSystem {
+internal sealed class ProtectedAreaSystem : ModSystem {
     public static List<Rectangle> ProtectedRegions = new List<Rectangle>();
 
     public static bool IsProtected(int x, int y) {
@@ -89,8 +89,8 @@ public class ProtectedAreaSystem : ModSystem {
     }
 }
 
-public class ProtectionGlobalItem : GlobalItem {
-    public static List<int> blacklist = new List<int> {
+internal sealed class ProtectionGlobalItem : GlobalItem {
+    private static List<int> _blacklist = new List<int> {
         ItemID.WaterBucket, ItemID.LavaBucket, ItemID.HoneyBucket, ItemID.BottomlessBucket,
         ItemID.Wrench, ItemID.BlueWrench, ItemID.GreenWrench, ItemID.YellowWrench, ItemID.MulticolorWrench,
         ItemID.ActuationRod, ItemID.Actuator, ItemID.WireKite, ItemID.WireCutter, ItemID.WireBulb,
@@ -195,7 +195,7 @@ public class ProtectionGlobalItem : GlobalItem {
         if (player != Main.LocalPlayer)
             return base.CanUseItem(item, player);
 
-        if (item.createTile != -1 || item.createWall != -1 || blacklist.Contains(item.type)) {
+        if (item.createTile != -1 || item.createWall != -1 || _blacklist.Contains(item.type)) {
             var targetPoint = Main.SmartCursorIsUsed ? new Point16(Main.SmartCursorX, Main.SmartCursorY) : new Point16(Player.tileTargetX, Player.tileTargetY);
             if (ProtectedAreaSystem.IsProtected(targetPoint.X, targetPoint.Y)) {
                 return false;
@@ -206,7 +206,7 @@ public class ProtectionGlobalItem : GlobalItem {
 }
 
 
-public class ProtectionGlobalTile : GlobalTile {
+internal sealed class ProtectionGlobalTile : GlobalTile {
     public override bool CanExplode(int i, int j, int type) {
         if (ProtectedAreaSystem.IsProtected(i, j)) {
             return false;

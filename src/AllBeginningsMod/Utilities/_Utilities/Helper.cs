@@ -1,5 +1,9 @@
 using System;
 using System.Runtime.CompilerServices;
+using Terraria.GameContent;
+using Terraria.GameContent.Drawing;
+using Terraria.ID;
+using Terraria.ObjectData;
 
 namespace AllBeginningsMod.Utilities;
 
@@ -139,5 +143,33 @@ public static partial class Helper {
     
     public static float AngleAtPoint(Vector2 point) {
         return (float)Math.Atan2(point.Y, point.X);
+    }
+    
+    public static void GetTopLeft(ref int i, ref int j) {
+        var tile = Framing.GetTileSafely(i, j);
+        var data = TileObjectData.GetTileData(tile);
+
+        if (data is null)
+            return;
+
+        (i, j) = (i - tile.TileFrameX % data.CoordinateFullWidth / 18, j - tile.TileFrameY % data.CoordinateFullHeight / 18);
+    }
+    
+    public static bool GetVisualInfo(int i, int j, out Color color, out Texture2D texture)
+    {
+        var t = Main.tile[i, j];
+        color = t.IsTileFullbright ? Color.White : Lighting.GetColor(i, j);
+        texture = TextureAssets.Tile[t.TileType].Value;
+
+        if (!TileDrawing.IsVisible(t))
+            return false;
+
+        if (t.TileColor != PaintID.None)
+        {
+            var painted = Main.instance.TilePaintSystem.TryGetTileAndRequestIfNotReady(t.TileType, 0, t.TileColor);
+            texture = painted ?? texture;
+        }
+
+        return true;
     }
 }
