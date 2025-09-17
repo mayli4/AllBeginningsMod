@@ -49,4 +49,11 @@ internal sealed class PointsOfInterestSystem : ModSystem {
         LocalPlayerInShack = Main.LocalPlayer.Hitbox.Intersects(detectionRect1.ToWorldCoordinates()) 
                              || Main.LocalPlayer.Hitbox.Intersects(detectionRect2.ToWorldCoordinates());
     }
+
+    public override void ClearWorld() {
+        FoundOldbotShack = false;
+        LocalPlayerInShack = false;
+        ShackPosition = Point.Zero;
+        ShackBounds = Rectangle.Empty;
+    }
 }

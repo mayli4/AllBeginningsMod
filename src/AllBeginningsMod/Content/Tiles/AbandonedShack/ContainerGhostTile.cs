@@ -18,8 +18,14 @@ internal sealed class ContainerGhostWall : ModWall {
     public override string Texture => Helper.PlaceholderTextureKey;
 
     public override void SetStaticDefaults() {
-        Main.tileBlockLight[Type] = true;
+        Main.tileLighted[Type] = true;
         
         AddMapEntry(Color.DarkRed);
+    }
+
+    public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b) {
+        r += 0.6f;
+        g += 0.6f;
+        b += 0.6f;
     }
 }

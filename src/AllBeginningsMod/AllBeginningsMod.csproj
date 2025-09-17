@@ -54,16 +54,11 @@
 
         <None Remove="..\Build/**/*" />
 
-        <None Remove="Common\Dialogue\**" />
         <Compile Remove="..\Build/**/*" />
         <Compile Remove="Common\Dialogue\**" />
         <AdditionalFiles Remove="..\Build/**" />
-        <AdditionalFiles Remove="Common\Dialogue\**" />
-        <EmbeddedResource Remove="Common\Dialogue\**" />
         
         <Compile Include="..\Build\Common.cs" />
-        
-        <None Remove="Assets\Textures\NPCs\Bosses\Nightgaunt\LimbEnd.png" />
     </ItemGroup>
     
     <ItemGroup>

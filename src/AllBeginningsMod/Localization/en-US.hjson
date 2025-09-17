@@ -25,6 +25,21 @@ Mods: {
 				DisplayName: Accented Red Dynasty Shingles Item
 				Tooltip: ""
 			}
+
+			GrassyDirtWallItem: {
+				DisplayName: Grassy Dirt Wall Item
+				Tooltip: ""
+			}
+
+			SmoothStoneWallItem: {
+				DisplayName: Smooth Stone Wall Item
+				Tooltip: ""
+			}
+
+			Debug: {
+				DisplayName: Debug
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {

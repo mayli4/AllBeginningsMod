@@ -1,5 +1,6 @@
 ﻿using AllBeginningsMod.Common.Graphics;
 using AllBeginningsMod.Common.World;
+using AllBeginningsMod.Content.Tiles.AbandonedShack;
 using AllBeginningsMod.Core;
 using AllBeginningsMod.Utilities;
 using System;
@@ -89,6 +90,35 @@ internal sealed class AbandonedShackSystem : ModSystem {
 
     public override void Load() {
         CommonHooks.DrawThingsBehindNonSolidSolidTilesEvent += DrawInsideContainer;
+        CommonHooks.DrawThingsAbovePlayersEvent += DrawOverlay;
+    }
+
+    private void DrawOverlay(bool overPlayers) {
+        if(!overPlayers) return;
+        
+        if (PointsOfInterestSystem.ShackPosition == Point.Zero) {
+            return;
+        }
+        
+        var rect1 = new Rectangle(PointsOfInterestSystem.ShackPosition.X + 11, PointsOfInterestSystem.ShackPosition.Y - 1, 18, 12);
+        var rect2 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y - 1, 11, 9);
+        
+        var totalRenderArea = Rectangle.Union(rect1, rect2);
+        
+        float targetAlpha = PointsOfInterestSystem.LocalPlayerInShack ? 0f : 1f;
+        _overlayAlpha = MathHelper.Lerp(_overlayAlpha, targetAlpha, 0.125f);
+
+        if (_overlayAlpha <= 0.01f && !PointsOfInterestSystem.LocalPlayerInShack) {
+            return;
+        }
+        
+        var renderColor = Color.White * _overlayAlpha;
+        
+        var overArea = LightingBuffer
+            .Prepare(totalRenderArea)
+            .WithColor(renderColor);
+        
+        overArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackOver.Value);
     }
 
     private void DrawInsideContainer() {
@@ -112,7 +142,7 @@ internal sealed class AbandonedShackSystem : ModSystem {
         }
         
         var rect1 = new Rectangle(PointsOfInterestSystem.ShackPosition.X + 11, PointsOfInterestSystem.ShackPosition.Y - 1, 18, 12);
-        var rect2 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y - 1, 11, 9); //as
+        var rect2 = new Rectangle(PointsOfInterestSystem.ShackPosition.X, PointsOfInterestSystem.ShackPosition.Y - 1, 11, 9);
 
         float targetAlpha = PointsOfInterestSystem.LocalPlayerInShack ? 0f : 1f;
         _overlayAlpha = MathHelper.Lerp(_overlayAlpha, targetAlpha, 0.125f);
@@ -130,12 +160,6 @@ internal sealed class AbandonedShackSystem : ModSystem {
             .WithColor(Color.White);
         
         baseArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackBase.Value);
-
-        var overArea = LightingBuffer
-            .Prepare(totalRenderArea)
-            .WithColor(renderColor);
-        
-        overArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackOver.Value);
 
         if(Main.rand.NextBool(50)) {
             Gore.NewGore(
@@ -181,14 +205,14 @@ internal sealed class AbandonedShackSystem : ModSystem {
 
 internal sealed class AbandonedShackMicrobiome : MicroBiome {
     public override bool Place(Point origin, StructureMap structures) {
-        if (Framing.GetTileSafely(origin.X, origin.Y).TileType != TileID.Grass || Framing.GetTileSafely(origin.X, origin.Y).LiquidAmount != 0) {
-            return false;
-        }
+        // if (Framing.GetTileSafely(origin.X, origin.Y).TileType != TileID.Grass || Framing.GetTileSafely(origin.X, origin.Y).LiquidAmount != 0) {
+        //     return false;
+        // }
 
         int x = origin.X;
         int y = origin.Y;
 
-        y += 26;
+        y += 32;
         
         ShapeData airData = new();
         ShapeData stoneData = new();
@@ -310,44 +334,56 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
             )
         );
         
+        Point floorGenOrigin = new Point(x - 19, y + 10);
+        
+        WorldUtils.Gen(
+            floorGenOrigin, 
+            new Shapes.Rectangle(43, 8), // A wide, relatively flat rectangle for the floor
+            Actions.Chain(
+                new Modifiers.Blotches(2, 0.7), // Add some natural irregularity
+                new Actions.PlaceTile(TileID.Dirt), // Place the dirt
+                new GrassAction() // Apply grass if exposed
+            )
+        );
+
+        // --- 5. Add small dirt patches around the floor in the stone. ---
+        int numSmallDirtPatches = WorldGen.genRand.Next(10, 15); // 5 to 9 patches
+        for (int i = 0; i < numSmallDirtPatches; i++) {
+            // Pick a random location near the main floor area, slightly up into the walls.
+            Point patchOrigin = new Point(
+                x + WorldGen.genRand.Next(-25, 26), // X range around pit center
+                floorGenOrigin.Y - WorldGen.genRand.Next(0, 21) // Y range: from floor level up to 20 tiles above it (into the stone walls)
+            );
+
+            // Small blob shape for the patch
+            GenShape patchShape = new Shapes.Circle(WorldGen.genRand.Next(2, 4)); // Radius 2-4 for 3-4 tile sized patches
+
+            WorldUtils.Gen(
+                patchOrigin,
+                patchShape,
+                Actions.Chain(
+                    new Modifiers.OnlyTiles(TileID.Stone), // IMPORTANT: Only replace existing stone tiles
+                    new Modifiers.Blotches(1, 0.5f), // Make the edges a bit irregular
+                    new Actions.PlaceTile(TileID.Dirt),
+                    new GrassAction() // Apply grass if exposed to air
+                )
+            );
+        }
+        
         WorldUtils.Gen(
             new Point(x, y), 
             new ModShapes.OuterOutline(airData),
             new Actions.Smooth()
         );
-
+        
         WorldUtils.Gen(
             new Point(x, y),
             new Shapes.Slime(20, 1.2, 1.4),
             Actions.Chain(
                 new Modifiers.Blotches(2, 0.4),
-                new Actions.PlaceWall(WallID.Stone),
-                new Modifiers.Blotches(2, 0.4),
-                new Modifiers.Dither(),
-                new Actions.PlaceWall(WallID.RocksUnsafe1),
-                new Modifiers.Dither(0.8f),
-                new Actions.PlaceWall(WallID.RocksUnsafe3)
+                new Actions.PlaceWall((ushort)ModContent.WallType<SmoothStoneWall>())
             )
         );
-        
-        int amt = WorldGen.genRand.Next(15, 20);
-
-        int blotchSpawnHorizontalExtent = 10;
-        int blotchSpawnVerticalExtent = 10;
-        for (int i = 0; i < amt; ++i) {
-            var o = new Point(
-                x + WorldGen.genRand.Next(-blotchSpawnHorizontalExtent, blotchSpawnHorizontalExtent + 1),
-                y + WorldGen.genRand.Next(-blotchSpawnVerticalExtent, blotchSpawnVerticalExtent + 1)
-            );
-            
-            int blotchRadius = WorldGen.genRand.Next(1, 3);
-            
-            WorldUtils.Gen(
-                o,
-                new Shapes.Circle(blotchRadius, blotchRadius),
-                Actions.Chain(new Modifiers.Blotches(3, 2), new Modifiers.OnlyWalls(WallID.Stone), new Actions.PlaceWall(WallID.RocksUnsafe1))
-            );
-        }
         
         WorldUtils.Gen(
             new Point(x, y - 17),
@@ -395,7 +431,7 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
         structures.AddProtectedStructure(new Rectangle(origin.X - 40, origin.Y - 40, 80, 80), 10);
         structures.AddProtectedStructure(shackBounds);
         
-        ProtectedAreaSystem.AddProtectedRegion(PointsOfInterestSystem.ShackBounds);
+        //ProtectedAreaSystem.AddProtectedRegion(PointsOfInterestSystem.ShackBounds);
         
         WorldUtils.Gen(
             new Point(x, y - 12),
@@ -452,5 +488,59 @@ public class AbandonedShackMapIcon : ModMapLayer {
 
         else
             MouseOver = false;
+    }
+}
+
+public class Debug : ModItem {
+    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnProj;
+
+    public override void SetDefaults() {
+        Item.width = 28;
+        Item.height = 28;
+        Item.rare = ItemRarityID.Green;
+        Item.useAnimation = 20;
+        Item.useTime = 20;
+        Item.useStyle = ItemUseStyleID.Swing;
+        Item.consumable = false;
+        Item.autoReuse = false;
+    }
+
+    public override bool AltFunctionUse(Player player) {
+        return true;
+    }
+
+    public override bool CanUseItem(Player player) {
+        return true;
+    }
+
+    public override bool? UseItem(Player player) {
+        Vector2 mouseWorldPosition = Main.MouseWorld;
+        int tileX = (int)(mouseWorldPosition.X / 16f);
+        int tileY = (int)(mouseWorldPosition.Y / 16f);
+        Point spawnPoint = new Point(tileX, tileY);
+        
+        if (player.altFunctionUse != 2) {
+            if(player.altFunctionUse != 2) {
+                WorldUtils.Gen(
+                    spawnPoint,
+                    new Shapes.Rectangle(90, 90),
+                    Actions.Chain(
+                        new Actions.RemoveWall(),
+                        new Actions.ClearTile(),
+                       // new Actions.PlaceTile(TileID.Dirt),
+                        new Actions.SetFrames(true)
+                    )
+                );
+            }
+            return true;
+        }
+        
+        if (player.altFunctionUse == 2) {
+            var biome = GenVars.configuration.CreateBiome<AbandonedShackMicrobiome>();
+
+            biome.Place(spawnPoint, GenVars.structures);
+            return true;
+        }
+        return false;
     }
 }
