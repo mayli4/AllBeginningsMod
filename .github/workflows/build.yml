@@ -34,7 +34,7 @@ jobs:
         run: dotnet build AllBeginningsMod.sln --configuration Release
         
       - name: Deploy .tmod artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MammothMod.tmod
           path: ./bin/Saves/tModLoader/Mods/AllBeginningsMod.tmod
