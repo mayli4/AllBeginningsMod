@@ -19,6 +19,9 @@
 
         <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
         <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+
+        <!-- for github workflows -->
+        <ExtraBuildModFlags Condition="'$(TML_SAVE_PATH)' != ''">$(ExtraBuildModFlags)-savedirectory "$([System.IO.Path]::GetFullPath('.'))/$(TML_SAVE_PATH)"</ExtraBuildModFlags>
     </PropertyGroup>
     
     <PropertyGroup>
