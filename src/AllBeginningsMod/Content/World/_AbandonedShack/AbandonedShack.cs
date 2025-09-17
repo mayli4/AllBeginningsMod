@@ -176,15 +176,13 @@ internal sealed class AbandonedShackSystem : ModSystem {
         var godrayColor = new Color();
         float godrayRot = 0;
         
-        if (Main.dayTime)
-        {
-            godrayColor = Color.Yellow * 0.5f;
+        if (Main.dayTime) {
+            godrayColor = Color.Yellow * 0.7f;
             godrayColor *= (float)Math.Pow(Math.Sin(Main.time / 54000f * 3.14f), 1);
             godrayRot = -0.5f * 1.57f + (float)Main.time / 54000f * 3.14f;
         }
-        else
-        {
-            godrayColor = Color.Goldenrod * 0.5f;
+        else {
+            godrayColor = Color.Goldenrod * 0.7f;
             godrayColor *= (float)Math.Pow(Math.Sin(Main.time / 24000f * 3.14f), 3) * 0.25f;
             godrayRot = -0.5f * 1.57f + (float)Main.time / 24000f * 3.14f;
         }
