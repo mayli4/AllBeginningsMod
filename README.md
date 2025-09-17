@@ -9,6 +9,6 @@
 
 ### developers:
 
-- tobias (lead, spriter) 
+- tobias (lead, spriter)
 - mathica (co-owner, programmer)
 - sucs (programmer)
