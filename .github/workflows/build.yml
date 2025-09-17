@@ -1,29 +1,23 @@
-name: Build
-
-env:
-  TML_BUILD_PATH_OVERRIDE: ./bin
+﻿name: Build Mod
 
 on:
   push:
-    branches: [stable]
-
-permissions:
-  contents: write
+    branches:
+    - stable
+  
+env:
+    TML_SAVE_PATH: ./bin/Saves
 
 jobs:
   build:
     runs-on: windows-latest
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Download tModLoader
+      - name: Download & Install tModLoader
         run: |
           curl -s -L https://github.com/tModLoader/tModLoader/releases/latest/download/tModLoader.zip -o tModLoader.zip
-
-      - name: Extract tModLoader
-        run: |
           unzip -q -o tModLoader.zip -d ../tModLoader
           rm tModLoader.zip
 
@@ -36,37 +30,21 @@ jobs:
           </Project>
           EOF
 
-      - name: Build solution
-        run: dotnet build EndlessEscapade.sln --configuration Release
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Build mod solution
+        run: dotnet build AllBeginningsMod.sln --configuration Release
+        
+      - name: Deploy .tmod artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: artifacts
-          path: |
-            ./bin/tModLoader/Mods/AllBeginningsMod.tmod
-            ./src/AllBeginningsMod/bin/Debug/net8.0/AllBeginningsMod.dll
-            ./src/Generators/bin/Debug/netstandard2.0/Generators.dll
+          name: MammothMod.tmod
+          path: ./bin/Saves/tModLoader/Mods/AllBeginningsMod.tmod
 
-
-  publish:
-    runs-on: windows-latest
-
-    needs: build
-
-    steps:
-      - name: Deploy action across private Discord
+      - name: Deploy action across Discord
         uses: sarisia/actions-status-discord@v1  
+        if: always()
         with:
-          webhook: ${{ secrets.PRIVATE_DISCORD_BUILD_WEBHOOK_TOKEN }}
-          title: New version of `Endless Escapade` is ready!
+          webhook: ${{ secrets.DISCORD_WEBHOOK_DEPLOY }}
+          nocontext: true
+          title: mod build
           description: |
-            Click [here](https://github.com/mayli4/AllBeginningsMod/releases/tag/test-${{ steps.date.outputs.date }}) to view.
-
-      - name: Deploy action across public Discord
-        uses: sarisia/actions-status-discord@v1  
-        with:
-          webhook: ${{ secrets.PUBLIC_DISCORD_BUILD_WEBHOOK_TOKEN }}
-          title: New version of `Endless Escapade` is ready!
-          description: |
-            Click [here](https://github.com/mayli4/AllBeginningsMod/releases/tag/test-${{ steps.date.outputs.date }}) to view.
+            click [here](https://github.com/mayli4/AllBeginningsMod/actions/runs/${{ github.run_id }}) to view
