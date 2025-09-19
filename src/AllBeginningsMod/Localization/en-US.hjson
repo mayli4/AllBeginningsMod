@@ -49,7 +49,11 @@ Mods: {
 			UrnOfGreedProjectile.DisplayName: Urn Of Greed Projectile
 		}
 
-		NPCs.NightgauntNPC.DisplayName: Nightgaunt N P C
+		NPCs: {
+			NightgauntNPC.DisplayName: Nightgaunt N P C
+			TestDialogueNPC.DisplayName: Test Dialogue N P C
+		}
+
 		MapIcons.OldbotShack: Oldbot's Shack
 	}
 }

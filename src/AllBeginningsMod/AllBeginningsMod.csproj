@@ -58,7 +58,6 @@
         <None Remove="..\Build/**/*" />
 
         <Compile Remove="..\Build/**/*" />
-        <Compile Remove="Common\Dialogue\**" />
         <AdditionalFiles Remove="..\Build/**" />
         
         <Compile Include="..\Build\Common.cs" />
@@ -68,6 +67,10 @@
       <Reference Include="StructureHelper">
         <HintPath>lib\StructureHelper.dll</HintPath>
       </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Common\Dialogue\" />
     </ItemGroup>
     
 </Project>
