@@ -54,7 +54,6 @@
     </ItemGroup>
     
     <ItemGroup>
-
         <None Remove="..\Build/**/*" />
 
         <Compile Remove="..\Build/**/*" />
@@ -70,7 +69,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="Common\Dialogue\" />
+      <Folder Include="Common\Dialogue\_UI\" />
     </ItemGroup>
     
 </Project>

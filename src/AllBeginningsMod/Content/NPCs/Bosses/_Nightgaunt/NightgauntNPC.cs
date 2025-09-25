@@ -5,8 +5,6 @@ using Terraria.ID;
 
 namespace AllBeginningsMod.Content.NPCs.Bosses;
 
-//had a solver but removed since it sucks, new one tbd
-
 public class NightgauntNPC : ModNPC {
     public override string Texture => Helper.PlaceholderTextureKey;
 

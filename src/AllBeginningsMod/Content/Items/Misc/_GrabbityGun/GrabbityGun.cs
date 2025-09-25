@@ -450,8 +450,8 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                 Graphics.BeginPipeline(0.5f)
                     .DrawTrail(
                         trailPoints.ToArray(),
-                        _ => 20f,
-                        _ => Color.OrangeRed,
+                        width: _ => 20f,
+                        color: _ => Color.OrangeRed,
                         shader,
                         ("transformMatrix", Graphics.WorldTransformMatrix),
                         ("time", Main.GameUpdateCount * -0.025f),

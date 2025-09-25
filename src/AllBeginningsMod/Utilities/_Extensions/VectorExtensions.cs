@@ -59,4 +59,6 @@ public static class VectorExtensions {
     }
     
     public static Vector3 Vec3(this Vector2 vector) => new(vector.X, vector.Y, 0);
+    
+    //public static Vector2 ToVector2(this Point vector) => new(vector.X, vector.Y);
 }
