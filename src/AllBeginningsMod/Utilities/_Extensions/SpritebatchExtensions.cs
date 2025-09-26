@@ -1,13 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿#nullable enable
 using System;
 using System.Runtime.CompilerServices;
-using Terraria;
-using Terraria.GameContent;
 
 namespace AllBeginningsMod.Utilities;
 
-public static class SpritebatchExtensions {
+internal static class SpritebatchExtensions {
     public static void Begin(this SpriteBatch spriteBatch, SpriteBatchSnapshot data) {
         spriteBatch.Begin(
             data.SortMode,
