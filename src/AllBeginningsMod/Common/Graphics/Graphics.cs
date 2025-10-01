@@ -35,6 +35,10 @@ public class Graphics : ModSystem {
     public readonly List<BeginData> BeginDatas = [];
     public readonly List<EffectData> EffectDatas = [];
     public readonly List<Vector2> PositionDatas = [];
+    
+    public readonly List<VertexPositionColorTexture> VertexPositionColorTextureDatas = [];
+    public readonly List<short> IndexDatas = [];
+    public readonly List<DrawTexturedIndexedMeshData> TexturedIndexedMeshDatas = [];
 
     public Commands Cache = new();
 
@@ -235,6 +239,9 @@ public class Graphics : ModSystem {
                 case CommandType.DrawSprite:
                     r.RunDrawSprite(dataIndex);
                     break;
+                case CommandType.DrawTexturedIndexedMesh:
+                    r.RunDrawTexturedIndexedMesh(dataIndex);
+                    break;
                 case CommandType.Begin:
                     r.RunBegin(dataIndex);
                     break;
@@ -354,6 +361,32 @@ public class Graphics : ModSystem {
                     trailPositions.Length * 2,
                     0,
                     (trailPositions.Length - 1) * 2
+                );
+            }
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly void RunDrawTexturedIndexedMesh(int index) {
+            var meshData = graphics.TexturedIndexedMeshDatas[index];
+
+            var vertices = CollectionsMarshal.AsSpan(graphics.VertexPositionColorTextureDatas)
+                .Slice(meshData.VerticesIndex, meshData.VertexCount);
+            var indices = CollectionsMarshal.AsSpan(graphics.IndexDatas)
+                .Slice(meshData.IndicesIndex, meshData.IndexCount);
+
+            var effectData = graphics.EffectDatas[meshData.EffectDataIndex];
+            SetEffectParams(effectData);
+
+            foreach (var pass in effectData.Effect.CurrentTechnique.Passes) {
+                pass.Apply();
+                GraphicsDevice.DrawUserIndexedPrimitives(
+                    primitiveType: meshData.PrimitiveType,
+                    vertexData: vertices.ToArray(),
+                    vertexOffset: 0,
+                    numVertices: meshData.VertexCount,
+                    indexData: indices.ToArray(),
+                    indexOffset: 0,
+                    primitiveCount: meshData.PrimitiveCount
                 );
             }
         }

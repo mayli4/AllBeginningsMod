@@ -27,6 +27,7 @@ public struct Commands() {
 public enum CommandType : byte {
     DrawTrail,
     DrawSprite,
+    DrawTexturedIndexedMesh,
 
     Begin,
     End,
@@ -55,6 +56,16 @@ public record struct DrawTrailData(
     int PositionCount,
     Func<float, float> Width,
     Func<float, Color> Color,
+    int EffectDataIndex
+);
+
+public record struct DrawTexturedIndexedMeshData(
+    int VerticesIndex,
+    int VertexCount,
+    int IndicesIndex,
+    int IndexCount,
+    PrimitiveType PrimitiveType,
+    int PrimitiveCount,
     int EffectDataIndex
 );
 

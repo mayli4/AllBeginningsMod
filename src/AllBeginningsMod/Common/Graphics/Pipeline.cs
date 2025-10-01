@@ -76,6 +76,37 @@ public struct Pipeline(Graphics graphics) {
 
         return DrawTrail(positions, width, color, effect, parameters);
     }
+    
+    public readonly Pipeline DrawTexturedIndexedMesh(
+        VertexPositionColorTexture[] vertices,
+        short[] indices,
+        PrimitiveType primitiveType,
+        int primitiveCount,
+        Effect effect,
+        params ReadOnlySpan<(string, ParameterValue)> parameters
+    ) {
+        var effectDataIndex = AddEffectData(effect, parameters);
+
+        var meshVerticesIndex = graphics.VertexPositionColorTextureDatas.Count;
+        graphics.VertexPositionColorTextureDatas.AddRange(vertices);
+
+        var meshIndicesIndex = graphics.IndexDatas.Count;
+        graphics.IndexDatas.AddRange(indices);
+
+        var texturedMeshDataIndex = graphics.TexturedIndexedMeshDatas.Count;
+        graphics.TexturedIndexedMeshDatas.Add(new() {
+            VerticesIndex = meshVerticesIndex,
+            VertexCount = vertices.Length,
+            IndicesIndex = meshIndicesIndex,
+            IndexCount = indices.Length,
+            PrimitiveType = primitiveType,
+            PrimitiveCount = primitiveCount,
+            EffectDataIndex = effectDataIndex,
+        });
+        graphics.Cache.Add(CommandType.DrawTexturedIndexedMesh, texturedMeshDataIndex);
+
+        return this;
+    }
 
     public readonly Pipeline SetBlendState(BlendState blendState) {
         var index = graphics.BlendStateData.Count;
