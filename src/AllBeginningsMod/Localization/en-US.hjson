@@ -53,6 +53,7 @@ Mods: {
 			NightgauntNPC.DisplayName: Nightgaunt N P C
 			TestDialogueNPC.DisplayName: Test Dialogue N P C
 			TestSpecialDialogueNPC.DisplayName: Test Special Dialogue N P C
+			TreetopPlatformNPC.DisplayName: Treetop Platform N P C
 		}
 
 		MapIcons.OldbotShack: Oldbot's Shack

@@ -1,4 +1,5 @@
 ﻿using System;
+using Terraria.GameContent.Drawing;
 
 namespace AllBeginningsMod.Core;
 
@@ -10,6 +11,8 @@ internal sealed class CommonHooks : ModSystem {
         On_Main.DoDraw_Tiles_Solid += DrawHook_BehindTiles;
         On_Main.DoDraw_Tiles_NonSolid += DrawHook_BehindNonSolidTiles;
         On_Main.DrawPlayers_AfterProjectiles += DrawHook_AfterPlayers;
+        
+        On_TileDrawing.PreDrawTiles += ClearForegroundStuff;
     }
     
     public override void Unload() {
@@ -17,6 +20,8 @@ internal sealed class CommonHooks : ModSystem {
         On_Main.DoDraw_Tiles_Solid -= DrawHook_BehindTiles;
         On_Main.DoDraw_Tiles_NonSolid -= DrawHook_BehindNonSolidTiles;
         On_Main.DrawPlayers_AfterProjectiles -= DrawHook_AfterPlayers;
+        
+        On_TileDrawing.PreDrawTiles -= ClearForegroundStuff;
     }
 
     public static event Action DrawThingsBehindWallsEvent;
@@ -46,5 +51,15 @@ internal sealed class CommonHooks : ModSystem {
         PreDrawPlayersEvent?.Invoke(true);
         orig(self);
         DrawThingsAbovePlayersEvent?.Invoke(true);
+    }
+    
+    public delegate void ClearTileCacheDelegate(bool solidLayer);
+    public static event ClearTileCacheDelegate ClearTileDrawingCachesEvent;
+    private static void ClearForegroundStuff(On_TileDrawing.orig_PreDrawTiles orig, TileDrawing self, bool solidLayer, bool forRenderTargets, bool intoRenderTargets) {
+        orig(self, solidLayer, forRenderTargets, intoRenderTargets);
+
+        //If we draw every frame or we draw into a RT, it means we're resetting stuff
+        if (intoRenderTargets || Lighting.UpdateEveryFrame)
+            ClearTileDrawingCachesEvent?.Invoke(solidLayer);
     }
 }

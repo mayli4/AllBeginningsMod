@@ -24,8 +24,8 @@ internal sealed class ContainerGhostWall : ModWall {
     }
 
     public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b) {
-        r += 0.6f;
-        g += 0.6f;
-        b += 0.6f;
+        r += 0.2f;
+        g += 0.2f;
+        b += 0.2f;
     }
 }

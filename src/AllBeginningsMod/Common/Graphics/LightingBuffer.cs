@@ -2,6 +2,8 @@
 
 namespace AllBeginningsMod.Common.Graphics;
 
+//todo murder this bruh
+
 /// <summary>
 ///     Draws arbitrary meshes that are affected by ingame lighting.
 /// </summary>

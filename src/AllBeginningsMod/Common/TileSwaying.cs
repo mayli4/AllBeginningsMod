@@ -8,6 +8,8 @@ internal sealed class TileSwaying : ModSystem {
     
     public static TileSwaying Instance;
     
+    public static event Action PreUpdateWind;
+    
     public override void Load() {
         Instance = this;
         On_TileDrawing.Update += On_TileDrawingOnUpdate;
@@ -22,6 +24,8 @@ internal sealed class TileSwaying : ModSystem {
         
         if (Main.dedServ)
             return;
+        
+        PreUpdateWind?.Invoke();
 
         double num = Math.Abs(Main.WindForVisuals);
         num = Utils.GetLerpValue(0.08f, 1.2f, (float)num, clamped: true);
