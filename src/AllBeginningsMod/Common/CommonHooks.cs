@@ -14,6 +14,14 @@ internal sealed class CommonHooks : ModSystem {
         On_Main.DrawGore += On_MainOnDrawGore;
         
         On_TileDrawing.PreDrawTiles += ClearForegroundStuff;
+        On_Main.DrawDust += On_MainOnDrawDust;
+    }
+
+    
+    public static event Action DrawDustsEvent;
+    private void On_MainOnDrawDust(On_Main.orig_DrawDust orig, Main self) {
+        orig(self);
+        DrawDustsEvent.Invoke();
     }
 
     public static event Action DrawThingsOverGore;

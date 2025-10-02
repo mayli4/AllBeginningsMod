@@ -71,6 +71,8 @@
     
     <ItemGroup>
       <Folder Include="Common\Dialogue\" />
+      <Folder Include="Content\Bosses\" />
+      <Folder Include="Content\Miscellaneous\_Items\" />
     </ItemGroup>
     
 </Project>

@@ -25,11 +25,11 @@ public sealed class CustomTileRendering : ILoadable {
         ResetSpecialPointsCache(_nonSolidSpecialPoints);
 
         CommonHooks.DrawThingsBehindNonSolidSolidTilesEvent += DrawBehindNonSolidTiles;
-        CommonHooks.DrawThingsAbovePlayersEvent += DrawThingsAbovePlayersEvent; 
+        CommonHooks.DrawDustsEvent += DrawThingsAbovePlayersEvent; 
         CommonHooks.ClearTileDrawingCachesEvent += ClearTiles;
     }
 
-    private void DrawThingsAbovePlayersEvent(bool afterProjectiles) {
+    private void DrawThingsAbovePlayersEvent() {
         if (LayerEmpty(TileDrawLayer.Foreground))
             return;
 
