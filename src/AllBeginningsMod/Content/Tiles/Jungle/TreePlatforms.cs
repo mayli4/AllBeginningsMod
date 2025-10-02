@@ -76,7 +76,7 @@ internal class TreePlatformImpl : ILoadable {
 	}
 }
 
-public class TreetopPlatformNPC : ModNPC {
+internal sealed class TreetopPlatformNPC : ModNPC {
     public Point16 TreePosition {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new((int)NPC.ai[0], (int)NPC.ai[1]);

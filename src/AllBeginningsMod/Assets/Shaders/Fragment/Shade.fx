@@ -6,8 +6,7 @@ float noiseStretch; // How far the noise is spread apart
 float4 adjustColor; // "Fancy" color between the darkness
 
 texture noiseTexture;
-sampler2D noise = sampler_state
-{
+sampler2D noise = sampler_state{
     texture = <noiseTexture>;
     magfilter = POINT;
     minfilter = POINT;
@@ -15,7 +14,6 @@ sampler2D noise = sampler_state
     AddressU = wrap;
     AddressV = wrap;
 };
-
 
 struct VertexShaderInput
 {
@@ -31,8 +29,7 @@ struct VertexShaderOutput
     float2 TextureCoordinates : TEXCOORD0;
 };
 
-VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
-{
+VertexShaderOutput VertexShaderFunction(in VertexShaderInput input){
     VertexShaderOutput output = (VertexShaderOutput) 0;
     float4 pos = mul(input.Position, uWorldViewProjection);
     output.Position = pos;
@@ -43,14 +40,11 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
     return output;
 }
 
-float invlerp(float from, float to, float value)
-{
+float invlerp(float from, float to, float value){
     return clamp((value - from) / (to - from), 0.0, 1.0);
 }
 
-
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
-{
+float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0{
     float2 uv = input.TextureCoordinates;
 
     //Base gradient that gets darker using UV coords

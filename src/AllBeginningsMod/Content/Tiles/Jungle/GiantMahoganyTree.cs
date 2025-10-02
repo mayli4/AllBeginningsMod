@@ -52,9 +52,8 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
     private bool? PreventTileBreakIfOnTopOfIt(int i, int j, int type) {
         if (type == Type) {
             int leftmostX = i;
-            while (WorldGen.InWorld(leftmostX - 1, j) 
-                   && Main.tile[leftmostX - 1, j].HasTile 
-                   && Main.tile[leftmostX - 1, j].TileType == Type) {
+            while (WorldGen.InWorld(leftmostX - 1, j) && Main.tile[leftmostX - 1, j].HasTile 
+                                                      && Main.tile[leftmostX - 1, j].TileType == Type) {
                 leftmostX--;
             }
             

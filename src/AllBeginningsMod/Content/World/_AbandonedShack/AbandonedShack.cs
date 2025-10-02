@@ -336,34 +336,31 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
         
         WorldUtils.Gen(
             floorGenOrigin, 
-            new Shapes.Rectangle(43, 8), // A wide, relatively flat rectangle for the floor
+            new Shapes.Rectangle(43, 8),
             Actions.Chain(
-                new Modifiers.Blotches(2, 0.7), // Add some natural irregularity
-                new Actions.PlaceTile(TileID.Dirt), // Place the dirt
-                new GrassAction() // Apply grass if exposed
+                new Modifiers.Blotches(2, 0.7),
+                new Actions.PlaceTile(TileID.Dirt),
+                new GrassAction()
             )
         );
 
-        // --- 5. Add small dirt patches around the floor in the stone. ---
-        int numSmallDirtPatches = WorldGen.genRand.Next(10, 15); // 5 to 9 patches
+        int numSmallDirtPatches = WorldGen.genRand.Next(10, 15);
         for (int i = 0; i < numSmallDirtPatches; i++) {
-            // Pick a random location near the main floor area, slightly up into the walls.
             Point patchOrigin = new Point(
-                x + WorldGen.genRand.Next(-25, 26), // X range around pit center
-                floorGenOrigin.Y - WorldGen.genRand.Next(0, 21) // Y range: from floor level up to 20 tiles above it (into the stone walls)
+                x + WorldGen.genRand.Next(-25, 26),
+                floorGenOrigin.Y - WorldGen.genRand.Next(0, 21)
             );
 
-            // Small blob shape for the patch
-            GenShape patchShape = new Shapes.Circle(WorldGen.genRand.Next(2, 4)); // Radius 2-4 for 3-4 tile sized patches
+            GenShape patchShape = new Shapes.Circle(WorldGen.genRand.Next(2, 4));
 
             WorldUtils.Gen(
                 patchOrigin,
                 patchShape,
                 Actions.Chain(
-                    new Modifiers.OnlyTiles(TileID.Stone), // IMPORTANT: Only replace existing stone tiles
-                    new Modifiers.Blotches(1, 0.5f), // Make the edges a bit irregular
+                    new Modifiers.OnlyTiles(TileID.Stone),
+                    new Modifiers.Blotches(1, 0.5f),
                     new Actions.PlaceTile(TileID.Dirt),
-                    new GrassAction() // Apply grass if exposed to air
+                    new GrassAction()
                 )
             );
         }
