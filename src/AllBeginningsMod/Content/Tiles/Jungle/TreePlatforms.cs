@@ -2,9 +2,10 @@
 using AllBeginningsMod.Utilities;
 using System.Runtime.CompilerServices;
 using Terraria.DataStructures;
-using Terraria.ID;
 
 namespace AllBeginningsMod.Content.Tiles.Jungle;
+
+//ty scalar for helping with grappling
 
 internal class TreePlatformPlayer : ModPlayer {
 	public override void PreUpdateMovement() {
@@ -116,6 +117,7 @@ public class TreetopPlatformNPC : ModNPC {
         NPC.HitSound = null;
         NPC.DeathSound = null;
         NPC.dontCountMe = true;
+        NPC.ShowNameOnHover = false;
     }
 
     public override void AI() {
@@ -128,6 +130,24 @@ public class TreetopPlatformNPC : ModNPC {
         }
 
         var tilePos = TreePosition;
+        
+        Point16 checkTileCoord = WindSourceTile; 
+        if (checkTileCoord.X == 0 && checkTileCoord.Y == 0) {
+            checkTileCoord = tilePos;
+        }
+
+        if (!WorldGen.InWorld(checkTileCoord.X, checkTileCoord.Y)) {
+            NPC.active = false;
+            NPC.netUpdate = true;
+            return;
+        }
+
+        Tile treeTile = Main.tile[checkTileCoord.X, checkTileCoord.Y];
+        if (!treeTile.HasTile || treeTile.TileType != ModContent.TileType<GiantMahoganyTree>()) {
+            NPC.active = false;
+            NPC.netUpdate = true;
+            return;
+        }
 
         NPC.Center = tilePos.ToVector2() * 16;
     }
@@ -151,7 +171,7 @@ public class TreetopPlatformNPC : ModNPC {
         float strength = (entity.Center.X - NPC.Center.X) / (NPC.width * .5f);
         float disp = (entity is NPC) ? 5f : 10f;
 
-        entity.velocity.Y = 0;
+        entity.velocity.Y = 0;  
         var newPosition = new Vector2(
             entity.position.X + diff * disp,
             NPC.Hitbox.Top + 10 - entity.height + currentRotation * strength * disp
@@ -168,6 +188,8 @@ public class TreetopPlatformNPC : ModNPC {
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+        //spriteBatch.Draw(Textures.Sample.Blobs.Value, NPC.position - screenPos, Color.White);
+        
         return false;
     }
 }

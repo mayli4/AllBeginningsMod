@@ -7,6 +7,10 @@ public static class VectorExtensions {
         return new Vector3(vector.X, vector.Y, z);
     }
     
+    public static Vector2 ToVector2(this Vector3 vector, float z = 0f) {
+        return new Vector2(vector.X, vector.Y);
+    }
+    
     public static Point ToPoint(this Vector2 vector, float z = 0f) {
         return new Point((int)vector.X, (int)vector.Y);
     }

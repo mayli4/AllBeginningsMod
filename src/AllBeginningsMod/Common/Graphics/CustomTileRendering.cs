@@ -9,14 +9,14 @@ public interface ICustomLayerTile {
 }
 
 public enum TileDrawLayer {
-    Background = 0x1,
-    BehindTiles = 0x2,
-    AboveTiles = 0x4,
-    Foreground = 0x8,
-    PostDrawTiles = 0x16
+    Background = 1,
+    BehindTiles = 2,
+    AboveTiles = 4,
+    Foreground = 8,
+    PostDrawTiles = 22
 }
 
-public class ExtraTileRenderLayers : ILoadable {
+public sealed class CustomTileRendering : ILoadable {
     private static readonly Dictionary<TileDrawLayer, List<Point16>> _solidSpecialPoints = new Dictionary<TileDrawLayer, List<Point16>>();
     private static readonly Dictionary<TileDrawLayer, List<Point16>> _nonSolidSpecialPoints = new Dictionary<TileDrawLayer, List<Point16>>();
 
@@ -33,7 +33,7 @@ public class ExtraTileRenderLayers : ILoadable {
         if (LayerEmpty(TileDrawLayer.Foreground))
             return;
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+        Main.spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
         DrawCachedPoints(TileDrawLayer.Foreground);
         Main.spriteBatch.End();
     }

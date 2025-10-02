@@ -11,10 +11,17 @@ internal sealed class CommonHooks : ModSystem {
         On_Main.DoDraw_Tiles_Solid += DrawHook_BehindTiles;
         On_Main.DoDraw_Tiles_NonSolid += DrawHook_BehindNonSolidTiles;
         On_Main.DrawPlayers_AfterProjectiles += DrawHook_AfterPlayers;
+        On_Main.DrawGore += On_MainOnDrawGore;
         
         On_TileDrawing.PreDrawTiles += ClearForegroundStuff;
     }
-    
+
+    public static event Action DrawThingsOverGore;
+    private void On_MainOnDrawGore(On_Main.orig_DrawGore orig, Main self) {
+        orig(self);
+        DrawThingsOverGore?.Invoke();
+    }
+
     public override void Unload() {
         On_Main.DoDraw_WallsAndBlacks -= DrawHook_BehindWalls;
         On_Main.DoDraw_Tiles_Solid -= DrawHook_BehindTiles;
