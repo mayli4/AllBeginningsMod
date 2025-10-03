@@ -3,7 +3,7 @@ matrix uWorldViewProjection;
 float4 baseShadowColor;
 float noiseScroll; // Scroll speed of the noise
 float noiseStretch; // How far the noise is spread apart
-float4 adjustColor; // "Fancy" color between the darkness
+float4 adjustColor; // Used here for its alpha component as cutout intensity
 
 texture noiseTexture;
 sampler2D noise = sampler_state{
@@ -15,8 +15,7 @@ sampler2D noise = sampler_state{
     AddressV = wrap;
 };
 
-struct VertexShaderInput
-{
+struct VertexShaderInput{
     float4 Position : POSITION0;
     float4 Color : COLOR0;
     float2 TextureCoordinates : TEXCOORD0;
@@ -47,23 +46,22 @@ float invlerp(float from, float to, float value){
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0{
     float2 uv = input.TextureCoordinates;
 
-    //Base gradient that gets darker using UV coords
-    float opacity = pow(1 - uv.y, 1.5);
-    //Fade at the horizontal edges of the quad
-    opacity *= pow(invlerp(0.5, 0.4, abs(uv.x - 0.5)), 0.6);
+    float baseGradientOpacity = pow(1 - uv.y, 1.5);
+    baseGradientOpacity *= pow(invlerp(0.5, 0.4, abs(uv.x - 0.5)), 0.6);
 
-    //fade based on opacity of input
-    opacity *= baseShadowColor.a;
+    float currentShadowOpacity = baseGradientOpacity * baseShadowColor.a;
 
-    float3 shadowColor = baseShadowColor;
-    
-    //tint shadows blueish or reddish based on noisemap that scrolls
-    float colorfulness = tex2D(noise, float2(uv.x * noiseStretch, noiseScroll)).r;
-    //Color goes from blue to red as we approach the edges
-    float3 shadowTint = lerp(adjustColor, float3(0.33, 0.1, 0.1), invlerp(0.4, 0.5, abs(uv.x - 0.5)));
+    float noiseValue = tex2D(noise, float2(uv.x * noiseStretch, noiseScroll)).r;
 
-    shadowColor += colorfulness * shadowTint;
-    return float4(shadowColor * opacity, opacity);
+    float cutoutStrength = clamp(adjustColor.a, 0.0, 1.0);
+
+    float opacityToRemove = noiseValue * cutoutStrength * currentShadowOpacity;
+
+    float finalOpacity = currentShadowOpacity - opacityToRemove;
+    finalOpacity = clamp(finalOpacity, 0.0, 1.0);
+    float3 finalColor = baseShadowColor.rgb;
+
+    return float4(finalColor, finalOpacity);
 }
 
 technique Technique1

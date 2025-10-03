@@ -10,9 +10,16 @@ using Terraria.GameContent;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.Utilities;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace AllBeginningsMod.Content.Jungle;
+
+//todo:
+//shaking
+//finish branches
+//polish framing
+//rotting trunks
 
 internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
     public override string Texture => Textures.Tiles.Jungle.KEY_GiantJungleTreeTile;
@@ -195,15 +202,15 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
 
         if(isExposedToAirOnTop && !isRightRoot && !isLeftRoot) {
             if(isLeftTrunkSegment) {
-                tile.TileFrameY = 0;
+                tile.TileFrameY = 116;
             }
             if(isRightTrunkSegment) {
-                tile.TileFrameY = 0;
+                tile.TileFrameY = 116;
                 tile.TileFrameX = 36;
             }
 
             if(isMiddleTrunkSegment) {
-                tile.TileFrameY = 0;
+                tile.TileFrameY = 116;
                 tile.TileFrameX = 18;
             }
         }
@@ -239,6 +246,23 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
         if(tileFrameY == 92) {
             height = 20;
             offsetY = -2;
+        }
+        
+        int seed = i * 31 + j * 17;
+        UnifiedRandom rand = new UnifiedRandom(seed);
+        
+        if (tileFrameY == 116 && tileFrameX == 0) {
+            if (rand.NextBool(2)) {
+                height = 20;
+                offsetY = -4;
+            }
+        }
+        
+        if (tileFrameY == 116 && tileFrameX == 36) {
+            if (rand.NextBool(2)) {
+                height = 20;
+                offsetY = 2;
+            }
         }
     }
     
@@ -337,7 +361,7 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
             spriteBatch.Draw(texture, drawPosRightBigBranch + new Vector2(0, 50), new Rectangle(42, 284, 40, 38), Lighting.GetColor(i, j), branchRot, rightBranchOrigin, 1f, SpriteEffects.None, 0f); 
         }
         
-        var drawPosLeftSmallBranch = new Vector2(i, j) * 16 - Main.screenPosition + new Vector2(3, 3);
+        var drawPosLeftSmallBranch = new Vector2(i, j) * 16 - Main.screenPosition + new Vector2(4, 3);
         
         if(leftSmallBranch) {
             float branchRot = GetSway(i, j) * 0.09f;
@@ -378,6 +402,11 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
         var rightBranchOrigin = new Vector2(0, rightBranchLeavesRect.Height / 2);
         var drawPosRightBigBranch = new Vector2(i + 1, j) * 16 - Main.screenPosition - new Vector2(5, 20);
         
+        if(top) {
+            DrawShade(drawPos - new Vector2(0, 90) + new Vector2(4, 18), leavesRotation, 110, 240, i, j);
+            spriteBatch.Draw(texture, drawPos + new Vector2(4, 18), leavesRect, Lighting.GetColor(i, j), leavesRotation, origin, 1f, SpriteEffects.None, 0f);   
+        }
+        
         if(leftBigBranch) {
             float branchRot = GetSway(i, j) * 0.01f;
             spriteBatch.Draw(texture, drawPosLeftBigBranch, leftBranchLeavesRect, Lighting.GetColor(i, j), branchRot, leftBranchOrigin, 1f, SpriteEffects.None, 0f); 
@@ -386,12 +415,6 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
         if(rightBigBranch) {
             float branchRot = GetSway(i, j) * 0.01f;
             spriteBatch.Draw(texture, drawPosRightBigBranch, rightBranchLeavesRect, Lighting.GetColor(i, j), branchRot, rightBranchOrigin, 1f, SpriteEffects.None, 0f); 
-        }
-        
-        
-        if(top) {
-            DrawShade(drawPos - new Vector2(0, 90) + new Vector2(4, 18), leavesRotation, 110, 240, i, j);
-            spriteBatch.Draw(texture, drawPos + new Vector2(4, 18), leavesRect, Lighting.GetColor(i, j), leavesRotation, origin, 1f, SpriteEffects.None, 0f);   
         }
     }
     
@@ -428,7 +451,7 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
 		Matrix renderMatrix = view * projection;
 
         float positionalOffset = (float)(Math.Sin(tileX * 0.1234f + tileY * 0.5678f) * 50f);
-        
+
         Graphics.BeginPipeline(0.5f)
             .DrawTexturedIndexedMesh(
                 vertices,
@@ -436,9 +459,9 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
                 PrimitiveType.TriangleList,
                 primitiveCount: 2,
                 effect,
-                ("baseShadowColor", Color.Black.ToVector4() * 0.8f * opacity),
+                ("baseShadowColor", Color.Black.ToVector4() * 0.9f * opacity),
                 ("adjustColor", Color.Goldenrod.ToVector4() * 1.4f * opacity),
-                ("noiseScroll", Main.GameUpdateCount * 0.0005f),
+                ("noiseScroll", Main.GameUpdateCount * 0.0005f + positionalOffset),
                 ("noiseStretch", 2),
                 ("uWorldViewProjection", renderMatrix),
                 ("noiseTexture", Textures.Sample.Noise4.Value)
@@ -456,8 +479,8 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
             WorldGen.PlaceTile(i + 3, j, type, mute: true, forced: true);
         }
         
-        int minHeightSegments = 15;
-        int maxHeightSegments = 30; 
+        int minHeightSegments = 20;
+        int maxHeightSegments = 40; 
         
         int treeHeightSegments = generateOverrideHeight > 0 ? generateOverrideHeight : WorldGen.genRand.Next(minHeightSegments, maxHeightSegments + 1);
 
