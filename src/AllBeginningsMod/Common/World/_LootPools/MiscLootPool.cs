@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Content.Items.Misc;
-using Terraria.ID;
+﻿using AllBeginningsMod.Content.Miscellaneous;
 
 namespace AllBeginningsMod.Common.World;
 

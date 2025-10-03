@@ -2,20 +2,22 @@
 
 namespace AllBeginningsMod.Utilities;
 
-public readonly struct SpriteBatchSnapshot : IEquatable<GraphicsDeviceSnapshot> {
+#nullable enable
+
+internal readonly struct SpriteBatchSnapshot {
     public SpriteSortMode SortMode { get; init; }
-    public BlendState BlendState { get; init; }
+    public BlendState BlendState { get; init; } = null!;
     public SamplerState SamplerState { get; init; }
-    public DepthStencilState DepthStencilState { get; init; }
+    public DepthStencilState DepthStencilState { get; init; } = null!;
     public RasterizerState RasterizerState { get; init; }
     public Effect? CustomEffect { get; init; }
     public Matrix TransformMatrix { get; init; }
 
     public SpriteBatchSnapshot() {
         SortMode = default;
-        BlendState = default;
+        BlendState = default!;
         SamplerState = Main.DefaultSamplerState;
-        DepthStencilState = default;
+        DepthStencilState = default!;
         RasterizerState = Main.Rasterizer;
         CustomEffect = null;
         TransformMatrix = Main.GameViewMatrix.TransformationMatrix;
@@ -30,24 +32,3 @@ public readonly struct SpriteBatchSnapshot : IEquatable<GraphicsDeviceSnapshot> 
         CustomEffect = spriteBatch.customEffect;
         TransformMatrix = spriteBatch.transformMatrix;
     }
-
-    public bool Equals(GraphicsDeviceSnapshot other) {
-        throw new NotImplementedException();
-    }
-
-    public override bool Equals(object obj) {
-        return obj is GraphicsDeviceSnapshot other && Equals(other);
-    }
-
-    public static bool operator ==(SpriteBatchSnapshot left, SpriteBatchSnapshot right) {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(SpriteBatchSnapshot left, SpriteBatchSnapshot right) {
-        return !left.Equals(right);
-    }
-
-    public override int GetHashCode() {
-        return HashCode.Combine((int)SortMode, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomEffect, TransformMatrix);
-    }
-}

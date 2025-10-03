@@ -533,6 +533,8 @@ public class Debug : ModItem {
         //         new Actions.PlaceTile(TileID.Mud)
         //     )
         // );
+        
+
         var biome = GenVars.configuration.CreateBiome<AbandonedShackMicrobiome>();
 
         biome.Place(spawnPoint, GenVars.structures);

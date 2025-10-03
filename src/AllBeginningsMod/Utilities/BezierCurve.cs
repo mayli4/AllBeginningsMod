@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace AllBeginningsMod.Utilities;
 
-public ref struct BezierCurve : IDisposable {
+internal ref struct BezierCurve : IDisposable {
     private readonly ReadOnlySpan<Vector2> _controlPoints;
     private readonly Vector2[] _rentedArray;
 
