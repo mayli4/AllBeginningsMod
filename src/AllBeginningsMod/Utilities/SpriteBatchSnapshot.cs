@@ -32,3 +32,4 @@ internal readonly struct SpriteBatchSnapshot {
         CustomEffect = spriteBatch.customEffect;
         TransformMatrix = spriteBatch.transformMatrix;
     }
+}
