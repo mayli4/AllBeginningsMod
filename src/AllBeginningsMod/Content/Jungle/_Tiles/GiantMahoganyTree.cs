@@ -20,6 +20,7 @@ namespace AllBeginningsMod.Content.Jungle;
 //finish branches
 //polish framing
 //rotting trunks
+//fix breaking (high prio)
 
 internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
     public override string Texture => Textures.Tiles.Jungle.KEY_GiantJungleTreeTile;
@@ -31,9 +32,11 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
     
     internal static IEnumerable<TreetopPlatformNPC> Platforms {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => Main.npc.Where(npc => npc.active && npc.type == ModContent.NPCType<TreetopPlatformNPC>())
-            .Select(npc => npc.ModNPC as TreetopPlatformNPC)
-            .Where(modNpc => modNpc != null);
+        get => from plat 
+            in Main.npc 
+            where plat.active 
+            where plat.type == ModContent.NPCType<TreetopPlatformNPC>() 
+            select plat.ModNPC as TreetopPlatformNPC;
     }
     
     public override void SetStaticDefaults() {
@@ -119,10 +122,6 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
     public static bool ValidTileToGrowOn(Tile t) => t.TileType == TileID.JungleGrass || t.TileType == TileID.Mud;
 
     public static bool IsTreeTop(int x, int y) => Main.tile[x, y].TileFrameY == 200;
-
-    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem) {
-        base.KillTile(i, j, ref fail, ref effectOnly, ref noItem);
-    }
 
     public override IEnumerable<Item> GetItemDrops(int i, int j) {
         int dropCount = 1;
