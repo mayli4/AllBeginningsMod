@@ -57,5 +57,17 @@ Mods: {
 		}
 
 		MapIcons.OldbotShack: Oldbot's Shack
+
+		Configs: {
+			ClientConfig: {
+				DisplayName: Client Config
+				Headers.Camera: Camera Header
+
+				EnableScreenshake: {
+					Label: Enable Screenshake
+					Tooltip: ""
+				}
+			}
+		}
 	}
 }

@@ -397,7 +397,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
 
         GrabbityGunItemHeldProjectile heldGun = heldGunVisualProjectile?.ModProjectile as GrabbityGunItemHeldProjectile;
         heldGun?.TriggerShake();
-        Main.instance.CameraModifiers.Add(new ExplosionShakeCameraModifier(10, 0.5f));
+        CameraSystem.AddModifier(Modifiers.SmallShake with { ShakeIntensity = 5f, Duration = 5f});
 
         Projectile.ai[2] = 60;
     }
