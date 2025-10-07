@@ -7,7 +7,7 @@ using Terraria.ObjectData;
 
 namespace AllBeginningsMod.Utilities;
 
-public static partial class Helper {
+internal static partial class Helper {
     public readonly static string PlaceholderTextureKey = "Terraria/Images/Item_0";
     public static Vector2 TileOffset => Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
 

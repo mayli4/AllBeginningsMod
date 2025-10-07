@@ -1,7 +1,9 @@
 ﻿using AllBeginningsMod.Common;
 using AllBeginningsMod.Utilities;
 using System.Runtime.CompilerServices;
+using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.ID;
 
 namespace AllBeginningsMod.Content.Jungle;
 
@@ -62,7 +64,7 @@ internal class TreePlatformImpl : ILoadable {
 			owner.grappling[0] = p.whoAmI;
 			owner.grapCount++;
 			owner.GrappleMovement();
-		}
+        }
 	}
 
 	private static void CheckNPCCollision(On_NPC.orig_UpdateCollision orig, NPC self) {

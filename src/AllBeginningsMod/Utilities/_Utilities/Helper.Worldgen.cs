@@ -2,7 +2,7 @@
 
 namespace AllBeginningsMod.Utilities;
 
-public partial class Helper {
+internal partial class Helper {
     /// <summary>
     /// Checks that all tiles above the given point are air
     /// </summary>
