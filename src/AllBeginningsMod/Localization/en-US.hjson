@@ -47,6 +47,7 @@ Mods: {
 			GrabbityGunItemHeldProjectile.DisplayName: ""
 			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
 			UrnOfGreedProjectile.DisplayName: Urn Of Greed Projectile
+			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
 		}
 
 		NPCs: {
@@ -54,6 +55,7 @@ Mods: {
 			TestDialogueNPC.DisplayName: Test Dialogue N P C
 			TestSpecialDialogueNPC.DisplayName: Test Special Dialogue N P C
 			TreetopPlatformNPC.DisplayName: ""
+			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
 		}
 
 		MapIcons.OldbotShack: Oldbot's Shack

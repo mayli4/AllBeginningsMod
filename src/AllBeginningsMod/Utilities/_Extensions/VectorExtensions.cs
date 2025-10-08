@@ -3,6 +3,13 @@
 namespace AllBeginningsMod.Utilities;
 
 public static class VectorExtensions {
+    public static Vector2 NormalizeSafe(this Vector2 vec, Vector2? defVec = null) {
+        vec.Normalize();
+        if (Utils.HasNaNs(vec))
+            vec = defVec ?? Vector2.Zero;
+        return vec;
+    }
+    
     public static Vector3 ToVector3(this Vector2 vector, float z = 0f) {
         return new Vector3(vector.X, vector.Y, z);
     }

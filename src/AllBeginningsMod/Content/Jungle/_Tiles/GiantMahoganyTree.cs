@@ -591,25 +591,3 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
         }
     }
 }
-
-// internal class FrameTest : ModSystem {
-//     private bool IsTreeTile(int x, int y) {
-//         if (!WorldGen.InWorld(x, y)) {
-//             return false;
-//         }
-//         Tile tile = Main.tile[x, y];
-//         return tile.HasTile && tile.TileType == ModContent.TileType<GiantMahoganyTree>();
-//     }
-//     
-//     public override void PostUpdateEverything() {
-//         Vector2 mouseWorldPosition = Main.MouseWorld;
-//         int tileX = (int)(mouseWorldPosition.X / 16f);
-//         int tileY = (int)(mouseWorldPosition.Y / 16f);
-//
-//         if(Main.keyState.IsKeyDown(Keys.H) && !Main.oldKeyState.IsKeyDown(Keys.H)) {
-//             //WorldGen.TileFrame(tileX, tileY, true);
-//             
-//             GiantMahoganyTree.GrowTree(tileX, tileY);
-//         }
-//     }
-// }
