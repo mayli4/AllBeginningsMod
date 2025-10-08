@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent;
@@ -77,6 +78,8 @@ internal sealed class CorpseFlowerBulb : ModNPC {
 
     public bool Bloomed { get; set; } = false;
 
+    private bool _wasBloomed = false;
+
     public override void SetDefaults() {
         NPC.width = 94;
         NPC.height = 90;
@@ -102,11 +105,30 @@ internal sealed class CorpseFlowerBulb : ModNPC {
         }
         
         NPC.Center = ParentPosition.ToVector2() * 16;
+
+        if(Bloomed)
+            NPC.dontTakeDamage = true;
+        
+        if (Bloomed && !_wasBloomed) {
+            SoundEngine.PlaySound(Sounds.Tile.Jungle.CorpseFlowerOpen with { PitchVariance = 0.5f}, NPC.Center);
+        }
+        
+        _wasBloomed = Bloomed;
     }
     
     public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers) => modifiers.HideCombatText();
-    public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) => Bloomed = true;
-    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) => Bloomed = true;
+    public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
+        if (!Bloomed) {
+            Bloomed = true;
+            NPC.netUpdate = true;
+        }
+    }
+    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
+        if (!Bloomed) {
+            Bloomed = true;
+            NPC.netUpdate = true;
+        }
+    }
 
     public override void HitEffect(NPC.HitInfo hit) {
         base.HitEffect(hit);
@@ -123,18 +145,14 @@ internal sealed class CorpseFlowerBulb : ModNPC {
         
         Vector2 scale = Vector2.One;
         Rectangle currentRect = default(Rectangle);
-        var unbloomedRect = new Rectangle(66, 0, 90, 94);
-        var bloomedRect = new Rectangle(158, 0, 122, 82);
+        var unbloomedRect = new Rectangle(66, 0, 122, 94);
+        var bloomedRect = new Rectangle(190, 0, 122, 94);
 
         currentRect = Bloomed ? bloomedRect : unbloomedRect;
         
         var origin = new Vector2(currentRect.Width / 2f, currentRect.Height / 2f);
         
-        var pos = this.NPC.position - Main.screenPosition;
-
-        if(currentRect == unbloomedRect) {
-            pos = pos + new Vector2(110, -20);
-        }
+        var pos = this.NPC.position + new Vector2(40, 58) - Main.screenPosition;
         
         Main.EntitySpriteDraw(
             tex,
