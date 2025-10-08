@@ -11,4 +11,20 @@ internal sealed class Easings {
     [MethodImpl(MethodImplOptions.AggressiveInlining)] 
     public static float PolyInEasing(float amount, float degree = 2f) 
         => (float)Math.Pow(amount, degree);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
+    public static float SineInEasing(float amount, float degree = 1f) 
+        => 1f - (float)Math.Cos(amount * MathHelper.Pi / 2f);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
+    public static float SineOutEasing(float amount, float degree = 1f) 
+        => (float)Math.Sin(amount * MathHelper.Pi / 2f);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
+    public static float SineInOutEasing(float amount, float degree = 1f) 
+        => -((float)Math.Cos(amount * MathHelper.Pi) - 1) / 2f;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)] 
+    public static float SineBumpEasing(float amount, float degree = 1f) 
+        => (float)Math.Sin(amount * MathHelper.Pi);
 }
