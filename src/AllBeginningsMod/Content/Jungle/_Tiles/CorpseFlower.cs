@@ -42,7 +42,7 @@ internal sealed class CorpseFlower : ModTile {
     
     public override void NearbyEffects(int i, int j, bool closer) {
         var tile = Main.tile[i, j];
-        if(tile.TileFrameX is not 0 || tile.TileFrameY is not 0) return;
+        if(tile.TileFrameX is not 18 || tile.TileFrameY is not 0) return;
 
         var platforms = from plat 
                     in Main.npc 
@@ -63,6 +63,7 @@ internal sealed class CorpseFlower : ModTile {
             if (npcIndex != -1) {
                 CorpseFlowerBulb newPlatform = (CorpseFlowerBulb)Main.npc[npcIndex].ModNPC;
                 newPlatform.ParentPosition = pos;
+                newPlatform.Bloomed = false;
                 Main.npc[npcIndex].netUpdate = true;
             }
         }
@@ -73,18 +74,20 @@ internal sealed class CorpseFlowerBulb : ModNPC {
     public override string Texture => Textures.Tiles.Jungle.KEY_CorpseFlowerBase;
     
     public Point16 ParentPosition { get; set; }
-    
+
+    public bool Bloomed { get; set; } = false;
+
     public override void SetDefaults() {
         NPC.width = 94;
         NPC.height = 90;
         NPC.damage = 0;
         NPC.defense = 0;
-        NPC.lifeMax = 1;
+        NPC.lifeMax = int.MaxValue;
         NPC.knockBackResist = 0f;
         NPC.immortal = true;
         NPC.noGravity = true;
         NPC.noTileCollide = true;
-        NPC.dontTakeDamage = true;
+        NPC.dontTakeDamage = false;
         NPC.value = 0f;
         NPC.aiStyle = -1;
         NPC.HitSound = null;
@@ -100,15 +103,30 @@ internal sealed class CorpseFlowerBulb : ModNPC {
         
         NPC.Center = ParentPosition.ToVector2() * 16;
     }
+    
+    public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers) => modifiers.HideCombatText();
+    public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) => Bloomed = true;
+    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) => Bloomed = true;
+
+    public override void HitEffect(NPC.HitInfo hit) {
+        base.HitEffect(hit);
+    }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+        var tile = Main.tile[ParentPosition.X - 1, ParentPosition.Y + 2];
         var tex = TextureAssets.Npc[Type].Value;
+        
+        if (tile.HasTile && tile.TileColor != PaintID.None) {
+            var paintedTex = Main.instance.TilePaintSystem.TryGetTileAndRequestIfNotReady(ModContent.TileType<CorpseFlower>(), 0, tile.TileColor);
+            tex = paintedTex ?? tex;
+        }
+        
         Vector2 scale = Vector2.One;
         Rectangle currentRect = default(Rectangle);
         var unbloomedRect = new Rectangle(66, 0, 90, 94);
         var bloomedRect = new Rectangle(158, 0, 122, 82);
 
-        currentRect = unbloomedRect;
+        currentRect = Bloomed ? bloomedRect : unbloomedRect;
         
         var origin = new Vector2(currentRect.Width / 2f, currentRect.Height / 2f);
         
