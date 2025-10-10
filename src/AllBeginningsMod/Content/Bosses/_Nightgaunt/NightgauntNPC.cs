@@ -5,12 +5,23 @@ using Terraria.ID;
 
 namespace AllBeginningsMod.Content.Bosses;
 
-//had a solver but removed since it sucks, new one tbd
-
-public class NightgauntNPC : ModNPC {
+internal partial class NightgauntNPC : ModNPC {
+    internal enum NightgauntState {
+        Idle,
+        Crawling,
+    }
+    
     public override string Texture => Helper.PlaceholderTextureKey;
 
     public Player Target => Main.player[NPC.target];
+    
+    private NightgauntState State {
+        get => (NightgauntState)NPC.ai[0];
+        set {
+            NPC.ai[0] = (int)value;
+            NPC.netUpdate = true;
+        }
+    }
 
     float _distanceToTarget;
     Vector2 _directionToTarget;
@@ -50,50 +61,23 @@ public class NightgauntNPC : ModNPC {
         _leftArm = new((36f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi }));
     }
 
+    private void ResetState() {
+        State = 0;
+        NPC.netUpdate = true;
+    }
+
     public override void AI() {
         NPC.TargetClosest(false);
 
-        var targetDelta = Target.Center - NPC.Center;
-        _distanceToTarget = targetDelta.Length();
-        _directionToTarget = targetDelta / _distanceToTarget;
-
-        NPC.rotation = Utils.AngleLerp(NPC.rotation, _directionToTarget.ToRotation(), 0.05f);
-        NPC.velocity += _directionToTarget * 0.05f;
-        NPC.velocity *= 0.95f;
-
-        _up = NPC.rotation.ToRotationVector2();
-        _right = _up.RotatedBy(MathHelper.PiOver2);
-
-        Vector2 rightShoulderPosition = RightShoulderPosition;
-        Vector2 leftShoulderPosition = LeftShoulderPosition;
-
-        if(_handSwapTimer == 0) {
-            _handSwapTimer = Main.rand.Next(14, 22);
-
-            var hSpeed = 2f;
-
-            var grabOffset = 160f;
-            if(_rightHandSwap) {
-                _rightArmTargetPosition = rightShoulderPosition + _directionToTarget * grabOffset;
-                NPC.velocity += _right * hSpeed;
-            }
-            else {
-                _leftArmTargetPosition = leftShoulderPosition + _directionToTarget * grabOffset;
-                NPC.velocity -= _right * hSpeed;
-            }
-
-            _rightHandSwap = !_rightHandSwap;
-
-            NPC.velocity += _directionToTarget * 2.5f;
+        switch(State) {
+            case NightgauntState.Idle:
+                break;
+            case NightgauntState.Crawling:
+                CrawlToPlayer();
+                break;
         }
-        else _handSwapTimer -= 1;
-
-        var grabLerpSpeed = 0.15f;
-        _rightArmEndPosition = Vector2.Lerp(_rightArmEndPosition, _rightArmTargetPosition, grabLerpSpeed);
-        _leftArmEndPosition = Vector2.Lerp(_leftArmEndPosition, _leftArmTargetPosition, grabLerpSpeed);
-
-        _rightArm.Update(rightShoulderPosition, _rightArmEndPosition);
-        _leftArm.Update(leftShoulderPosition, _leftArmEndPosition);
+        
+        State = NightgauntState.Crawling;
     }
 
     static void DrawArm(Vector2 a, Vector2 b, Vector2 c, Color drawColor, SpriteEffects effects) {
