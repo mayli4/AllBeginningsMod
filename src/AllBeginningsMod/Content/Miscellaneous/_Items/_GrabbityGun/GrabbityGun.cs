@@ -712,7 +712,7 @@ public class GrabbityGunOutline : ILoadable {
         var shader = Shaders.Fragment.Outline.Value;
 
         shader.Parameters["uColor"].SetValue(Color.Orange.ToVector4());
-        shader.Parameters["uSize"].SetValue(new Vector2(NPCTarget.Width, NPCTarget.Height));
+        shader.Parameters["uSize"].SetValue(new Vector2(NPCTarget.Width / 2, NPCTarget.Height / 2));
         shader.Parameters["uThreshold"].SetValue(0.4f);
         var snapshot = spriteBatch.CaptureEndBegin(new SpriteBatchSnapshot() with { CustomEffect = shader, BlendState = BlendState.AlphaBlend, TransformMatrix = Main.UIScaleMatrix });
 

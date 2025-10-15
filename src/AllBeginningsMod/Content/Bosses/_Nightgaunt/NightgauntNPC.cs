@@ -1,5 +1,6 @@
 using AllBeginningsMod.Common;
 using AllBeginningsMod.Utilities;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 
@@ -32,7 +33,11 @@ internal partial class NightgauntNPC : ModNPC {
     readonly static Vector2 ShoulderOffset = new(50, 20);
     Vector2 RightShoulderPosition => NPC.Center + _right * ShoulderOffset.X + _up * ShoulderOffset.Y;
     Vector2 LeftShoulderPosition => NPC.Center - _right * ShoulderOffset.X + _up * ShoulderOffset.Y;
-
+    
+    readonly static Vector2 LegOffset = new(35, -70);
+    Vector2 RightLegBasePosition => NPC.Center + _right * LegOffset.X + _up * LegOffset.Y;
+    Vector2 LeftLegBasePosition => NPC.Center - _right * LegOffset.X + _up * LegOffset.Y;
+    
     IKSkeleton _rightArm;
     Vector2 _rightArmTargetPosition;
     Vector2 _rightArmEndPosition;
@@ -40,9 +45,20 @@ internal partial class NightgauntNPC : ModNPC {
     IKSkeleton _leftArm;
     Vector2 _leftArmTargetPosition;
     Vector2 _leftArmEndPosition;
+    
+    IKSkeleton _rightLeg;
+    Vector2 _rightLegTargetPosition;
+    Vector2 _rightLegEndPosition;
+
+    IKSkeleton _leftLeg;
+    Vector2 _leftLegTargetPosition;
+    Vector2 _leftLegEndPosition;
 
     int _handSwapTimer;
     bool _rightHandSwap;
+    
+    int _legSwapTimer;
+    bool _rightLegSwap;
 
     public override void SetDefaults() {
         NPC.width = 30;
@@ -56,9 +72,14 @@ internal partial class NightgauntNPC : ModNPC {
         NPC.aiStyle = -1;
         NPC.noGravity = true;
         NPC.noTileCollide = true;
+    }
 
+    public override void OnSpawn(IEntitySource source) {
         _rightArm = new((36f, new()), (60f, new() { MinAngle = -MathHelper.Pi, MaxAngle = 0f }));
         _leftArm = new((36f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi }));
+        
+        _leftLeg = new((36f, new()), (60f, new() { MinAngle = -MathHelper.Pi, MaxAngle = 0f }));
+        _rightLeg = new((36f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi }));
     }
 
     private void ResetState() {
@@ -113,6 +134,19 @@ internal partial class NightgauntNPC : ModNPC {
         DrawArm(_leftArm.Position(0), _leftArm.Position(1), _leftArm.Position(2), drawColor, SpriteEffects.None);
 
 #if DEBUG
+        
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightArmTargetPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Lime);
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightArmEndPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Teal);
+        
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftArmTargetPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Lime);
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftArmEndPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Teal);
+        
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightLegTargetPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Orange);
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightLegEndPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Yellow);
+        
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftLegTargetPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Orange);
+        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftLegEndPosition - screenPos, new Rectangle(0, 0, 10, 10), Color.Yellow);
+        
         spriteBatch.DrawLine(
             NPC.Center - Main.screenPosition,
             NPC.Center + _up * 40f - Main.screenPosition,
@@ -129,37 +163,37 @@ internal partial class NightgauntNPC : ModNPC {
             TextureAssets.BlackTile.Value
         );
 
-        // spriteBatch.DrawLine(
-        //     _rightArm.Position(0) - Main.screenPosition,
-        //     _rightArm.Position(1) - Main.screenPosition,
-        //     Color.Blue,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
+        spriteBatch.DrawLine(
+            _rightLeg.Position(0) - Main.screenPosition,
+            _rightLeg.Position(1) - Main.screenPosition,
+            Color.Blue,
+            4,
+            TextureAssets.BlackTile.Value
+        );
 
-        // spriteBatch.DrawLine(
-        //     _rightArm.Position(1) - Main.screenPosition,
-        //     _rightArm.Position(2) - Main.screenPosition,
-        //     Color.Red,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
+        spriteBatch.DrawLine(
+            _rightLeg.Position(1) - Main.screenPosition,
+            _rightLeg.Position(2) - Main.screenPosition,
+            Color.Red,
+            4,
+            TextureAssets.BlackTile.Value
+        );
 
-        // spriteBatch.DrawLine(
-        //     _leftArm.Position(0) - Main.screenPosition,
-        //     _leftArm.Position(1) - Main.screenPosition,
-        //     Color.Blue,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
+        spriteBatch.DrawLine(
+            _leftLeg.Position(0) - Main.screenPosition,
+            _leftLeg.Position(1) - Main.screenPosition,
+            Color.Blue,
+            4,
+            TextureAssets.BlackTile.Value
+        );
 
-        // spriteBatch.DrawLine(
-        //     _leftArm.Position(1) - Main.screenPosition,
-        //     _leftArm.Position(2) - Main.screenPosition,
-        //     Color.Red,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
+        spriteBatch.DrawLine(
+            _leftLeg.Position(1) - Main.screenPosition,
+            _leftLeg.Position(2) - Main.screenPosition,
+            Color.Red,
+            4,
+            TextureAssets.BlackTile.Value
+        );
 #endif
 
         return true;

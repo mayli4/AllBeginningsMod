@@ -48,6 +48,8 @@ Mods: {
 			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
 			UrnOfGreedProjectile.DisplayName: Urn Of Greed Projectile
 			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
+			VerletGrappleHook.DisplayName: Verlet Grapple Hook
+			DanglingRopeProjectile.DisplayName: Dangling Rope Projectile
 		}
 
 		NPCs: {
@@ -67,6 +69,210 @@ Mods: {
 
 				EnableScreenshake: {
 					Label: Enable Screenshake
+					Tooltip: ""
+				}
+			}
+
+			KZ_Configs_Bloom: {
+				DisplayName: K Z_ Configs_ Bloom
+
+				PartBloomKey: {
+					Label: Part Bloom Key
+					Tooltip: ""
+				}
+
+				PartBloom_AddValuePerTime: {
+					Label: Part Bloom_ Add Value Per Time
+					Tooltip: ""
+				}
+
+				PartBloom_ExtraStep: {
+					Label: Part Bloom_ Extra Step
+					Tooltip: ""
+				}
+
+				PartBloom_ToTile2: {
+					Label: Part Bloom_ To Tile2
+					Tooltip: ""
+				}
+
+				WholeBloom_Step: {
+					Label: Whole Bloom_ Step
+					Tooltip: ""
+				}
+
+				WholeBloom_Value: {
+					Label: Whole Bloom_ Value
+					Tooltip: ""
+				}
+
+				WholeBloom_ExtraValue: {
+					Label: Whole Bloom_ Extra Value
+					Tooltip: ""
+				}
+			}
+
+			KZ_Configs_Dark: {
+				DisplayName: K Z_ Configs_ Dark
+
+				DarkKey: {
+					Label: Dark Key
+					Tooltip: ""
+				}
+			}
+
+			KZ_Configs_Light: {
+				DisplayName: K Z_ Configs_ Light
+
+				LightKey: {
+					Label: Light Key
+					Tooltip: ""
+				}
+
+				MaxLength: {
+					Label: Max Length
+					Tooltip: ""
+				}
+
+				DeclineValue: {
+					Label: Decline Value
+					Tooltip: ""
+				}
+
+				CenterWhite: {
+					Label: Center White
+					Tooltip: ""
+				}
+
+				LightDistance: {
+					Label: Light Distance
+					Tooltip: ""
+				}
+
+				ClampColor_TargetValue: {
+					Label: Clamp Color_ Target Value
+					Tooltip: ""
+				}
+
+				ExtraLightValue: {
+					Label: Extra Light Value
+					Tooltip: ""
+				}
+
+				BossActive_LightValue: {
+					Label: Boss Active_ Light Value
+					Tooltip: ""
+				}
+
+				DrawNPC: {
+					Label: Draw N P C
+					Tooltip: ""
+				}
+
+				DrawItem: {
+					Label: Draw Item
+					Tooltip: ""
+				}
+
+				DrawProj: {
+					Label: Draw Proj
+					Tooltip: ""
+				}
+
+				DrawPlayer: {
+					Label: Draw Player
+					Tooltip: ""
+				}
+
+				ColorDeclineValue: {
+					Label: Color Decline Value
+					Tooltip: ""
+				}
+
+				ObstacleDeclineValue: {
+					Label: Obstacle Decline Value
+					Tooltip: ""
+				}
+
+				SpecialMode_H: {
+					Label: Special Mode_ H
+					Tooltip: ""
+				}
+
+				SpecialMode_S: {
+					Label: Special Mode_ S
+					Tooltip: ""
+				}
+
+				SpecialMode_L: {
+					Label: Special Mode_ L
+					Tooltip: ""
+				}
+
+				SpecialMode_DISC: {
+					Label: Special Mode_ D I S C
+					Tooltip: ""
+				}
+
+				ComputDistance: {
+					Label: Comput Distance
+					Tooltip: ""
+				}
+			}
+
+			KZ_Configs_Light_SpecialTile: {
+				DisplayName: K Z_ Configs_ Light_ Special Tile
+
+				ThroughGlass: {
+					Label: Through Glass
+					Tooltip: ""
+				}
+
+				UseDefaultSetting: {
+					Label: Use Default Setting
+					Tooltip: ""
+				}
+			}
+
+			KZ_Configs_ScreenEffect: {
+				DisplayName: K Z_ Configs_ Screen Effect
+
+				hSL_ShaderInfo: {
+					Label: h S L_ Shader Info
+					Tooltip: ""
+				}
+			}
+
+			HSL_ShaderInfo: {
+				Tooltip: ""
+
+				HSL_Key: {
+					Label: H S L_ Key
+					Tooltip: ""
+				}
+
+				H_Value: {
+					Label: H_ Value
+					Tooltip: ""
+				}
+
+				S_Value: {
+					Label: S_ Value
+					Tooltip: ""
+				}
+
+				V_Value: {
+					Label: V_ Value
+					Tooltip: ""
+				}
+
+				sharpness: {
+					Label: sharpness
+					Tooltip: ""
+				}
+
+				temperature: {
+					Label: temperature
 					Tooltip: ""
 				}
 			}

@@ -3,14 +3,26 @@ using System.Runtime.CompilerServices;
 
 namespace AllBeginningsMod.Common;
 
+public record struct Limb(float Length, IKSkeleton.Constraints Constraints);
+
 public struct IKSkeleton {
     public struct Constraints() {
         public float MinAngle = -MathF.PI;
         public float MaxAngle = MathF.PI;
     }
 
+    [InlineArray(MaxJointCount + 1)]
+    struct PositionData { Vector2 _; }
+    
     public readonly int JointCount => _options.Length;
     public readonly int PositionCount => JointCount + 1;
+    
+    const int MaxJointCount = 16;
+
+    readonly (float length, Constraints constraints)[] _options;
+    PositionData _previousPositions;
+    PositionData _positions;
+    float _maxDistance;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly Vector2 Position(int index) => _positions[index];
@@ -78,14 +90,4 @@ public struct IKSkeleton {
 
         return distance;
     }
-
-    const int MaxJointCount = 16;
-
-    [InlineArray(MaxJointCount + 1)]
-    struct PositionData { Vector2 _; }
-
-    readonly (float length, Constraints constraints)[] _options;
-    PositionData _previousPositions;
-    PositionData _positions;
-    float _maxDistance;
 }
