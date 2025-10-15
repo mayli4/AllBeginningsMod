@@ -78,6 +78,7 @@ internal partial class NightgauntNPC : ModNPC {
         NPC.aiStyle = -1;
         NPC.noGravity = true;
         NPC.noTileCollide = true;
+        NPC.boss = true;
     }
 
     public override void OnSpawn(IEntitySource source) {
