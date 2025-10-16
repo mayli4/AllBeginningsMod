@@ -61,6 +61,8 @@
         <AdditionalFiles Remove="..\Build/**" />
         
         <Compile Include="..\Build\Common.cs" />
+        
+        <Compile Remove="Common\Graphics\RenderTargetPreservation.cs" />
     </ItemGroup>
     
     <ItemGroup>

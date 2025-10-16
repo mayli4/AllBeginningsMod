@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace AllBeginningsMod.Common;
 
-public record struct Limb(float Length, IKSkeleton.Constraints Constraints);
-
 public struct IKSkeleton {
     public struct Constraints() {
         public float MinAngle = -MathF.PI;

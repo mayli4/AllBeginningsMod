@@ -40,25 +40,26 @@ internal partial class NightgauntNPC : ModNPC {
     Vector2 RightLegBasePosition => NPC.Center + _right * LegOffset.X + _up * LegOffset.Y;
     Vector2 LeftLegBasePosition => NPC.Center - _right * LegOffset.X + _up * LegOffset.Y;
     
-    IKSkeleton _rightArm;
     Vector2 _rightArmTargetPosition;
     Vector2 _rightArmEndPosition;
     bool _rightArmAnchored;
 
-    IKSkeleton _leftArm;
     Vector2 _leftArmTargetPosition;
     Vector2 _leftArmEndPosition;
     bool _leftArmAnchored;
     
-    IKSkeleton _rightLeg;
     Vector2 _rightLegTargetPosition;
     Vector2 _rightLegEndPosition;
     bool _rightLegAnchored;
 
-    IKSkeleton _leftLeg;
     Vector2 _leftLegTargetPosition;
     Vector2 _leftLegEndPosition;
     bool _leftLegAnchored;
+    
+    private NightgauntLimb _rightArm;
+    private NightgauntLimb _leftArm;
+    private NightgauntLimb _rightLeg;
+    private NightgauntLimb _leftLeg;
 
     int _handSwapTimer;
     bool _rightHandSwap;
@@ -82,11 +83,7 @@ internal partial class NightgauntNPC : ModNPC {
     }
 
     public override void OnSpawn(IEntitySource source) {
-        _rightArm = new((36f, new()), (60f, new() { MinAngle = -MathHelper.Pi, MaxAngle = 0f }));
-        _leftArm = new((36f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi }));
-        
-        _leftLeg = new((46f, new()), (60f, new() { MinAngle = -MathHelper.Pi, MaxAngle = 0f }));
-        _rightLeg = new((46f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi }));
+        CreateLimbs();  
     }
 
     private void ResetState() {
@@ -96,6 +93,10 @@ internal partial class NightgauntNPC : ModNPC {
 
     public override void AI() {
         NPC.TargetClosest(false);
+
+        if(_leftLeg == default || _rightLeg == default || _leftArm == default || _rightArm == default) {
+            CreateLimbs();
+        }
 
         switch(State) {
             case NightgauntState.Idle:
