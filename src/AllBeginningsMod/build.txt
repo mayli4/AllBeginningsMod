@@ -6,4 +6,4 @@ hideResources = true
 includeSource = false
 includePDB = true
 
-modReferences = StructureHelper
+modReferences = StructureHelper, Daybreak

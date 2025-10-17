@@ -66,6 +66,9 @@
     </ItemGroup>
     
     <ItemGroup>
+      <Reference Include="Daybreak">
+        <HintPath>lib\Daybreak.dll</HintPath>
+      </Reference>
       <Reference Include="StructureHelper">
         <HintPath>lib\StructureHelper.dll</HintPath>
       </Reference>
