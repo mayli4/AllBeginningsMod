@@ -11,6 +11,84 @@ internal partial class NightgauntNPC {
         public bool IsAnchored = anchored;
     }
     
+    private NightgauntLimb _body;
+    private NightgauntLimb _rightArm;
+    private NightgauntLimb _leftArm;
+    private NightgauntLimb _rightLeg;
+    private NightgauntLimb _leftLeg;
+
+    public static Vector2 ShoulderOffset;
+    
+    public Vector2 RightShoulderPosition {
+        get {
+            var shoulderSegmentUp = (_body.Skeleton.Position(1) - _body.Skeleton.Position(0)).SafeNormalize(Vector2.UnitY);
+            var shoulderSegmentRight = shoulderSegmentUp.RotatedBy(MathHelper.PiOver2);
+
+            return _body.Skeleton.Position(0) 
+                   + shoulderSegmentRight * ShoulderOffset.X
+                   - shoulderSegmentUp * ShoulderOffset.Y;
+        }
+    }
+    
+    public Vector2 LeftShoulderPosition {
+        get {
+            var shoulderSegmentUp = (_body.Skeleton.Position(1) - _body.Skeleton.Position(0)).SafeNormalize(Vector2.UnitY);
+            var shoulderSegmentRight = shoulderSegmentUp.RotatedBy(MathHelper.PiOver2);
+
+            return _body.Skeleton.Position(0) 
+                   - shoulderSegmentRight * ShoulderOffset.X
+                   - shoulderSegmentUp * ShoulderOffset.Y;
+        }
+    }
+
+    public static Vector2 LegOffset;
+    public Vector2 RightLegBasePosition {
+        get {
+            var hipSegmentUp = (_body.Skeleton.Position(2) - _body.Skeleton.Position(1)).SafeNormalize(Vector2.UnitY);
+            var hipSegmentRight = hipSegmentUp.RotatedBy(MathHelper.PiOver2);
+
+            return _body.Skeleton.Position(2) 
+                   + hipSegmentRight * LegOffset.X
+                   - hipSegmentUp * LegOffset.Y;
+        }
+    }
+
+    public Vector2 LeftLegBasePosition {
+        get {
+            var hipSegmentUp = (_body.Skeleton.Position(2) - _body.Skeleton.Position(1)).SafeNormalize(Vector2.UnitY);
+            var hipSegmentRight = hipSegmentUp.RotatedBy(MathHelper.PiOver2);
+
+            return _body.Skeleton.Position(2) 
+                   - hipSegmentRight * LegOffset.X
+                   - hipSegmentUp * LegOffset.Y;
+        }
+    }
+
+    private IKSkeleton _bodySkeleton;
+    private Vector2 _bodyTargetPosition;
+    
+    Vector2 _rightArmTargetPosition;
+    Vector2 _rightArmEndPosition;
+    bool _rightArmAnchored;
+
+    Vector2 _leftArmTargetPosition;
+    Vector2 _leftArmEndPosition;
+    bool _leftArmAnchored;
+    
+    Vector2 _rightLegTargetPosition;
+    Vector2 _rightLegEndPosition;
+    bool _rightLegAnchored;
+
+    Vector2 _leftLegTargetPosition;
+    Vector2 _leftLegEndPosition;
+    bool _leftLegAnchored;
+
+    int _handSwapTimer;
+    bool _rightHandSwap;
+    
+    int _legSwapTimer;
+    bool _rightLegSwap;
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void UpdateLimbState(ref NightgauntLimb nightgauntLimb, Vector2 basePos, float lerpSpeed, float anchorThreshold) {
         nightgauntLimb.EndPosition = Vector2.Lerp(nightgauntLimb.EndPosition, nightgauntLimb.TargetPosition, lerpSpeed);
@@ -19,10 +97,55 @@ internal partial class NightgauntNPC {
     }
 
     void CreateLimbs() {
-        _rightArm = new NightgauntLimb(new IKSkeleton((36f, new()), (60f, new() { MinAngle = -MathHelper.Pi, MaxAngle = 0f })));
-        _leftArm = new NightgauntLimb(new IKSkeleton((36f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi })));
+        float upperArmLength = 76f;
+        float forearmLength = 54f;
+        float handLength = 15f;
+
+        var shoulderConstraints = new IKSkeleton.Constraints();
+        var rightElbowConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.Pi, MaxAngle = 0f };
+        var leftElbowConstraints = new IKSkeleton.Constraints() { MinAngle = 0f, MaxAngle = MathHelper.Pi };
+
+        var wristConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.PiOver4, MaxAngle = MathHelper.PiOver4 };
+
+        _rightArm = new NightgauntLimb(new IKSkeleton(
+            (upperArmLength, shoulderConstraints),
+            (forearmLength, rightElbowConstraints),
+            (handLength, wristConstraints)
+        ));
+        _leftArm = new NightgauntLimb(new IKSkeleton(
+            (upperArmLength, shoulderConstraints),
+            (forearmLength, leftElbowConstraints),
+            (handLength, wristConstraints)
+        ));
         
-        _rightLeg = new NightgauntLimb(new IKSkeleton((46f, new()), (60f, new() { MinAngle = 0f, MaxAngle = MathHelper.Pi })));
-        _leftLeg = new NightgauntLimb(new IKSkeleton((46f, new()), (60f, new() { MinAngle = -MathHelper.Pi, MaxAngle = 0f })));
+        float thighLength = 68f;
+        float calfLength = 58f;
+        float footLength = 15f;
+
+        var hipConstraints = new IKSkeleton.Constraints();
+        var rightKneeConstraints = new IKSkeleton.Constraints() { MinAngle = 0f, MaxAngle = MathHelper.Pi };
+        var leftKneeConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.Pi, MaxAngle = 0f };
+        var ankleConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.PiOver4, MaxAngle = MathHelper.PiOver4 };
+
+        _rightLeg = new NightgauntLimb(new IKSkeleton(
+            (thighLength, hipConstraints),
+            (calfLength, rightKneeConstraints),
+            (footLength, ankleConstraints)
+        ));
+        
+        _leftLeg = new NightgauntLimb(new IKSkeleton(
+            (thighLength, hipConstraints),
+            (calfLength, leftKneeConstraints),
+            (footLength, ankleConstraints)
+        ));
+        
+        float torsoLength = 40f;
+        float assLength = 30f;
+
+        _body = new NightgauntLimb(new IKSkeleton(
+            (torsoLength, new() { }),
+            (torsoLength, new() { }),
+            (assLength, new() { })
+        ));
     }
 }

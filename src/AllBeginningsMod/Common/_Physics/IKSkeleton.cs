@@ -88,4 +88,12 @@ public struct IKSkeleton {
 
         return distance;
     }
+    
+    public readonly float GetTotalLength() {
+        float length = 0;
+        foreach (var (l, _) in _options) {
+            length += l;
+        }
+        return length;
+    }
 }

@@ -1,5 +1,8 @@
 using AllBeginningsMod.Common;
 using AllBeginningsMod.Utilities;
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -11,6 +14,15 @@ internal partial class NightgauntNPC : ModNPC {
     internal enum NightgauntState {
         Idle,
         Crawling,
+    }
+
+    internal enum Attack {
+        SwingLunge
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = sizeof(float) * 4)]
+    internal struct NightgauntAi() {
+        [FieldOffset(0)] public NightgauntState State;
     }
     
     public override string Texture => Textures.NPCs.Bosses.Nightgaunt.KEY_NightgauntNPC;
@@ -32,47 +44,12 @@ internal partial class NightgauntNPC : ModNPC {
     Vector2 _right;
     Vector2 _left;
 
-    readonly static Vector2 ShoulderOffset = new(50, 20);
-    Vector2 RightShoulderPosition => NPC.Center + _right * ShoulderOffset.X + _up * ShoulderOffset.Y;
-    Vector2 LeftShoulderPosition => NPC.Center - _right * ShoulderOffset.X + _up * ShoulderOffset.Y;
-    
-    readonly static Vector2 LegOffset = new(35, -120);
-    Vector2 RightLegBasePosition => NPC.Center + _right * LegOffset.X + _up * LegOffset.Y;
-    Vector2 LeftLegBasePosition => NPC.Center - _right * LegOffset.X + _up * LegOffset.Y;
-    
-    Vector2 _rightArmTargetPosition;
-    Vector2 _rightArmEndPosition;
-    bool _rightArmAnchored;
-
-    Vector2 _leftArmTargetPosition;
-    Vector2 _leftArmEndPosition;
-    bool _leftArmAnchored;
-    
-    Vector2 _rightLegTargetPosition;
-    Vector2 _rightLegEndPosition;
-    bool _rightLegAnchored;
-
-    Vector2 _leftLegTargetPosition;
-    Vector2 _leftLegEndPosition;
-    bool _leftLegAnchored;
-    
-    private NightgauntLimb _rightArm;
-    private NightgauntLimb _leftArm;
-    private NightgauntLimb _rightLeg;
-    private NightgauntLimb _leftLeg;
-
-    int _handSwapTimer;
-    bool _rightHandSwap;
-    
-    int _legSwapTimer;
-    bool _rightLegSwap;
-
     public override void SetDefaults() {
-        NPC.width = 30;
-        NPC.height = 40;
+        NPC.width = 180;
+        NPC.height = 140;
         NPC.damage = 15;
         NPC.defense = 8;
-        NPC.lifeMax = 150;
+        NPC.lifeMax = 1500;
         NPC.HitSound = SoundID.NPCHit1;
         NPC.DeathSound = SoundID.NPCDeath1;
         NPC.value = 100f;
@@ -83,7 +60,10 @@ internal partial class NightgauntNPC : ModNPC {
     }
 
     public override void OnSpawn(IEntitySource source) {
-        CreateLimbs();  
+        CreateLimbs();
+        
+        LegOffset = new(-15, -40);
+        ShoulderOffset = new(-38, -30);
     }
 
     private void ResetState() {
@@ -93,6 +73,7 @@ internal partial class NightgauntNPC : ModNPC {
 
     public override void AI() {
         NPC.TargetClosest(false);
+        ref NightgauntAi ai = ref Unsafe.As<float, NightgauntAi>(ref NPC.ai[0]);
 
         if(_leftLeg == default || _rightLeg == default || _leftArm == default || _rightArm == default) {
             CreateLimbs();
