@@ -143,7 +143,7 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         }
         
         var screenCenter = Main.screenPosition + new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f);
-        var worldViewDimensions = new Vector2(Main.screenWidth, Main.screenHeight) / Main.GameViewMatrix.Zoom;
+        var worldViewDimensions = new Vector2(Main.screenWidth, Main.screenHeight);
         var correctScreenTopLeft = screenCenter - (worldViewDimensions / 2f);
         
         effect.Parameters["metaballData"].SetValue(_metaballData);
