@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using AllBeginningsMod.Common.Graphics;
+using AllBeginningsMod.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -9,6 +11,15 @@ using Terraria.ModLoader;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace AllBeginningsMod.Content.Bosses;
+
+/* todo
+ 
+ - make it support more than 64 potentially, unsure if this is needed since lifetimes handle ball murder most of the time and we wont have a ton onscreen, but might be good to have anyways
+ - multiple buffers? ping-pong between buffer a to buffer b and accumulate their combined metaballs
+ 
+ - fix More zooming issues
+ 
+ */
 
 /// <summary>
 ///     Handles all metaball related rendering for the nightgaunt, dreamspawn, etc
@@ -30,11 +41,29 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
     private Vector4[] _metaballData;
     private const int max_metaballs = 64;
 
+    private RenderTarget2D _screenBuffer;
+    private const float RenderScale = 0.5f;
+
     public override void Load() {
-        _metaballs = stackalloc Metaball[max_metaballs].ToArray();
-        _metaballData = stackalloc Vector4[max_metaballs].ToArray();
+        _metaballs = new Metaball[max_metaballs];
+        _metaballData = new Vector4[max_metaballs];
         
         _activeMetaballCount = 0;
+        
+        Threading.RunOnMainThread(() =>
+        {
+            _screenBuffer = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
+
+            Main.OnResolutionChanged += ReinitTargets;
+        });
+    }
+
+    public override void Unload() {
+        Main.OnResolutionChanged -= ReinitTargets;
+    }
+
+    void ReinitTargets(Vector2 size) {
+        _screenBuffer = new RenderTarget2D(Main.graphics.GraphicsDevice, (int)size.X, (int)size.Y);
     }
     
     public override void PostUpdateEverything() {
@@ -86,8 +115,15 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         if (_activeMetaballCount == 0) return;
 
         var sb = Main.spriteBatch;
+        var gd = Main.instance.GraphicsDevice;
         var effect = Shaders.Nightgaunt.NightgauntMetaball.Value;
-
+        RtContentPreserver.ApplyToBindings(gd.GetRenderTargets());
+        var rts = gd.GetRenderTargets();
+        RtContentPreserver.ApplyToBindings(rts);
+        
+        gd.SetRenderTarget(_screenBuffer);
+        gd.Clear(Color.Transparent);
+        
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, effect, Matrix.Identity);
 
         var src = _metaballs.AsSpan(0, _activeMetaballCount);
@@ -106,9 +142,9 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
             }
         }
         
-        Vector2 screenCenter = Main.screenPosition + new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f);
-        Vector2 worldViewDimensions = new Vector2(Main.screenWidth, Main.screenHeight) / Main.GameViewMatrix.Zoom;
-        Vector2 correctScreenTopLeft = screenCenter - (worldViewDimensions / 2f);
+        var screenCenter = Main.screenPosition + new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f);
+        var worldViewDimensions = new Vector2(Main.screenWidth, Main.screenHeight) / Main.GameViewMatrix.Zoom;
+        var correctScreenTopLeft = screenCenter - (worldViewDimensions / 2f);
         
         effect.Parameters["metaballData"].SetValue(_metaballData);
         effect.Parameters["metaballCount"].SetValue(_activeMetaballCount);
@@ -117,7 +153,10 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         effect.Parameters["worldViewDimensions"].SetValue(worldViewDimensions);
 
         sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
-
         sb.End();
+        
+        gd.SetRenderTargets(rts);
+        
+        Graphics.BeginPipeline(0.5f).DrawSprite(_screenBuffer, Vector2.Zero, Color.Red).Flush();
     }
 }
