@@ -1,5 +1,6 @@
 ﻿using AllBeginningsMod.Common.Graphics;
 using AllBeginningsMod.Utilities;
+using Daybreak.Common.Features.Hooks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -24,7 +25,7 @@ namespace AllBeginningsMod.Content.Bosses;
 /// <summary>
 ///     Handles all metaball related rendering for the nightgaunt, dreamspawn, etc
 /// </summary>
-internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
+internal unsafe sealed class NightgauntMetaballRenderer {
     [StructLayout(LayoutKind.Explicit)]
     private struct Metaball {
         [FieldOffset(0)] public Vector2 Position;
@@ -35,16 +36,17 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         [FieldOffset(28)] public float InitialRadius;
     }
 
-    private Metaball[] _metaballs;
-    private int _activeMetaballCount;
+    private static Metaball[] _metaballs;
+    private static int _activeMetaballCount;
 
-    private Vector4[] _metaballData;
+    private static Vector4[] _metaballData;
     private const int max_metaballs = 64;
 
-    private RenderTarget2D _screenBuffer;
+    private static RenderTarget2D _screenBuffer;
     private const float RenderScale = 0.5f;
 
-    public override void Load() {
+    [OnLoad]
+    static void Load() {
         _metaballs = new Metaball[max_metaballs];
         _metaballData = new Vector4[max_metaballs];
         
@@ -58,34 +60,25 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         });
     }
 
-    public override void Unload() {
+    [OnUnload]
+    static void Unload() {
         Main.OnResolutionChanged -= ReinitTargets;
     }
 
-    void ReinitTargets(Vector2 size) {
+    static void ReinitTargets(Vector2 size) {
         _screenBuffer = new RenderTarget2D(Main.graphics.GraphicsDevice, (int)size.X, (int)size.Y);
     }
     
-    public override void PostUpdateEverything() {
+    [SubscribesTo<ModSystemHooks.PostUpdateEverything>]
+    static void UpdateBalls(ModSystemHooks.PostUpdateEverything.Original orig, ModSystem self) {
+        orig();
+        
         if (!Main.hasFocus) return;
 
         float dt = 1f / 60f;
 
         if (Main.keyState.IsKeyDown(Keys.F) && Main.oldKeyState.IsKeyUp(Keys.F)) {
-            if (_activeMetaballCount < max_metaballs) {
-                float initialRadius = 50f + (float)Main.rand.NextDouble() * 50f;
-                float maxTime = 3f + (float)Main.rand.NextDouble() * 2f;
-
-                ref Metaball newBall = ref _metaballs[_activeMetaballCount];
-                newBall.Position = Main.MouseWorld;
-                newBall.Radius = initialRadius;
-                newBall.Velocity = Vector2.Zero;
-                newBall.InitialRadius = initialRadius;
-                newBall.MaxTime = 5;
-                newBall.TimeLeft = 5;
-
-                _activeMetaballCount++;
-            }
+            New(Main.MouseWorld, 15f, 5f);
         }
 
         var balls = _metaballs.AsSpan(0, _activeMetaballCount);
@@ -108,10 +101,23 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
     }
 
     public static void New(Vector2 pos, float radius, float lifetime, Vector2 velocity = default) {
-        
+        if (_activeMetaballCount < max_metaballs) {
+            ref var newBall = ref _metaballs[_activeMetaballCount];
+            newBall.Position = pos;
+            newBall.Radius = radius;
+            newBall.Velocity = velocity;
+            newBall.InitialRadius = radius;
+            newBall.MaxTime = lifetime;
+            newBall.TimeLeft = lifetime;
+
+            _activeMetaballCount++;
+        }
     }
     
-    public override void PostDrawTiles() {
+    [SubscribesTo<ModSystemHooks.PostDrawTiles>]
+    static void DrawBalls(ModSystemHooks.PostDrawTiles.Original orig, ModSystem self) {
+        orig();
+        
         if (_activeMetaballCount == 0) return;
 
         var sb = Main.spriteBatch;
@@ -148,7 +154,7 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         
         effect.Parameters["metaballData"].SetValue(_metaballData);
         effect.Parameters["metaballCount"].SetValue(_activeMetaballCount);
-        effect.Parameters["smoothness"].SetValue(540f); 
+        effect.Parameters["smoothness"].SetValue(40f); 
         effect.Parameters["screenPos"].SetValue(correctScreenTopLeft);
         effect.Parameters["worldViewDimensions"].SetValue(worldViewDimensions);
 
