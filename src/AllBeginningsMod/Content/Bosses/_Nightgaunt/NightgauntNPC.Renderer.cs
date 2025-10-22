@@ -6,7 +6,31 @@ using Terraria.GameContent;
 namespace AllBeginningsMod.Content.Bosses;
 
 internal partial class NightgauntNPC {
-    static void DrawArm(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+        if(NPC.IsABestiaryIconDummy) return false;
+        
+        DrawBody(ref _body, drawColor, SpriteEffects.None);
+        
+        DrawHeadNeck(ref _headNeck, drawColor, SpriteEffects.FlipVertically);
+        
+        DrawArm(ref _rightArm, true, drawColor, SpriteEffects.FlipHorizontally);
+        DrawArm(ref _leftArm, false, drawColor, SpriteEffects.None);
+        
+        DrawLeg(ref _rightLeg, true, drawColor, SpriteEffects.FlipHorizontally);
+        DrawLeg(ref _leftLeg, false, drawColor, SpriteEffects.None);
+        
+        Graphics.BeginPipeline(1.0f)
+            .DrawBasicTrail(
+            _tailPoints.ToArray(),
+            t => 18,
+            Textures.NPCs.Bosses.Nightgaunt.NightgauntTail.Value,
+            drawColor
+            )
+            .Flush();
+        return false;
+    }
+    
+        static void DrawArm(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
         var armTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
     
         Vector2 shoulder = limb.Skeleton.Position(0);
@@ -55,7 +79,7 @@ internal partial class NightgauntNPC {
         var footAnchoredFrame = new Rectangle(76, 228, 32, 70);
     
         var thighOrigin = new Vector2(13, 0);
-        var calfOrigin = new Vector2(13, 10);
+        var calfOrigin = new Vector2(18, 10);
         var footOrigin = new Vector2(14, 0);
         
         if(right) {
@@ -98,91 +122,27 @@ internal partial class NightgauntNPC {
         Main.spriteBatch.Draw(bodyTexture, midTorso - Main.screenPosition, segment2Frame, drawColor, (midTorso - hips).ToRotation() + rotationOffset, segment2Origin, 1f, effects, 0f);
         Main.spriteBatch.Draw(bodyTexture, hips - Main.screenPosition, segment3Frame, drawColor, (hips - tailEnd).ToRotation() + rotationOffset, segment3Origin, 1f, effects, 0f);
     }
+    
+    static void DrawHeadNeck(ref NightgauntLimb headNeck, Color drawColor, SpriteEffects effects) {
+        var headNeckTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
 
-    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
-        if(NPC.IsABestiaryIconDummy) return false;
+        Vector2 neckBase = headNeck.Skeleton.Position(0);
+        Vector2 midNeck = headNeck.Skeleton.Position(1);
+        Vector2 headPivot = headNeck.Skeleton.Position(2);
+        Vector2 headTip = headNeck.Skeleton.Position(3);
         
-        DrawBody(ref _body, drawColor, SpriteEffects.None);
-        
-        DrawArm(ref _rightArm, true, drawColor, SpriteEffects.FlipHorizontally);
-        DrawArm(ref _leftArm, false, drawColor, SpriteEffects.None);
-        
-        DrawLeg(ref _rightLeg, true, drawColor, SpriteEffects.FlipHorizontally);
-        DrawLeg(ref _leftLeg, false, drawColor, SpriteEffects.None);
-        
-        Graphics.BeginPipeline(1.0f)
-            .DrawBasicTrail(
-            _tailPoints.ToArray(),
-            t => 18,
-            Textures.NPCs.Bosses.Nightgaunt.NightgauntTail.Value,
-            drawColor
-            )
-            .Flush();
+        var neckBaseFrame = new Rectangle(276, 90, 34, 40);
+        var midNeckFrame = new Rectangle(276, 52, 34, 32);
+        var headFrame = new Rectangle(276, 0, 34, 46);
 
-#if DEBUG
-        
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightArmTargetPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Lime);
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightArmEndPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Teal);
-        
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftArmTargetPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Lime);
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftArmEndPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Teal);
-        
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightLegTargetPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Orange);
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _rightLegEndPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Yellow);
-        
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftLegTargetPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Orange);
-        spriteBatch.Draw(Textures.Sample.Pixel.Value, _leftLegEndPosition - screenPos, new Rectangle(0, 0, 5, 5), Color.Yellow);
-        
-        spriteBatch.DrawLine(
-            _body.Skeleton.Position(0) - Main.screenPosition,
-            _body.Skeleton.Position(1) - Main.screenPosition,
-            Color.Blue,
-            4,
-            TextureAssets.BlackTile.Value
-        );
-        
-        spriteBatch.DrawLine(
-            _body.Skeleton.Position(1) - Main.screenPosition,
-            _body.Skeleton.Position(2) - Main.screenPosition,
-            Color.Red,
-            4,
-            TextureAssets.BlackTile.Value
-        );
-        
-        spriteBatch.DrawLine(
-            _body.Skeleton.Position(2) - Main.screenPosition,
-            _body.Skeleton.Position(3) - Main.screenPosition,
-            Color.Green,
-            4,
-            TextureAssets.BlackTile.Value
-        );
-        //
-        // spriteBatch.DrawLine(
-        //     _leftLeg.Skeleton.Position(0) - Main.screenPosition,
-        //     _leftLeg.Skeleton.Position(1) - Main.screenPosition,
-        //     Color.Blue,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
-        //
-        // spriteBatch.DrawLine(
-        //     _leftLeg.Skeleton.Position(1) - Main.screenPosition,
-        //     _leftLeg.Skeleton.Position(2) - Main.screenPosition,
-        //     Color.Red,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
-        //
-        // spriteBatch.DrawLine(
-        //     _leftLeg.Skeleton.Position(2) - Main.screenPosition,
-        //     _leftLeg.Skeleton.Position(3) - Main.screenPosition,
-        //     Color.Green,
-        //     4,
-        //     TextureAssets.BlackTile.Value
-        // );
-        
-#endif
+        var neckBaseOrigin = new Vector2(17, 10);
+        var midNeckOrigin = new Vector2(17, 10);
+        var headOrigin = new Vector2(17, 10);
 
-        return false;
+        float rotationOffset = MathHelper.PiOver2;
+
+        Main.spriteBatch.Draw(headNeckTexture, neckBase - Main.screenPosition, neckBaseFrame, drawColor, (neckBase - midNeck).ToRotation() + rotationOffset, neckBaseOrigin, 1f, effects, 0f);
+        Main.spriteBatch.Draw(headNeckTexture, midNeck - Main.screenPosition, midNeckFrame, drawColor, (midNeck - headPivot).ToRotation() + rotationOffset, midNeckOrigin, 1f, effects, 0f);
+        Main.spriteBatch.Draw(headNeckTexture, headPivot - Main.screenPosition, headFrame, drawColor, (headPivot - headTip).ToRotation() + rotationOffset, headOrigin, 1f, effects, 0f);
     }
 }

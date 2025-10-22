@@ -43,7 +43,6 @@ internal unsafe sealed class NightgauntMetaballRenderer {
     private const int max_metaballs = 64;
 
     private static RenderTarget2D _screenBuffer;
-    private const float RenderScale = 0.5f;
 
     [OnLoad]
     static void Load() {

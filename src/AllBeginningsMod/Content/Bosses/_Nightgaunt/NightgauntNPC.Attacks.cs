@@ -31,6 +31,25 @@ internal partial class NightgauntNPC {
     
         UpdateLimbState(ref _body, bodyBasePosition, 0.1f, 5f);
         NPC.Center = _body.Skeleton.Position(0);
+        
+        Vector2 neckBasePos = _body.Skeleton.Position(0);
+    
+        Vector2 neckRootSegmentDirection;
+        neckRootSegmentDirection = _up;
+        Vector2 neckRootSegmentRight = neckRootSegmentDirection.RotatedBy(MathHelper.PiOver2);
+
+        Vector2 actualNeckRoot = neckBasePos
+                                 + neckRootSegmentRight * NeckAttachmentOffset.X
+                                 + neckRootSegmentDirection * NeckAttachmentOffset.Y;
+
+        float headTargetOffset = 80f;
+        float headSway = 20f;
+    
+        _headNeck.TargetPosition = Main.MouseWorld 
+                                   + neckRootSegmentDirection * headTargetOffset 
+                                   + neckRootSegmentRight * turnAmount * headSway;
+
+        UpdateLimbState(ref _headNeck, actualNeckRoot, 0.15f, 5f);
     
         float legTimerDecrement = 1f + Math.Abs(turnAmount) * 5;
 

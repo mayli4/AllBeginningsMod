@@ -16,6 +16,14 @@ internal partial class NightgauntNPC {
     private NightgauntLimb _leftArm;
     private NightgauntLimb _rightLeg;
     private NightgauntLimb _leftLeg;
+    
+    private NightgauntLimb _headNeck;
+
+// The point on the body IK chain where the neck roots
+    private const int NeckRootBodySegmentIndex = 0; // Typically the very first segment (closest to NPC.Center)
+
+// NEW: Offset for the neck's attachment point relative to NeckRootBodySegmentIndex
+    readonly static Vector2 NeckAttachmentOffset = new(0, -10);
 
     public static Vector2 ShoulderOffset;
     
@@ -146,6 +154,21 @@ internal partial class NightgauntNPC {
             (torsoLength, new() { }),
             (torsoLength, new() { }),
             (assLength, new() { })
+        ));
+        
+        float neckBaseLength = 30f;
+        float midNeckLength = 20f;
+        float headLength = 60f;
+
+        var neckBaseConstraints = new IKSkeleton.Constraints() {  };
+
+        var midNeckConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.PiOver2 * 0.9f, MaxAngle = MathHelper.PiOver2 * 0.9f };
+        var headJointConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.PiOver4, MaxAngle = MathHelper.PiOver4 };
+
+        _headNeck = new NightgauntLimb(new IKSkeleton(
+            (neckBaseLength, neckBaseConstraints),
+            (midNeckLength, midNeckConstraints),
+            (headLength, headJointConstraints)
         ));
     }
 }
