@@ -19,11 +19,11 @@ internal readonly struct RectangleDrag {
     public readonly Vector2Drag Resize;
 
     public RectangleDrag(Vector2 position, Vector2 size, Vector2 cursor, Vector2 moveAxis, Vector2 resizeSigns) {
-        if (resizeSigns != default) {
+        if(resizeSigns != default) {
             Move = new Vector2Drag(position, cursor, Vector2.Max(-resizeSigns, Vector2.Zero));
             Resize = new Vector2Drag(size, cursor, resizeSigns);
         }
-        else if (moveAxis != default) {
+        else if(moveAxis != default) {
             Move = new Vector2Drag(position, cursor, moveAxis);
             Resize = new Vector2Drag(size, cursor, Vector2.Zero);
         }

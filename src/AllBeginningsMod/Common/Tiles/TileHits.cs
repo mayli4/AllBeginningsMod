@@ -8,7 +8,7 @@ namespace AllBeginningsMod.Common.Tiles;
 
 internal sealed class TileHits : ModSystem {
     internal readonly record struct TileHitCtx(HitTile Tile, int X, int Y, int HitType, Player player);
-    
+
     public Dictionary<Point, TileHitCtx> Contexts { get; } = new();
 
     public override void OnModLoad() {
@@ -29,7 +29,7 @@ internal sealed class TileHits : ModSystem {
         c.Index = c.Instrs.Count - 1;
 
         // Jump to every HitTile::HitObject invocation, push Player instance (`this`, ldarg.0), and call our method instead of HitTile::HitObject (jump to label after).
-        while (c.TryGotoPrev(MoveType.After, x => x.MatchCallvirt<HitTile>(nameof(HitTile.HitObject)))) {
+        while(c.TryGotoPrev(MoveType.After, x => x.MatchCallvirt<HitTile>(nameof(HitTile.HitObject)))) {
             // Mark label to jump to later.
             var label = c.MarkLabel();
 

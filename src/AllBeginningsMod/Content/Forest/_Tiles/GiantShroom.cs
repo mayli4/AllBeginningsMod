@@ -44,7 +44,7 @@ public sealed class GiantShroom : ModTile {
                     new Point(i, j)
             );
 
-            if (!capExists) {
+            if(!capExists) {
                 int projIndex = Projectile.NewProjectile(
                     new EntitySource_TileUpdate(i, j),
                     new Vector2(i * 16 + 15, j * 16 - 14),
@@ -55,145 +55,146 @@ public sealed class GiantShroom : ModTile {
                     Main.myPlayer
                 );
 
-                if (Main.projectile[projIndex].ModProjectile is GiantShroomCapDummy capDummy) {
+                if(Main.projectile[projIndex].ModProjectile is GiantShroomCapDummy capDummy) {
                     capDummy.ParentPosition = new Point(i, j);
                 }
-            }   
+            }
         }
     }
-    
-internal sealed class GiantShroomCapDummy : ModProjectile {
-    public Point ParentPosition { get; set; }
 
-    public override string Texture => Assets.Assets.Textures.Tiles.Forest.KEY_GiantShroomCap;
+    internal sealed class GiantShroomCapDummy : ModProjectile {
+        public Point ParentPosition { get; set; }
 
-    private int _squishTimer;
-    private float _bounceState;
-    private float _leanDirection;
+        public override string Texture => Assets.Assets.Textures.Tiles.Forest.KEY_GiantShroomCap;
 
-    private const int SQUISH_ANIMATION_DURATION = 60;
-    private const float MAX_LEAN_RADIANS = 0.3f;
+        private int _squishTimer;
+        private float _bounceState;
+        private float _leanDirection;
 
-    private const float IDLE_WOBBLE_AMOUNT = 0.02f;
-    private const float IDLE_WOBBLE_SPEED = 0.8f;
-    
-    private const int HEART_SPAWN_COOLDOWN = 60 * 15;
-    private int _heartSpawnTimer = HEART_SPAWN_COOLDOWN;
+        private const int SQUISH_ANIMATION_DURATION = 60;
+        private const float MAX_LEAN_RADIANS = 0.3f;
 
-    public override void SetDefaults() {
-        Projectile.width = 70;
-        Projectile.height = 40;
-        Projectile.tileCollide = false;
-        Projectile.ignoreWater = true;
-        Projectile.timeLeft = 10;
-    }
+        private const float IDLE_WOBBLE_AMOUNT = 0.02f;
+        private const float IDLE_WOBBLE_SPEED = 0.8f;
 
-    public override void AI() {
-        Tile parentTile = Main.tile[ParentPosition.X, ParentPosition.Y];
-        if (
-            parentTile.HasTile &&
-            parentTile.TileType == ModContent.TileType<GiantShroom>()
-        ) {
+        private const int HEART_SPAWN_COOLDOWN = 60 * 15;
+        private int _heartSpawnTimer = HEART_SPAWN_COOLDOWN;
+
+        public override void SetDefaults() {
+            Projectile.width = 70;
+            Projectile.height = 40;
+            Projectile.tileCollide = false;
+            Projectile.ignoreWater = true;
             Projectile.timeLeft = 10;
-        } else {
-            Projectile.Kill();
-            return;
-        }
-        
-        if (_heartSpawnTimer > 0) {
-            _heartSpawnTimer--;
         }
 
-        if (_bounceState == 0 && Main.LocalPlayer.velocity.Y > 0 && Main.LocalPlayer.Hitbox.Intersects(Projectile.Hitbox)) {
-            _bounceState = 1;
-            _leanDirection = Math.Sign(Main.LocalPlayer.velocity.X);
-
-            for (int i = 0; i < 15; i++) {
-                Dust.NewDust(
-                    Projectile.position,
-                    Projectile.width,
-                    Projectile.height / 2,
-                    DustID.Water,
-                    Main.LocalPlayer.velocity.X * 0.2f,
-                    -2f,
-                    80,
-                    default,
-                    1.2f
-                );
+        public override void AI() {
+            Tile parentTile = Main.tile[ParentPosition.X, ParentPosition.Y];
+            if(
+                parentTile.HasTile &&
+                parentTile.TileType == ModContent.TileType<GiantShroom>()
+            ) {
+                Projectile.timeLeft = 10;
+            }
+            else {
+                Projectile.Kill();
+                return;
             }
 
-            if (Main.LocalPlayer.velocity.Y > -10) {
-                Main.LocalPlayer.velocity.Y = -10;
+            if(_heartSpawnTimer > 0) {
+                _heartSpawnTimer--;
             }
 
-            if (Main.LocalPlayer.velocity.X != 0) {
-                Main.LocalPlayer.velocity.X +=
-                    (Main.LocalPlayer.velocity.X > 0 ? 1 : -1) * 3f;
+            if(_bounceState == 0 && Main.LocalPlayer.velocity.Y > 0 && Main.LocalPlayer.Hitbox.Intersects(Projectile.Hitbox)) {
+                _bounceState = 1;
+                _leanDirection = Math.Sign(Main.LocalPlayer.velocity.X);
+
+                for(int i = 0; i < 15; i++) {
+                    Dust.NewDust(
+                        Projectile.position,
+                        Projectile.width,
+                        Projectile.height / 2,
+                        DustID.Water,
+                        Main.LocalPlayer.velocity.X * 0.2f,
+                        -2f,
+                        80,
+                        default,
+                        1.2f
+                    );
+                }
+
+                if(Main.LocalPlayer.velocity.Y > -10) {
+                    Main.LocalPlayer.velocity.Y = -10;
+                }
+
+                if(Main.LocalPlayer.velocity.X != 0) {
+                    Main.LocalPlayer.velocity.X +=
+                        (Main.LocalPlayer.velocity.X > 0 ? 1 : -1) * 3f;
+                }
+
+                if(_heartSpawnTimer <= 0) {
+                    Item.NewItem(Projectile.GetSource_FromThis(), Projectile.Center, ItemID.Heart, 3);
+                    _heartSpawnTimer = HEART_SPAWN_COOLDOWN;
+                }
             }
-            
-            if (_heartSpawnTimer <= 0) {
-                Item.NewItem(Projectile.GetSource_FromThis(), Projectile.Center, ItemID.Heart, 3);
-                _heartSpawnTimer = HEART_SPAWN_COOLDOWN;
+
+            if(_bounceState == 1) {
+                _squishTimer++;
+            }
+
+            if(_squishTimer >= 90) {
+                _bounceState = 0;
+                _squishTimer = 0;
+                _leanDirection = 0;
             }
         }
 
-        if (_bounceState == 1) {
-            _squishTimer++;
-        }
+        public override bool PreDraw(ref Color lightColor) {
+            var tex = TextureAssets.Projectile[Projectile.type].Value;
+            var pos = Projectile.position + new Vector2(36, 40) - Main.screenPosition;
+            var origin = new Vector2(tex.Width / 2f, tex.Height);
+            Vector2 scale = Vector2.One;
 
-        if (_squishTimer >= 90) {
-            _bounceState = 0;
-            _squishTimer = 0;
-            _leanDirection = 0;
+            float rotation;
+            if(_bounceState == 1 && _squishTimer <= SQUISH_ANIMATION_DURATION) {
+                float animationProgress =
+                    (float)_squishTimer / SQUISH_ANIMATION_DURATION;
+
+                float decay = 5f;
+                float frequency = 15f;
+                float jiggleFactor = (float)Math.Pow(Math.E, -decay * animationProgress) * (float)Math.Sin(frequency * animationProgress);
+
+                scale.Y = 1f + jiggleFactor * 0.4f;
+                scale.X = 1f - jiggleFactor * 0.4f;
+
+                float leanProgress = Math.Clamp(animationProgress, 0f, 1f);
+                float currentLeanFactor = 1f - leanProgress;
+                rotation = _leanDirection * MAX_LEAN_RADIANS * currentLeanFactor;
+            }
+            else {
+                float time = Main.GameUpdateCount * 0.05f;
+
+                float wobbleX = (float)Math.Sin(time * IDLE_WOBBLE_SPEED);
+                scale.X = 1 + wobbleX * IDLE_WOBBLE_AMOUNT;
+
+                float wobbleY = (float)Math.Sin(time * IDLE_WOBBLE_SPEED + 1);
+                scale.Y = 1 + wobbleY * IDLE_WOBBLE_AMOUNT;
+
+                rotation = 0f;
+            }
+
+            Main.EntitySpriteDraw(
+                tex,
+                pos,
+                null,
+                lightColor,
+                rotation,
+                origin,
+                scale,
+                SpriteEffects.None
+            );
+
+            return false;
         }
     }
-
-    public override bool PreDraw(ref Color lightColor) {
-        var tex = TextureAssets.Projectile[Projectile.type].Value;
-        var pos = Projectile.position + new Vector2(36, 40) - Main.screenPosition;
-        var origin = new Vector2(tex.Width / 2f, tex.Height);
-        Vector2 scale = Vector2.One;
-        
-        float rotation;
-        if (_bounceState == 1 && _squishTimer <= SQUISH_ANIMATION_DURATION) {
-            float animationProgress =
-                (float)_squishTimer / SQUISH_ANIMATION_DURATION;
-            
-            float decay = 5f;
-            float frequency = 15f;
-            float jiggleFactor = (float)Math.Pow(Math.E, -decay * animationProgress) * (float)Math.Sin(frequency * animationProgress);
-
-            scale.Y = 1f + jiggleFactor * 0.4f;
-            scale.X = 1f - jiggleFactor * 0.4f;
-
-            float leanProgress = Math.Clamp(animationProgress, 0f, 1f);
-            float currentLeanFactor = 1f - leanProgress;
-            rotation = _leanDirection * MAX_LEAN_RADIANS * currentLeanFactor;
-        } 
-        else {
-            float time = Main.GameUpdateCount * 0.05f;
-
-            float wobbleX = (float)Math.Sin(time * IDLE_WOBBLE_SPEED);
-            scale.X = 1 + wobbleX * IDLE_WOBBLE_AMOUNT;
-
-            float wobbleY = (float)Math.Sin(time * IDLE_WOBBLE_SPEED + 1);
-            scale.Y = 1 + wobbleY * IDLE_WOBBLE_AMOUNT;
-
-            rotation = 0f;
-        }
-
-        Main.EntitySpriteDraw(
-            tex,
-            pos,
-            null,
-            lightColor,
-            rotation,
-            origin,
-            scale,
-            SpriteEffects.None
-        );
-
-        return false;
-    }
-}
 }

@@ -1,27 +1,27 @@
 ﻿#if BUILDINGFROMCSPROJ_CLIENT || BUILDINGFROMCSPROJ_SERVER || BUILDINGFROMCSPROJ_MOD
 using Microsoft.Xna.Framework;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MonoMod.Core.Utils;
 using MonoMod.RuntimeDetour;
+using System;
+using System.Buffers.Binary;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System;
-using Terraria.ModLoader;
-using Terraria;
-using System.Buffers.Binary;
-using System.Threading;
-using System.Text;
 using System.Runtime.InteropServices;
-using MonoMod.Core.Utils;
-using System.Collections;
-using System.IO.Compression;
-using Terraria.ModLoader.Core;
-using MonoMod.Cil;
 using System.Security.Cryptography;
-using Mono.Cecil.Cil;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Terraria;
+using Terraria.ModLoader;
+using Terraria.ModLoader.Core;
 
 #if !BUILDINGFROMCSPROJ_MOD
 
@@ -40,26 +40,23 @@ internal static class Launcher {
     public static bool IsClientEx { get; private set; }
     public static bool IsServer { get; private set; }
     public static bool IsMod { get; private set; }
-    
+
     public static void ClientMain(string[] args, int clientIndex) {
         string file = args?.FirstOrDefault();
         Console.WriteLine(file);
         Console.WriteLine($"current dir: {Environment.CurrentDirectory}");
-        if (!File.Exists(file)) {
+        if(!File.Exists(file)) {
             Console.WriteLine($"Missing tml path, does not exist or is not accessible");
-            try
-            {
+            try {
                 file = File.ReadAllLines("tmlpath.txt")[0];
                 Console.WriteLine($"Using tml path from tmlpath.txt");
             }
-            catch (FileNotFoundException)
-            {
+            catch(FileNotFoundException) {
 
                 Console.WriteLine("tmlpath.txt file not found");
                 return;
             }
-            catch (IndexOutOfRangeException)
-            {
+            catch(IndexOutOfRangeException) {
                 Console.WriteLine($"Missing tml path in tmlpath.txt");
                 return;
             }
@@ -81,7 +78,7 @@ internal static class Launcher {
         applyingDetoursTask = Task.Run(ApplyDetours).ContinueWith(t => Console.WriteLine($"Finished applying detours in {sw.Elapsed}"));
 
         string[] mainArgs = ["-console", .. args];//   args; 
-        if (IsServer)
+        if(IsServer)
             mainArgs = ["-server", .. args];
         typeof(ModLoader).Assembly.EntryPoint.Invoke(null, [mainArgs]);
     }
@@ -115,19 +112,20 @@ internal static class Launcher {
         detours.Add(new Hook(tpt.GetMethod("ForceStaticInitializers", fstatic, [typeof(Assembly)])!,
             (Action<Assembly> orig, Assembly assemblies) => { }, applyByDefault: false));
 
-        detours.Add(new Hook(tmt.GetMethod("LoadContent", finstance)!, static (Action<Main> orig, Main self) => {
-            if (applyingDetoursTask?.IsCompleted is false) {
+        detours.Add(new Hook(tmt.GetMethod("LoadContent", finstance)!, static (Action<Main> orig, Main self) =>
+        {
+            if(applyingDetoursTask?.IsCompleted is false) {
                 Console.WriteLine("Waiting detours");
                 applyingDetoursTask.ConfigureAwait(false).GetAwaiter().GetResult();
             }
             orig(self);
         }, false));
 
-        detours.Add(new Hook(tmt.GetMethod("DrawSplash", finstance)!, static (Action<Main, GameTime> orig, Main self, GameTime gameTime) => {
+        detours.Add(new Hook(tmt.GetMethod("DrawSplash", finstance)!, static (Action<Main, GameTime> orig, Main self, GameTime gameTime) =>
+        {
             Console.WriteLine("Fast splash start");
             Stopwatch sw = Stopwatch.StartNew();
-            for (int i = 0; i < 900 && Terraria.Main.showSplash; i++)
-            {
+            for(int i = 0; i < 900 && Terraria.Main.showSplash; i++) {
                 orig(self, gameTime);
                 Terraria.Main.Assets.TransferCompletedAssets();
             }
@@ -144,9 +142,9 @@ internal static class Launcher {
 
         List<Action> actions = new(64);
 
-        for (int i = 0; i < detours.Count; i++)
+        for(int i = 0; i < detours.Count; i++)
             actions.Add(detours[i].Apply);
-        for (int i = 0; i < ilhooks.Count; i++)
+        for(int i = 0; i < ilhooks.Count; i++)
             actions.Add(ilhooks[i].Apply);
 
         Parallel.Invoke([.. actions]);

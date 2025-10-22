@@ -7,7 +7,7 @@ internal sealed class Sets : ModSystem {
 
     public override void ResizeArrays() {
         base.ResizeArrays();
-        
+
         AlwaysPreventTileBreakIfOnTopOfIt = new bool[TileLoader.TileCount];
         NPCID.Sets.Factory.CreateNamedSet(Mod, nameof(AlwaysPreventTileBreakIfOnTopOfIt)).RegisterCustomSet(true);
     }

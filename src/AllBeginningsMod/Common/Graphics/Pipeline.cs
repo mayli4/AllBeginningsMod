@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace AllBeginningsMod.Common.Graphics;
+
 public struct Pipeline(Graphics graphics) {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly Pipeline ApplyOutline(Color color, float threshold = 0.001f) {
@@ -76,7 +77,7 @@ public struct Pipeline(Graphics graphics) {
 
         return DrawTrail(positions, width, color, effect, parameters);
     }
-    
+
     public readonly Pipeline DrawTexturedIndexedMesh(
         VertexPositionColorTexture[] vertices,
         short[] indices,
@@ -94,7 +95,8 @@ public struct Pipeline(Graphics graphics) {
         graphics.IndexDatas.AddRange(indices);
 
         var texturedMeshDataIndex = graphics.TexturedIndexedMeshDatas.Count;
-        graphics.TexturedIndexedMeshDatas.Add(new() {
+        graphics.TexturedIndexedMeshDatas.Add(new()
+        {
             VerticesIndex = meshVerticesIndex,
             VertexCount = vertices.Length,
             IndicesIndex = meshIndicesIndex,

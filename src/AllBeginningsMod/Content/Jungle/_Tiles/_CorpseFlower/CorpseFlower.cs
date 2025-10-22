@@ -14,7 +14,7 @@ namespace AllBeginningsMod.Content.Jungle;
 
 internal sealed class CorpseFlower : ModTile {
     public override string Texture => Textures.Tiles.Jungle.KEY_CorpseFlowerBase;
-    
+
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;
         Main.tileNoAttach[Type] = false;
@@ -22,50 +22,50 @@ internal sealed class CorpseFlower : ModTile {
         Main.tileLavaDeath[Type] = true;
 
         Main.tileSolid[Type] = false;
-        
+
         Main.tileFrameImportant[Type] = true;
 
         TileObjectData.newTile.Width = 3;
         TileObjectData.newTile.Height = 2;
-        
+
         TileObjectData.newTile.Origin = new Point16(0, 0);
 
         TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.SolidTile | AnchorType.SolidWithTop | AnchorType.SolidSide, TileObjectData.newTile.Width, 0);
-        
-        TileObjectData.newTile.CoordinateHeights = new [] { 16, 16, 16 };
+
+        TileObjectData.newTile.CoordinateHeights = new[] { 16, 16, 16 };
         TileObjectData.newTile.CoordinateWidth = 16;
         TileObjectData.newTile.CoordinatePadding = 2;
         TileObjectData.newTile.DrawYOffset = 2;
-        
+
         TileObjectData.addTile(Type);
-        
+
         AddMapEntry(Color.Brown);
 
         DustType = DustID.RichMahogany;
         HitSound = SoundID.Dig;
     }
-    
+
     public override void NearbyEffects(int i, int j, bool closer) {
         var tile = Main.tile[i, j];
         if(tile.TileFrameX is not 18 || tile.TileFrameY is not 0) return;
 
-        var bulbs = from bulb 
-                    in Main.npc 
-                    where bulb.active 
-                    where bulb.type == ModContent.NPCType<CorpseFlowerBulb>() 
+        var bulbs = from bulb
+                    in Main.npc
+                    where bulb.active
+                    where bulb.type == ModContent.NPCType<CorpseFlowerBulb>()
                     select bulb.ModNPC as CorpseFlowerBulb;
 
         var pos = new Point16(i + 1, j - 2);
-        
-        if (!bulbs.Any(p => p.ParentPosition == pos)) {
+
+        if(!bulbs.Any(p => p.ParentPosition == pos)) {
             int npcIndex = NPC.NewNPC(
                 new EntitySource_SpawnNPC(),
                 (i * 16),
                 (j * 16),
                 ModContent.NPCType<CorpseFlowerBulb>()
             );
-        
-            if (npcIndex != -1) {
+
+            if(npcIndex != -1) {
                 CorpseFlowerBulb newPlatform = (CorpseFlowerBulb)Main.npc[npcIndex].ModNPC;
                 newPlatform.ParentPosition = pos;
                 newPlatform.Bloomed = false;
@@ -77,7 +77,7 @@ internal sealed class CorpseFlower : ModTile {
 
 internal sealed class CorpseFlowerBulb : ModNPC {
     public override string Texture => Textures.Tiles.Jungle.KEY_CorpseFlowerBase;
-    
+
     public Point16 ParentPosition { get; set; }
 
     public bool Bloomed { get; set; } = false;
@@ -85,7 +85,7 @@ internal sealed class CorpseFlowerBulb : ModNPC {
     private bool _wasBloomed = false;
     private float _bloomAnimationTimer = -1f;
     public float BloomAnimationDuration = 65f;
-    
+
     private float _postBloomSquashTimer = -1f;
     public float PostBloomSquashDuration = 15f;
 
@@ -109,23 +109,23 @@ internal sealed class CorpseFlowerBulb : ModNPC {
     }
 
     public override void AI() {
-        if (ParentPosition.X == 0 && ParentPosition.Y == 0 && NPC.position != Vector2.Zero) {
+        if(ParentPosition.X == 0 && ParentPosition.Y == 0 && NPC.position != Vector2.Zero) {
             ParentPosition = NPC.Center.ToPoint16();
         }
-        
-        NPC.Center = ParentPosition.ToVector2() * 16; 
 
-        NPC.dontTakeDamage = Bloomed; 
-        
-        if (Bloomed && !_wasBloomed) {
+        NPC.Center = ParentPosition.ToVector2() * 16;
+
+        NPC.dontTakeDamage = Bloomed;
+
+        if(Bloomed && !_wasBloomed) {
             SoundEngine.PlaySound(Sounds.Tile.Jungle.CorpseFlowerHit with { Volume = 0.8f, PitchVariance = 0.2f }, NPC.Center);
             _bloomAnimationTimer = 0f;
             _postBloomSquashTimer = -1f;
         }
 
-        if (_bloomAnimationTimer >= 0f && _bloomAnimationTimer < BloomAnimationDuration) {
+        if(_bloomAnimationTimer >= 0f && _bloomAnimationTimer < BloomAnimationDuration) {
             _bloomAnimationTimer++;
-            if (_bloomAnimationTimer >= BloomAnimationDuration) {
+            if(_bloomAnimationTimer >= BloomAnimationDuration) {
                 _bloomAnimationTimer = BloomAnimationDuration;
                 _postBloomSquashTimer = 0f;
                 SoundEngine.PlaySound(Sounds.Tile.Jungle.CorpseFlowerOpen with { Volume = 0.8f, PitchVariance = 0.2f }, NPC.Center);
@@ -136,13 +136,13 @@ internal sealed class CorpseFlowerBulb : ModNPC {
             }
         }
 
-        if (_postBloomSquashTimer >= 0f && _postBloomSquashTimer < PostBloomSquashDuration) {
+        if(_postBloomSquashTimer >= 0f && _postBloomSquashTimer < PostBloomSquashDuration) {
             _postBloomSquashTimer++;
-            if (_postBloomSquashTimer >= PostBloomSquashDuration) {
+            if(_postBloomSquashTimer >= PostBloomSquashDuration) {
                 _postBloomSquashTimer = PostBloomSquashDuration;
             }
         }
-        
+
         _wasBloomed = Bloomed;
 
         if(Main.rand.NextBool(9)) {
@@ -152,17 +152,17 @@ internal sealed class CorpseFlowerBulb : ModNPC {
             d.noLightEmittence = true;
         }
     }
-    
+
     public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers) => modifiers.HideCombatText();
-    
+
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
-        if (!Bloomed) {
+        if(!Bloomed) {
             Bloomed = true;
             NPC.netUpdate = true;
         }
     }
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
-        if (!Bloomed) {
+        if(!Bloomed) {
             Bloomed = true;
             NPC.netUpdate = true;
         }
@@ -173,14 +173,14 @@ internal sealed class CorpseFlowerBulb : ModNPC {
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
-        var tile = Main.tile[ParentPosition.X, ParentPosition.Y]; 
+        var tile = Main.tile[ParentPosition.X, ParentPosition.Y];
         var tex = TextureAssets.Npc[Type].Value;
-        
-        if (tile.HasTile && tile.TileColor != PaintID.None) {
+
+        if(tile.HasTile && tile.TileColor != PaintID.None) {
             var paintedTex = Main.instance.TilePaintSystem.TryGetTileAndRequestIfNotReady(ModContent.TileType<CorpseFlower>(), 0, tile.TileColor);
             tex = paintedTex ?? tex;
         }
-        
+
         var unbloomedRect = new Rectangle(66, 0, 122, 94);
         var bloomedRect = new Rectangle(190, 0, 122, 94);
 
@@ -190,13 +190,13 @@ internal sealed class CorpseFlowerBulb : ModNPC {
         Vector2 drawScale = Vector2.One;
         float drawRotation = 0f;
 
-        if (_bloomAnimationTimer >= 0f && _bloomAnimationTimer < BloomAnimationDuration) {
+        if(_bloomAnimationTimer >= 0f && _bloomAnimationTimer < BloomAnimationDuration) {
             float progress = _bloomAnimationTimer / BloomAnimationDuration;
-            
-            if (progress < 0.33f) {
+
+            if(progress < 0.33f) {
                 float shakeProgress = MathHelper.Clamp(progress / 0.33f, 0f, 1f);
                 float shakeStrength = MathF.Sin(shakeProgress * MathHelper.Pi * 4) * (1f - shakeProgress) * 4f;
-                
+
                 //drawPosition.X += Main.rand.NextFloat(-1f, 1f) * shakeStrength;
                 //drawPosition.Y += MathF.Abs(MathF.Sin(shakeProgress * MathHelper.Pi * 8)) * shakeStrength * 0.5f;
                 drawRotation = MathF.Sin(shakeProgress * MathHelper.Pi * 3) * 0.07f;
@@ -209,8 +209,8 @@ internal sealed class CorpseFlowerBulb : ModNPC {
                 drawScale.X = 1f - squishAmount * 0.3f;
                 drawScale.Y = 1f + squishAmount * 0.7f;
             }
-        } 
-        else if (_postBloomSquashTimer >= 0f && _postBloomSquashTimer < PostBloomSquashDuration) {
+        }
+        else if(_postBloomSquashTimer >= 0f && _postBloomSquashTimer < PostBloomSquashDuration) {
             currentRect = bloomedRect;
             drawOrigin = new Vector2(currentRect.Width / 2f, currentRect.Height);
 
@@ -218,39 +218,39 @@ internal sealed class CorpseFlowerBulb : ModNPC {
             float easedProgress = Easings.SineInEasing(progress, 2f);
 
             float squashAmount = MathF.Sin(easedProgress * MathHelper.Pi);
-            
+
             drawScale.X = 1f + squashAmount * 0.25f;
             drawScale.Y = 1f - squashAmount * 0.15f;
-            
+
             //drawRotation = MathF.Sin(easedProgress * 3) * 0.07f;
         }
-        
-        else if (Bloomed) {
+
+        else if(Bloomed) {
             currentRect = bloomedRect;
             drawScale = new Vector2(1f + 0.1f * (float)(0.2 * Math.Sin(Main.GlobalTimeWrappedHourly * 3 * NPC.whoAmI * 0.2f) + 0.5));
             drawScale.Y = 2 - drawScale.X;
-            
+
             drawRotation = MathF.Sin(Main.GlobalTimeWrappedHourly * 3 * NPC.whoAmI * 0.2f) * 0.05f;
         }
 
-        if (!Bloomed) {
+        if(!Bloomed) {
             drawScale = new Vector2(1f + 0.1f * (float)(0.2 * Math.Sin(Main.GlobalTimeWrappedHourly * 3 * NPC.whoAmI * 0.2f) + 0.5));
             drawScale.Y = 2 - drawScale.X;
-        
+
             drawRotation = MathF.Sin(Main.GlobalTimeWrappedHourly * 3 * NPC.whoAmI * 0.2f) * 0.05f;
         }
-        
+
         Main.EntitySpriteDraw(
             tex,
             drawPosition,
             currentRect,
             drawColor,
             drawRotation,
-            drawOrigin, 
+            drawOrigin,
             drawScale,
             SpriteEffects.None
         );
-        
+
         return false;
     }
 }

@@ -12,13 +12,13 @@ internal sealed class IndentedStringWriter : IDisposable {
     private bool tabsPending;
     public IndentedStringWriter() => Builder = new();
     public IndentedStringWriter(int initialCapacity) => Builder = new(initialCapacity);
-    
+
     public IndentedStringWriter(StringBuilder builder) {
         Builder = builder;
     }
-    
+
     private StringBuilder WritePendingTabs() {
-        if (tabsPending) {
+        if(tabsPending) {
             Builder.Append(' ', Indent * 4);
             tabsPending = false;
         }
@@ -40,17 +40,17 @@ internal sealed class IndentedStringWriter : IDisposable {
     public void Write(double value) => WritePendingTabs().Append(value.ToString(CultureInfo.InvariantCulture));
 
     public void WriteLine() {
-        Builder.AppendLine(); 
+        Builder.AppendLine();
         tabsPending = true;
     }
 
     public void WriteLine(string text) {
-        WritePendingTabs().Append(text).AppendLine(); 
+        WritePendingTabs().Append(text).AppendLine();
         tabsPending = true;
     }
 
     public void WriteLine([InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolationHandler handler) {
-        Builder.AppendLine(); 
+        Builder.AppendLine();
         tabsPending = true;
     }
 
@@ -65,9 +65,9 @@ internal sealed class IndentedStringWriter : IDisposable {
 
     }
     public void EndScope([InterpolatedStringHandlerArgument("")] ref IndentedStringWriterInterpolationHandler handler) => EndScope();
-    
+
     public void Dispose() { }
-    
+
     public string ToStringAndClear() {
         string result = Builder.ToString();
         Builder.Clear();
@@ -96,7 +96,7 @@ internal sealed class IndentedStringWriter : IDisposable {
         public void AppendFormatted(float value) => writer.Write(value);
         public void AppendFormatted(double value) => writer.Write(value);
         public void AppendFormatted<T>(T value) {
-            if (value is IFormattable t)
+            if(value is IFormattable t)
                 writer.Write(t.ToString(null, CultureInfo.InvariantCulture));
             else
                 writer.Write(value?.ToString() ?? "");

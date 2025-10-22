@@ -11,10 +11,10 @@ public struct IKSkeleton {
 
     [InlineArray(MaxJointCount + 1)]
     struct PositionData { Vector2 _; }
-    
+
     public readonly int JointCount => _options.Length;
     public readonly int PositionCount => JointCount + 1;
-    
+
     const int MaxJointCount = 16;
 
     readonly (float length, Constraints constraints)[] _options;
@@ -88,10 +88,10 @@ public struct IKSkeleton {
 
         return distance;
     }
-    
+
     public readonly float GetTotalLength() {
         float length = 0;
-        foreach (var (l, _) in _options) {
+        foreach(var (l, _) in _options) {
             length += l;
         }
         return length;

@@ -25,11 +25,11 @@ internal partial class NightgauntNPC : ModNPC {
     internal struct NightgauntAi() {
         [FieldOffset(0)] public NightgauntState State;
     }
-    
+
     public override string Texture => Textures.NPCs.Bosses.Nightgaunt.KEY_NightgauntNPC;
 
     public Player Target => Main.player[NPC.target];
-    
+
     private NightgauntState State {
         get => (NightgauntState)NPC.ai[0];
         set {
@@ -67,7 +67,7 @@ internal partial class NightgauntNPC : ModNPC {
 
     public override void OnSpawn(IEntitySource source) {
         CreateLimbs();
-        
+
         LegOffset = new(-15, -40);
         ShoulderOffset = new(-38, -30);
     }
@@ -92,12 +92,12 @@ internal partial class NightgauntNPC : ModNPC {
                 CrawlToPlayer();
                 break;
         }
-        
+
         State = NightgauntState.Crawling;
-        
+
         UpdateTail();
     }
-    
+
     private void UpdateTail() {
         Vector2 bodyTailRootSegmentPosition = _body.Skeleton.Position(3);
 
@@ -112,17 +112,17 @@ internal partial class NightgauntNPC : ModNPC {
                            + segmentBeforeTailRootRight
                            - segmentBeforeTailRootUp * tailOffset;
 
-        
-        if (_tailPoints.Count == 0) {
+
+        if(_tailPoints.Count == 0) {
             _tailPoints.Add(tailRoot);
-            for (int i = 1; i < tail_points; i++) {
-                _tailPoints.Add(tailRoot - segmentBeforeTailRootUp * tail_segment_length * i); 
+            for(int i = 1; i < tail_points; i++) {
+                _tailPoints.Add(tailRoot - segmentBeforeTailRootUp * tail_segment_length * i);
             }
         }
 
         _tailPoints[0] = tailRoot;
 
-        for (int i = 1; i < _tailPoints.Count; i++) {
+        for(int i = 1; i < _tailPoints.Count; i++) {
             Vector2 prevPoint = _tailPoints[i - 1];
             Vector2 currentPoint = _tailPoints[i];
 
@@ -133,10 +133,10 @@ internal partial class NightgauntNPC : ModNPC {
             _tailPoints[i] += direction.RotatedBy(MathHelper.PiOver2) * sway;
         }
 
-        while (_tailPoints.Count > tail_points) {
+        while(_tailPoints.Count > tail_points) {
             _tailPoints.RemoveAt(_tailPoints.Count - 1);
         }
-        while (_tailPoints.Count < tail_points) {
+        while(_tailPoints.Count < tail_points) {
             Vector2 lastPoint = _tailPoints[^1];
             Vector2 secondLastPoint = _tailPoints.Count > 1 ? _tailPoints[^2] : tailRoot;
             Vector2 extendDirection = (lastPoint - secondLastPoint).SafeNormalize(Vector2.Zero);

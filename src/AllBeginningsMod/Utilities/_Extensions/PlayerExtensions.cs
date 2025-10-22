@@ -9,6 +9,6 @@ internal static class PlayerExtensions {
         player.fullRotation = rotation;
         player.fullRotationOrigin = origin ?? player.fullRotationOrigin;
     }
-    
+
     public static bool FallThrough(this Player player) => player.GetModPlayer<CollisionPlayer>().FallThrough();
 }

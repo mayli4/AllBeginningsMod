@@ -21,7 +21,7 @@ internal unsafe sealed class ParticleSystem : ModSystem {
     }
 
     private const int bits_per_mask = sizeof(ulong) * 8;
-    
+
     private static ulong[] presenceMask = Array.Empty<ulong>();
     private static Data[] particles = Array.Empty<Data>();
 }

@@ -10,20 +10,20 @@ internal sealed class ProtectedAreaSystem : ModSystem {
     public static List<Rectangle> ProtectedRegions = new List<Rectangle>();
 
     public static bool IsProtected(int x, int y) {
-        if (Main.gameMenu || Main.dedServ)
+        if(Main.gameMenu || Main.dedServ)
             return false;
 
-        foreach (Rectangle region in ProtectedRegions) {
-            if (region.Contains(x, y))
+        foreach(Rectangle region in ProtectedRegions) {
+            if(region.Contains(x, y))
                 return true;
         }
         return false;
     }
     public static void AddProtectedRegion(Rectangle region) {
-        if (!ProtectedRegions.Contains(region))
+        if(!ProtectedRegions.Contains(region))
             ProtectedRegions.Add(region);
     }
-    
+
     public static void RemoveProtectedRegion(Rectangle region) {
         ProtectedRegions.Remove(region);
     }
@@ -37,7 +37,7 @@ internal sealed class ProtectedAreaSystem : ModSystem {
 
         int length = tag.GetInt("AllBeginnings_ProtectedRegionCount");
 
-        for (int k = 0; k < length; k++) {
+        for(int k = 0; k < length; k++) {
             ProtectedRegions.Add(new Rectangle
             (
                 tag.GetInt($"AllBeginnings_x{k}"),
@@ -52,7 +52,7 @@ internal sealed class ProtectedAreaSystem : ModSystem {
     public override void SaveWorldData(TagCompound tag) {
         tag["AllBeginnings_ProtectedRegionCount"] = ProtectedRegions.Count;
 
-        for (int k = 0; k < ProtectedRegions.Count; k++) {
+        for(int k = 0; k < ProtectedRegions.Count; k++) {
             Rectangle region = ProtectedRegions[k];
             tag.Add($"AllBeginnings_x{k}", region.X);
             tag.Add($"AllBeginnings_y{k}", region.Y);
@@ -64,7 +64,7 @@ internal sealed class ProtectedAreaSystem : ModSystem {
     public override void NetSend(BinaryWriter writer) {
         writer.Write(ProtectedRegions.Count);
 
-        for (int i = 0; i < ProtectedRegions.Count; i++) {
+        for(int i = 0; i < ProtectedRegions.Count; i++) {
             var region = ProtectedRegions[i];
             writer.Write(region.X);
             writer.Write(region.Y);
@@ -78,8 +78,9 @@ internal sealed class ProtectedAreaSystem : ModSystem {
 
         int numRegions = reader.ReadInt32();
 
-        for (int i = 0; i < numRegions; i++) {
-            ProtectedRegions.Add(new Rectangle {
+        for(int i = 0; i < numRegions; i++) {
+            ProtectedRegions.Add(new Rectangle
+            {
                 X = reader.ReadInt32(),
                 Y = reader.ReadInt32(),
                 Width = reader.ReadInt32(),
@@ -125,79 +126,79 @@ internal sealed class ProtectionGlobalItem : GlobalItem {
     }
 
     private bool DontPoundTile(On_WorldGen.orig_PoundTile orig, int x, int y) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return false;
         }
         return orig(x, y);
     }
 
     private bool DontPlaceWire(On_WorldGen.orig_PlaceWire orig, int x, int y) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return false;
         }
         return orig(x, y);
     }
     private bool DontPlaceWire2(On_WorldGen.orig_PlaceWire2 orig, int x, int y) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return false;
         }
         return orig(x, y);
     }
     private bool DontPlaceWire3(On_WorldGen.orig_PlaceWire3 orig, int x, int y) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return false;
         }
         return orig(x, y);
     }
     private bool DontPlaceWire4(On_WorldGen.orig_PlaceWire4 orig, int x, int y) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return false;
         }
         return orig(x, y);
     }
 
     private bool DontPlaceActuator(On_WorldGen.orig_PlaceActuator orig, int x, int y) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return false;
         }
         return orig(x, y);
     }
 
     private void DontPickWallInZone(On_Player.orig_PickWall orig, Player self, int x, int y, int damage) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return;
         }
         orig(self, x, y, damage);
     }
 
     private void DontPickInZone(On_Player.orig_PickTile orig, Player self, int x, int y, int pickPower) {
-        if (ProtectedAreaSystem.IsProtected(x, y)) {
+        if(ProtectedAreaSystem.IsProtected(x, y)) {
             return;
         }
         orig(self, x, y, pickPower);
     }
 
     private bool DontManuallyPlaceInZone(On_WorldGen.orig_PlaceTile orig, int i, int j, int type, bool mute, bool forced, int plr, int style) {
-        if (ProtectedAreaSystem.IsProtected(i, j)) {
+        if(ProtectedAreaSystem.IsProtected(i, j)) {
             return false;
         }
         return orig(i, j, type, mute, forced, plr, style);
     }
 
     private void DontExplodeAtRuntime(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem) {
-        if (ProtectedAreaSystem.IsProtected(i, j) && !WorldGen.generatingWorld) {
+        if(ProtectedAreaSystem.IsProtected(i, j) && !WorldGen.generatingWorld) {
             return;
         }
         orig(i, j, fail, effectOnly, noItem);
     }
 
     public override bool CanUseItem(Item item, Player player) {
-        if (player != Main.LocalPlayer)
+        if(player != Main.LocalPlayer)
             return base.CanUseItem(item, player);
 
-        if (item.createTile != -1 || item.createWall != -1 || _blacklist.Contains(item.type)) {
+        if(item.createTile != -1 || item.createWall != -1 || _blacklist.Contains(item.type)) {
             var targetPoint = Main.SmartCursorIsUsed ? new Point16(Main.SmartCursorX, Main.SmartCursorY) : new Point16(Player.tileTargetX, Player.tileTargetY);
-            if (ProtectedAreaSystem.IsProtected(targetPoint.X, targetPoint.Y)) {
+            if(ProtectedAreaSystem.IsProtected(targetPoint.X, targetPoint.Y)) {
                 return false;
             }
         }
@@ -208,7 +209,7 @@ internal sealed class ProtectionGlobalItem : GlobalItem {
 
 internal sealed class ProtectionGlobalTile : GlobalTile {
     public override bool CanExplode(int i, int j, int type) {
-        if (ProtectedAreaSystem.IsProtected(i, j)) {
+        if(ProtectedAreaSystem.IsProtected(i, j)) {
             return false;
         }
         return base.CanExplode(i, j, type);

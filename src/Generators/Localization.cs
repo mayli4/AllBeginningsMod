@@ -1,7 +1,8 @@
 using Generators.Utilities;
-
+using Hjson;
 using Microsoft.CodeAnalysis;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -11,10 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-
-using Hjson;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Generators;
 
@@ -26,7 +23,7 @@ internal sealed class LocalizationGenerator : IIncrementalGenerator {
     private static readonly Regex arg_remapping_regex = new(@"(?<={\^?)(\d+)(?=(?::[^\r\n]+?)?})", RegexOptions.Compiled);
 
     private static readonly string initial_file_header;
-    
+
     /// <summary>
     ///     A single localization key and its derived properties.
     /// </summary>
@@ -73,10 +70,12 @@ using System.Linq;
             .Collect();
 
         var categorizedLocalizationData = allLocalizationEntries
-            .SelectMany(static (entries, cancellationToken) => {
+            .SelectMany(static (entries, cancellationToken) =>
+            {
                 return entries
                     .Where(entry => entry.FullKey.StartsWith($"Mods.{mod_name}.", StringComparison.OrdinalIgnoreCase))
-                    .Select(entry => {
+                    .Select(entry =>
+                    {
                         string relativeToModKey = entry.FullKey.Substring($"Mods.{mod_name}.".Length);
                         string topLevelCategory = relativeToModKey.Split('.').FirstOrDefault();
                         return (topLevelCategory, entry);
@@ -89,14 +88,15 @@ using System.Linq;
 
         context.RegisterSourceOutput(
             categorizedLocalizationData,
-            (sourceContext, categoryGroup) => {
+            (sourceContext, categoryGroup) =>
+            {
                 sourceContext.CancellationToken.ThrowIfCancellationRequested();
 
                 var (topLevelCategory, categoryEntries) = categoryGroup;
 
                 var categoryRootNode = new Node(topLevelCategory, $"Mods.{mod_name}.{topLevelCategory}");
 
-                foreach (var entry in categoryEntries.OrderBy(e => e.FullKey)) {
+                foreach(var entry in categoryEntries.OrderBy(e => e.FullKey)) {
                     sourceContext.CancellationToken.ThrowIfCancellationRequested();
 
                     string relativeToCategoryKey = entry.FullKey.Substring($"Mods.{mod_name}.{topLevelCategory}.".Length);
@@ -105,17 +105,17 @@ using System.Linq;
 
                     string currentFullKeyPrefix = categoryRootNode.FullKeyPrefix;
 
-                    for (var i = 0; i < parts.Length; i++) {
+                    for(var i = 0; i < parts.Length; i++) {
                         var part = parts[i];
-                        if (string.IsNullOrEmpty(part)) continue;
+                        if(string.IsNullOrEmpty(part)) continue;
 
                         string nextFullKeySegment = string.IsNullOrWhiteSpace(currentFullKeyPrefix) ? part : $"{currentFullKeyPrefix}.{part}";
 
-                        if (i == parts.Length - 1) {
+                        if(i == parts.Length - 1) {
                             currentNode.Entries.Add(entry);
                         }
                         else {
-                            if (!currentNode.ChildNodes.TryGetValue(part, out var childNode)) {
+                            if(!currentNode.ChildNodes.TryGetValue(part, out var childNode)) {
                                 childNode = new Node(part, nextFullKeySegment);
                                 currentNode.ChildNodes.Add(part, childNode);
                             }
@@ -139,7 +139,7 @@ using System.Linq;
                 string fileName = $"_Localization.Keys.{topLevelCategory}.g.cs";
 
                 string emptyCategoryContent = $"{initial_file_header.Trim()}\n\npublic static partial class Keys {{\n\n}}\n";
-                if (categoryEntries.Length == 0 || string.IsNullOrWhiteSpace(sourceText) || sourceText.Trim().Equals(emptyCategoryContent.Trim(), StringComparison.OrdinalIgnoreCase)) {
+                if(categoryEntries.Length == 0 || string.IsNullOrWhiteSpace(sourceText) || sourceText.Trim().Equals(emptyCategoryContent.Trim(), StringComparison.OrdinalIgnoreCase)) {
                     sourceContext.ReportDiagnostic(Diagnostic.Create(
                         new DiagnosticDescriptor(
                             id: "LGEN201",
@@ -152,8 +152,7 @@ using System.Linq;
                         topLevelCategory,
                         mod_name));
                 }
-                else
-                {
+                else {
                     sourceContext.AddSource(fileName, sourceText);
                 }
             }
@@ -170,7 +169,7 @@ using System.Linq;
         writer.WriteLine("public static string GetTextValue(params object?[] values) => Language.GetTextValue(KEY, values);");
         writer.WriteLine();
 
-        foreach (var entry in node.Entries.OrderBy(e => e.Name)) {
+        foreach(var entry in node.Entries.OrderBy(e => e.Name)) {
             writer.BeginScope($"public static partial class {entry.Name}");
             writer.WriteLine($"public const string KEY = \"{entry.FullKey}\";");
             writer.WriteLine($"public const int ARG_COUNT = {entry.ArgCount};");
@@ -178,7 +177,7 @@ using System.Linq;
 
             writer.WriteLine("public static LocalizedText GetText() => Language.GetText(KEY);");
 
-            if (entry.ArgCount == 0) {
+            if(entry.ArgCount == 0) {
                 writer.WriteLine("public static string GetTextValue() => Language.GetTextValue(KEY);");
             }
             else {
@@ -190,20 +189,18 @@ using System.Linq;
             writer.EndScope();
         }
 
-        foreach (var child in node.ChildNodes.Values.OrderBy(n => n.Name))
-        {
+        foreach(var child in node.ChildNodes.Values.OrderBy(n => n.Name)) {
             GenerateClassForNode(writer, child, depth + 1);
         }
 
         writer.EndScope();
     }
 
-    private static IEnumerable<Entry> GetKeysFromFile(AdditionalText file, CancellationToken cancellationToken)
-    {
+    private static IEnumerable<Entry> GetKeysFromFile(AdditionalText file, CancellationToken cancellationToken) {
         var keys = new List<Entry>();
         var text = file.GetText(cancellationToken)?.ToString();
 
-        if (string.IsNullOrWhiteSpace(text)) {
+        if(string.IsNullOrWhiteSpace(text)) {
             return Enumerable.Empty<Entry>();
         }
 
@@ -211,19 +208,18 @@ using System.Linq;
             var json = HjsonValue.Parse(text).ToString();
             var jsonObject = JObject.Parse(json);
 
-            foreach (var token in jsonObject.SelectTokens("$..*")) {
+            foreach(var token in jsonObject.SelectTokens("$..*")) {
                 cancellationToken.ThrowIfCancellationRequested();
-                
-                if (token is JObject { Count: 0 } || token is JArray { Count: 0 } || token.HasValues) {
+
+                if(token is JObject { Count: 0 } || token is JArray { Count: 0 } || token.HasValues) {
                     continue;
                 }
 
                 var pathBuilder = new StringBuilder();
                 var parents = new Stack<string>();
                 var current = token;
-                while (current.Parent != null) {
-                    if (current.Parent is JProperty property)
-                    {
+                while(current.Parent != null) {
+                    if(current.Parent is JProperty property) {
                         parents.Push(property.Name);
                     }
                     current = current.Parent;
@@ -231,43 +227,40 @@ using System.Linq;
 
                 while(parents.Count > 0) {
                     string segment = parents.Pop();
-                    if (pathBuilder.Length > 0)
+                    if(pathBuilder.Length > 0)
                         pathBuilder.Append('.');
                     pathBuilder.Append(segment);
                 }
-                
-                var fullKey = pathBuilder.ToString();
-                string name = fullKey.Split('.').Last(); 
 
-                var value = token.Type switch {
+                var fullKey = pathBuilder.ToString();
+                string name = fullKey.Split('.').Last();
+
+                var value = token.Type switch
+                {
                     JTokenType.String => token.Value<string>() ?? "",
                     JTokenType.Integer => token.Value<long>().ToString(CultureInfo.InvariantCulture),
                     JTokenType.Boolean => token.Value<bool>().ToString(CultureInfo.InvariantCulture),
                     JTokenType.Float => token.Value<double>().ToString(CultureInfo.InvariantCulture),
                     _ => token.ToString(Formatting.None)
                 };
-                
+
                 int argCount = GetArgumentCount(value);
 
                 keys.Add(new Entry(fullKey, name, value, argCount));
             }
         }
-        catch (Exception)
-        {
-            
+        catch(Exception) {
+
         }
 
         return keys;
     }
-    private static int GetArgumentCount(string value)
-    {
+    private static int GetArgumentCount(string value) {
         var matches = arg_remapping_regex.Matches(value);
         var uniqueArgIndices = new HashSet<int>();
 
-        foreach (Match match in matches)
-        {
-            if (int.TryParse(match.Groups[1].Value, out int argIndex))
-            {
+        foreach(Match match in matches) {
+            if(int.TryParse(match.Groups[1].Value, out int argIndex)) {
                 uniqueArgIndices.Add(argIndex);
             }
         }

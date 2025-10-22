@@ -7,7 +7,7 @@ internal sealed class GrassyDirtWall : ModWall {
 
     public override void SetStaticDefaults() {
         Main.tileBlockLight[Type] = true;
-        
+
         AddMapEntry(Color.Brown);
     }
 }
@@ -20,7 +20,7 @@ internal sealed class GrassyDirtWallItem : ModItem {
         Item.width = 16;
         Item.height = 16;
         Item.value = 5;
-        
+
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTurn = true;
         Item.autoReuse = true;
@@ -34,7 +34,7 @@ internal sealed class SmoothStoneWall : ModWall {
 
     public override void SetStaticDefaults() {
         Main.tileBlockLight[Type] = true;
-        
+
         AddMapEntry(Color.Gray);
     }
 }
@@ -47,7 +47,7 @@ internal sealed class SmoothStoneWallItem : ModItem {
         Item.width = 16;
         Item.height = 16;
         Item.value = 5;
-        
+
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTurn = true;
         Item.autoReuse = true;
@@ -55,4 +55,3 @@ internal sealed class SmoothStoneWallItem : ModItem {
         Item.useTime = 10;
     }
 }
-

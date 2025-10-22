@@ -9,15 +9,16 @@ namespace Generators;
 public class ModImplGenerator : IIncrementalGenerator {
     void IIncrementalGenerator.Initialize(
         IncrementalGeneratorInitializationContext context) {
-        context.RegisterSourceOutput(context.AnalyzerConfigOptionsProvider, (x, options) => {
-                if(GeneratorUtils.GetRootNamespaceOrRaiseDiagnostic(x, options.GlobalOptions) is not { } rootNamespace)
-                    return;
+        context.RegisterSourceOutput(context.AnalyzerConfigOptionsProvider, (x, options) =>
+        {
+            if(GeneratorUtils.GetRootNamespaceOrRaiseDiagnostic(x, options.GlobalOptions) is not { } rootNamespace)
+                return;
 
-                x.AddSource(
-                    "_ModImpl.g.cs",
-                    SourceText.From(GenerateUsings(rootNamespace), Encoding.UTF8)
-                );
-            }
+            x.AddSource(
+                "_ModImpl.g.cs",
+                SourceText.From(GenerateUsings(rootNamespace), Encoding.UTF8)
+            );
+        }
         );
 
         string GenerateUsings(string rootNamespace) {

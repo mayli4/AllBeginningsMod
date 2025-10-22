@@ -8,17 +8,17 @@ namespace AllBeginningsMod.Content.Bosses;
 internal partial class NightgauntNPC {
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
         if(NPC.IsABestiaryIconDummy) return false;
-        
+
         DrawBody(ref _body, drawColor, SpriteEffects.None);
-        
+
         DrawHeadNeck(ref _headNeck, drawColor, SpriteEffects.FlipVertically);
-        
+
         DrawArm(ref _rightArm, true, drawColor, SpriteEffects.FlipHorizontally);
         DrawArm(ref _leftArm, false, drawColor, SpriteEffects.None);
-        
+
         DrawLeg(ref _rightLeg, true, drawColor, SpriteEffects.FlipHorizontally);
         DrawLeg(ref _leftLeg, false, drawColor, SpriteEffects.None);
-        
+
         Graphics.BeginPipeline(1.0f)
             .DrawBasicTrail(
             _tailPoints.ToArray(),
@@ -29,10 +29,10 @@ internal partial class NightgauntNPC {
             .Flush();
         return false;
     }
-    
-        static void DrawArm(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
+
+    static void DrawArm(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
         var armTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
-    
+
         Vector2 shoulder = limb.Skeleton.Position(0);
         Vector2 elbow = limb.Skeleton.Position(1);
         Vector2 wrist = limb.Skeleton.Position(2);
@@ -47,7 +47,7 @@ internal partial class NightgauntNPC {
             forearmDefaultFrame = new Rectangle(38, 94, 32, 62);
             handFrame = new Rectangle(38, 162, 32, 70);
         }
-        
+
         var currentHandFrame = limb.IsAnchored ? handAnchoredFrame : handFrame;
 
         var upperArmOrigin = new Vector2(14, 6);
@@ -57,7 +57,7 @@ internal partial class NightgauntNPC {
         if(limb.IsAnchored) {
             handOrigin = right ? new Vector2(16, 3) : new Vector2(24, 0);
         }
-    
+
         float rotationOffset = MathHelper.PiOver2;
 
         Main.spriteBatch.Draw(armTexture, shoulder - Main.screenPosition, upperArmFrame, drawColor, (shoulder - elbow).ToRotation() + rotationOffset, upperArmOrigin, 1f, effects, 0f);
@@ -67,7 +67,7 @@ internal partial class NightgauntNPC {
 
     static void DrawLeg(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
         var legTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
-    
+
         Vector2 hip = limb.Skeleton.Position(0);
         Vector2 knee = limb.Skeleton.Position(1);
         Vector2 ankle = limb.Skeleton.Position(2);
@@ -77,29 +77,29 @@ internal partial class NightgauntNPC {
         var calfFrame = new Rectangle(76, 76, 32, 70);
         var footFrame = new Rectangle(76, 152, 32, 70);
         var footAnchoredFrame = new Rectangle(76, 228, 32, 70);
-    
+
         var thighOrigin = new Vector2(13, 0);
         var calfOrigin = new Vector2(18, 10);
         var footOrigin = new Vector2(14, 0);
-        
+
         if(right) {
             thighFrame = new Rectangle(114, 0, 32, 70);
             calfFrame = new Rectangle(114, 76, 32, 70);
             footFrame = new Rectangle(114, 152, 32, 70);
-            
+
             calfOrigin = new Vector2(16, 10);
             footOrigin = new Vector2(24, 6);
         }
-    
+
         float rotationOffset = MathHelper.PiOver2;
-        
+
         var currentFootFrame = limb.IsAnchored ? footAnchoredFrame : footFrame;
 
         Main.spriteBatch.Draw(legTexture, hip - Main.screenPosition, thighFrame, drawColor, (hip - knee).ToRotation() + rotationOffset, thighOrigin, 1f, effects, 0f);
         Main.spriteBatch.Draw(legTexture, knee - Main.screenPosition, calfFrame, drawColor, (knee - ankle).ToRotation() + rotationOffset, calfOrigin, 1f, effects, 0f);
         Main.spriteBatch.Draw(legTexture, ankle - Main.screenPosition, currentFootFrame, drawColor, (ankle - toeTip).ToRotation() + rotationOffset, footOrigin, 1f, effects, 0f);
     }
-    
+
     static void DrawBody(ref NightgauntLimb body, Color drawColor, SpriteEffects effects) {
         var bodyTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
 
@@ -122,7 +122,7 @@ internal partial class NightgauntNPC {
         Main.spriteBatch.Draw(bodyTexture, midTorso - Main.screenPosition, segment2Frame, drawColor, (midTorso - hips).ToRotation() + rotationOffset, segment2Origin, 1f, effects, 0f);
         Main.spriteBatch.Draw(bodyTexture, hips - Main.screenPosition, segment3Frame, drawColor, (hips - tailEnd).ToRotation() + rotationOffset, segment3Origin, 1f, effects, 0f);
     }
-    
+
     static void DrawHeadNeck(ref NightgauntLimb headNeck, Color drawColor, SpriteEffects effects) {
         var headNeckTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
 
@@ -130,7 +130,7 @@ internal partial class NightgauntNPC {
         Vector2 midNeck = headNeck.Skeleton.Position(1);
         Vector2 headPivot = headNeck.Skeleton.Position(2);
         Vector2 headTip = headNeck.Skeleton.Position(3);
-        
+
         var neckBaseFrame = new Rectangle(276, 90, 34, 40);
         var midNeckFrame = new Rectangle(276, 52, 34, 32);
         var headFrame = new Rectangle(276, 0, 34, 46);

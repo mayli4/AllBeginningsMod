@@ -29,34 +29,34 @@ internal sealed class CopperUrn : BaseUrnTile {
 internal sealed class CopperUrnRich : BaseUrnTile {
     public override UrnType UrnType => UrnType.CopperRich;
     public override int Dust => DustID.Gold;
-    
+
     public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnRichTile;
 }
 
 internal sealed class StoneUrn : BaseUrnTile {
     public override UrnType UrnType => UrnType.Stone;
     public override int Dust => DustID.Stone;
-    
+
     public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_StoneUrnTile;
 }
 
 internal sealed class StoneUrnRich : BaseUrnTile {
     public override UrnType UrnType => UrnType.StoneRich;
     public override int Dust => DustID.Granite;
-    
+
     public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_GildedGraniteTile;
 }
 
 internal sealed class ClayUrn : BaseUrnTile {
     public override UrnType UrnType => UrnType.Clay;
     public override int Dust => DustID.Lead;
-    
+
     public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnTile;
 }
 
 internal sealed class ClayUrnRich : BaseUrnTile {
     public override UrnType UrnType => UrnType.ClayRich;
     public override int Dust => DustID.Stone;
-    
+
     public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_PorcelainUrnTile;
 }

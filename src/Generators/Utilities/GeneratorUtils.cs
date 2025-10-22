@@ -3,12 +3,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Generators.Utilities;
 
-public static class GeneratorUtils
-{
-    public static string GetRootNamespaceOrRaiseDiagnostic(SourceProductionContext ctx, AnalyzerConfigOptions options)
-    {
-        if (options.TryGetValue("build_property.rootnamespace", out string rootNamespace))
-        {
+public static class GeneratorUtils {
+    public static string GetRootNamespaceOrRaiseDiagnostic(SourceProductionContext ctx, AnalyzerConfigOptions options) {
+        if(options.TryGetValue("build_property.rootnamespace", out string rootNamespace)) {
             return rootNamespace;
         }
 

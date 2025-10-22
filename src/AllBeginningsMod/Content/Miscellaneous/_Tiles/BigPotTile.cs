@@ -15,7 +15,7 @@ public class BigPotTile : ModTile {
         Main.tileSolid[Type] = true;
 
         DustType = DustID.Stone;
-        
+
         AddMapEntry(new Color(73, 89, 97));
     }
 }
@@ -28,7 +28,7 @@ public class BigPotItem : ModItem {
         Item.width = 16;
         Item.height = 16;
         Item.value = 5;
-        
+
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTurn = true;
         Item.autoReuse = true;

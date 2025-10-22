@@ -14,7 +14,7 @@ public class AccentedRedDynastyShinglesTile : ModTile {
         Main.tileSolid[Type] = true;
 
         DustType = DustID.DynastyShingle_Red;
-        
+
         AddMapEntry(new Color(149, 69, 68));
     }
 }
@@ -27,7 +27,7 @@ public class AccentedRedDynastyShinglesItem : ModItem {
         Item.width = 16;
         Item.height = 16;
         Item.value = 5;
-        
+
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTurn = true;
         Item.autoReuse = true;

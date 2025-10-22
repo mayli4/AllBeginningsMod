@@ -16,13 +16,13 @@ internal abstract class UIComponent {
             return element;
         }
     }
-    
+
     protected abstract void OnAttach(UIElement element);
 
     protected abstract void OnDetach(UIElement element);
 
     public void AttachTo(UIElement element) {
-        if (_parent != null) {
+        if(_parent != null) {
             throw new InvalidOperationException("UI component already attached to an element.");
         }
 
@@ -32,11 +32,11 @@ internal abstract class UIComponent {
     }
 
     public void DetachFrom(UIElement element) {
-        if (_parent == null) {
+        if(_parent == null) {
             throw new InvalidOperationException("UI component not attached to an element.");
         }
 
-        if (element != Parent) {
+        if(element != Parent) {
             throw new InvalidOperationException("Attempted to detach a UI component from an element it is not attached to.");
         }
 

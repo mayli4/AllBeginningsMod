@@ -5,11 +5,11 @@ namespace AllBeginningsMod.Common;
 
 internal sealed class TileSwaying : ModSystem {
     public double TreeWindCounter { get; private set; }
-    
+
     public static TileSwaying Instance;
-    
+
     public static event Action PreUpdateWind;
-    
+
     public override void Load() {
         Instance = this;
         On_TileDrawing.Update += On_TileDrawingOnUpdate;
@@ -18,13 +18,13 @@ internal sealed class TileSwaying : ModSystem {
     public override void Unload() {
         On_TileDrawing.Update -= On_TileDrawingOnUpdate;
     }
-    
+
     private void On_TileDrawingOnUpdate(On_TileDrawing.orig_Update orig, TileDrawing self) {
         orig(self);
-        
-        if (Main.dedServ)
+
+        if(Main.dedServ)
             return;
-        
+
         PreUpdateWind?.Invoke();
 
         double num = Math.Abs(Main.WindForVisuals);

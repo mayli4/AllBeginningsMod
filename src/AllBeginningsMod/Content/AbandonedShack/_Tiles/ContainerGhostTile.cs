@@ -9,7 +9,7 @@ internal sealed class ContainerGhostTile : ModTile {
         Main.tileMergeDirt[Type] = false;
         Main.tileBlockLight[Type] = true;
         Main.tileSolid[Type] = true;
-        
+
         AddMapEntry(Color.Red);
     }
 }
@@ -19,7 +19,7 @@ internal sealed class ContainerGhostWall : ModWall {
 
     public override void SetStaticDefaults() {
         Main.tileLighted[Type] = true;
-        
+
         AddMapEntry(Color.DarkRed);
     }
 

@@ -25,12 +25,12 @@ public sealed class CustomTileRendering : ILoadable {
         ResetSpecialPointsCache(_nonSolidSpecialPoints);
 
         CommonHooks.DrawThingsBehindNonSolidSolidTilesEvent += DrawBehindNonSolidTiles;
-        CommonHooks.DrawDustsEvent += DrawThingsAbovePlayersEvent; 
+        CommonHooks.DrawDustsEvent += DrawThingsAbovePlayersEvent;
         CommonHooks.ClearTileDrawingCachesEvent += ClearTiles;
     }
 
     private void DrawThingsAbovePlayersEvent() {
-        if (LayerEmpty(TileDrawLayer.Foreground))
+        if(LayerEmpty(TileDrawLayer.Foreground))
             return;
 
         Main.spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
@@ -40,25 +40,22 @@ public sealed class CustomTileRendering : ILoadable {
 
     public void Unload() { }
 
-    private void DrawBehindNonSolidTiles()
-    {
-        if (LayerEmpty(TileDrawLayer.Background))
+    private void DrawBehindNonSolidTiles() {
+        if(LayerEmpty(TileDrawLayer.Background))
             return;
         DrawCachedPoints(TileDrawLayer.Background);
     }
 
-    private void DrawBehindSolidTiles()
-    {
-        if (LayerEmpty(TileDrawLayer.BehindTiles))
+    private void DrawBehindSolidTiles() {
+        if(LayerEmpty(TileDrawLayer.BehindTiles))
             return;
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.Default, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         DrawCachedPoints(TileDrawLayer.BehindTiles);
         Main.spriteBatch.End();
     }
 
-    private void DrawAboveSolidTiles()
-    {
-        if (LayerEmpty(TileDrawLayer.AboveTiles))
+    private void DrawAboveSolidTiles() {
+        if(LayerEmpty(TileDrawLayer.AboveTiles))
             return;
 
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
@@ -66,24 +63,21 @@ public sealed class CustomTileRendering : ILoadable {
         Main.spriteBatch.End();
     }
 
-    private void DrawPostDrawTiles()
-    {
-        if (LayerEmpty(TileDrawLayer.PostDrawTiles))
+    private void DrawPostDrawTiles() {
+        if(LayerEmpty(TileDrawLayer.PostDrawTiles))
             return;
         DrawCachedPoints(TileDrawLayer.PostDrawTiles);
     }
 
-    public static void AddSpecialDrawingPoint(int x, int y, TileDrawLayer layer, bool nonSolid = false)
-    {
-        if (nonSolid)
+    public static void AddSpecialDrawingPoint(int x, int y, TileDrawLayer layer, bool nonSolid = false) {
+        if(nonSolid)
             _nonSolidSpecialPoints[layer].Add(new Point16(x, y));
         else
             _solidSpecialPoints[layer].Add(new Point16(x, y));
     }
 
-    public static void ClearTiles(bool solidLayer)
-    {
-        if (solidLayer)
+    public static void ClearTiles(bool solidLayer) {
+        if(solidLayer)
             ResetSpecialPointsCache(_solidSpecialPoints);
         else
             ResetSpecialPointsCache(_nonSolidSpecialPoints);
@@ -91,25 +85,21 @@ public sealed class CustomTileRendering : ILoadable {
 
     public static bool LayerEmpty(TileDrawLayer layer) => _nonSolidSpecialPoints[layer].Count + _solidSpecialPoints[layer].Count == 0;
 
-    public static void DrawCachedPoints(TileDrawLayer layer)
-    {
+    public static void DrawCachedPoints(TileDrawLayer layer) {
         DrawCachedPoints(layer, _nonSolidSpecialPoints);
         DrawCachedPoints(layer, _solidSpecialPoints);
     }
 
-    public static void DrawCachedPoints(TileDrawLayer layer, Dictionary<TileDrawLayer, List<Point16>> dict)
-    {
-        for (int i = 0; i < dict[layer].Count; i++)
-        {
+    public static void DrawCachedPoints(TileDrawLayer layer, Dictionary<TileDrawLayer, List<Point16>> dict) {
+        for(int i = 0; i < dict[layer].Count; i++) {
             Point16 tilePos = dict[layer][i];
             ushort type = Main.tile[tilePos].TileType;
-            if (TileLoader.GetTile(type) is ICustomLayerTile tile)
+            if(TileLoader.GetTile(type) is ICustomLayerTile tile)
                 tile.DrawSpecialLayer(dict[layer][i].X, dict[layer][i].Y, layer, Main.spriteBatch);
         }
     }
 
-    public static void ResetSpecialPointsCache(Dictionary<TileDrawLayer, List<Point16>> dict)
-    {
+    public static void ResetSpecialPointsCache(Dictionary<TileDrawLayer, List<Point16>> dict) {
         dict.Clear();
         dict.Add(TileDrawLayer.Background, new List<Point16>());
         dict.Add(TileDrawLayer.BehindTiles, new List<Point16>());

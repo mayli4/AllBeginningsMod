@@ -397,7 +397,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
 
         GrabbityGunItemHeldProjectile heldGun = heldGunVisualProjectile?.ModProjectile as GrabbityGunItemHeldProjectile;
         heldGun?.TriggerShake();
-        CameraSystem.AddModifier(Modifiers.SmallShake with { ShakeIntensity = 5f, Duration = 5f});
+        CameraSystem.AddModifier(Modifiers.SmallShake with { ShakeIntensity = 5f, Duration = 5f });
 
         Projectile.ai[2] = 60;
     }
@@ -528,11 +528,11 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
     public bool IsLaunched { get; set; }
     public int LauncherProjectileIdentity { get; set; }
     public int LaunchDamage { get; set; }
-    
+
     public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter) {
         bitWriter.WriteBit(IsGrabbed);
         bitWriter.WriteBit(IsLaunched);
-        if (IsLaunched) {
+        if(IsLaunched) {
             binaryWriter.Write(LauncherProjectileIdentity);
             binaryWriter.Write(LaunchDamage);
         }
@@ -541,7 +541,7 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
     public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader) {
         IsGrabbed = bitReader.ReadBit();
         IsLaunched = bitReader.ReadBit();
-        if (IsLaunched) {
+        if(IsLaunched) {
             LauncherProjectileIdentity = binaryReader.ReadInt32();
             LaunchDamage = binaryReader.ReadInt32();
         }
@@ -566,7 +566,7 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
             IsLaunched = false;
             LauncherProjectileIdentity = -1;
             LaunchDamage = 0;
-            if (wasLaunched) {
+            if(wasLaunched) {
                 npc.netUpdate = true;
             }
         }
@@ -619,7 +619,7 @@ internal sealed class GrabbityGunGlobalNPC : GlobalNPC {
                     IsLaunched = false;
                     LauncherProjectileIdentity = -1;
                     LaunchDamage = 0;
-                    if (wasLaunched) {
+                    if(wasLaunched) {
                         npc.netUpdate = true;
                     }
                 }

@@ -17,8 +17,8 @@ internal class JungleBushes : GenPass {
     }
 
     private static bool Valid(int x) {
-        for (int y = (int)(Main.worldSurface * 0.35f); y < Main.rockLayer; y++) {
-            if (Main.tile[x, y].HasTile && Main.tile[x, y].TileType == TileID.JungleGrass)
+        for(int y = (int)(Main.worldSurface * 0.35f); y < Main.rockLayer; y++) {
+            if(Main.tile[x, y].HasTile && Main.tile[x, y].TileType == TileID.JungleGrass)
                 return true;
         }
         return false;
@@ -26,60 +26,60 @@ internal class JungleBushes : GenPass {
 
     public override void ApplyPass(GenerationProgress progress, GameConfiguration configuration) {
         progress.Set(0f);
-        
+
         var genNoise = new FastNoiseLite();
         genNoise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
         genNoise.SetSeed(WorldGen.genRand.Next());
 
-        for (int k = 60; k < Main.maxTilesX - 60; k++) {
+        for(int k = 60; k < Main.maxTilesX - 60; k++) {
             progress.Value = (float)(k - 60) / (Main.maxTilesX - 120);
 
-            if (WorldGen.genRand.NextBool(10) && Valid(k)) {
+            if(WorldGen.genRand.NextBool(10) && Valid(k)) {
                 int size = WorldGen.genRand.Next(6, 12);
 
-                for (int xOffsetWithinBush = 0; xOffsetWithinBush < size; xOffsetWithinBush++) {
+                for(int xOffsetWithinBush = 0; xOffsetWithinBush < size; xOffsetWithinBush++) {
                     int currentColumnX = k + xOffsetWithinBush;
 
                     int currentSurfaceY = -1;
-                    for (int j = (int)(Main.worldSurface * 0.35f); j < Main.rockLayer; j++) {
-                        if (ValidTileForBushGround(Main.tile[currentColumnX, j])) {
+                    for(int j = (int)(Main.worldSurface * 0.35f); j < Main.rockLayer; j++) {
+                        if(ValidTileForBushGround(Main.tile[currentColumnX, j])) {
                             currentSurfaceY = j;
                             break;
                         }
                     }
 
-                    if (currentSurfaceY == -1) {
+                    if(currentSurfaceY == -1) {
                         continue;
                     }
 
                     int xOff = xOffsetWithinBush > size / 2 ? size - xOffsetWithinBush : xOffsetWithinBush;
-                    
+
                     float noisePre = genNoise.GetNoise(k * 10, currentColumnX * 10);
                     int noise = (int)(noisePre * 15);
 
                     int topYOfBushSegment = currentSurfaceY - Math.Min(xOff / 2 + noise + 5, 9);
-                    
+
                     int bushBottomY = topYOfBushSegment;
                     int maxDepthBelowSurface = 20;
 
-                    for (int ySim = topYOfBushSegment; ; ySim++) {
-                        if (ySim - topYOfBushSegment > maxDepthBelowSurface) {
+                    for(int ySim = topYOfBushSegment; ; ySim++) {
+                        if(ySim - topYOfBushSegment > maxDepthBelowSurface) {
                             break;
                         }
-                        if (!WorldGen.InWorld(currentColumnX, ySim + 1) || (Main.tile[currentColumnX, ySim + 1].WallType != 0 && Main.tile[currentColumnX, ySim + 1].WallType != WallID.Jungle)) {
+                        if(!WorldGen.InWorld(currentColumnX, ySim + 1) || (Main.tile[currentColumnX, ySim + 1].WallType != 0 && Main.tile[currentColumnX, ySim + 1].WallType != WallID.Jungle)) {
                             bushBottomY = ySim;
-                            break; 
+                            break;
                         }
                         bushBottomY = ySim;
                     }
 
-                    if (bushBottomY < topYOfBushSegment) {
+                    if(bushBottomY < topYOfBushSegment) {
                         continue;
                     }
 
                     int actualBushHeight = bushBottomY - topYOfBushSegment + 1;
 
-                    if (actualBushHeight > 0) {
+                    if(actualBushHeight > 0) {
                         WorldUtils.Gen(
                             new Point(currentColumnX, topYOfBushSegment),
                             new Shapes.Rectangle(1, actualBushHeight),

@@ -23,16 +23,16 @@ internal static class LightingBuffer {
         int indexCount = tileArea.Width * tileArea.Height * 6;
         _primitiveCount = indexCount / 3;
 
-        if (_vertices == null || _vertices.Length < _vertexCount)
+        if(_vertices == null || _vertices.Length < _vertexCount)
             _vertices = new VertexPositionColorTexture[_vertexCount];
 
         bool sizeChanged = meshWidth != _lastMeshWidth || meshHeight != _lastMeshHeight;
-        if (sizeChanged && (_indices == null || _indices.Length < indexCount))
+        if(sizeChanged && (_indices == null || _indices.Length < indexCount))
             _indices = new short[indexCount];
 
         PopulateVertices(tileArea, meshWidth);
 
-        if (sizeChanged) {
+        if(sizeChanged) {
             PopulateIndices(tileArea.Width, tileArea.Height, meshWidth);
             _lastMeshWidth = meshWidth;
             _lastMeshHeight = meshHeight;
@@ -45,8 +45,8 @@ internal static class LightingBuffer {
         int horizontalSamples = tileArea.Width / 2 + 1;
         int verticalSamples = tileArea.Height / 2 + 1;
 
-        for (int j = 0; j < verticalSamples; j++) {
-            for (int i = 0; i < horizontalSamples; i++) {
+        for(int j = 0; j < verticalSamples; j++) {
+            for(int i = 0; i < horizontalSamples; i++) {
                 Lighting.GetCornerColors(tileArea.X + i * 2, tileArea.Y + j * 2, out var colors);
 
                 bool isRightEdge = i * 2 == tileArea.Width;
@@ -54,7 +54,7 @@ internal static class LightingBuffer {
 
                 int x = i * 2;
                 int y = j * 2;
-                
+
                 float u = x / (float)tileArea.Width;
                 float v = y / (float)tileArea.Height;
 
@@ -64,7 +64,7 @@ internal static class LightingBuffer {
                     new Vector2(u, v)
                 );
 
-                if (!isRightEdge) {
+                if(!isRightEdge) {
                     _vertices[y * meshWidth + x + 1] = new VertexPositionColorTexture(
                         new Vector3((tileArea.X + x + 1) * 16f, (tileArea.Y + y) * 16f, 0f),
                         colors.TopRightColor,
@@ -72,7 +72,7 @@ internal static class LightingBuffer {
                     );
                 }
 
-                if (!isBottomEdge) {
+                if(!isBottomEdge) {
                     _vertices[(y + 1) * meshWidth + x] = new VertexPositionColorTexture(
                         new Vector3((tileArea.X + x) * 16f, (tileArea.Y + y + 1) * 16f, 0f),
                         colors.BottomLeftColor,
@@ -80,7 +80,7 @@ internal static class LightingBuffer {
                     );
                 }
 
-                if (!isRightEdge && !isBottomEdge) {
+                if(!isRightEdge && !isBottomEdge) {
                     _vertices[(y + 1) * meshWidth + x + 1] = new VertexPositionColorTexture(
                         new Vector3((tileArea.X + x + 1) * 16f, (tileArea.Y + y + 1) * 16f, 0f),
                         colors.BottomRightColor,
@@ -93,8 +93,8 @@ internal static class LightingBuffer {
 
     private static void PopulateIndices(int width, int height, int meshWidth) {
         int counter = 0;
-        for (int j = 0; j < height; j++) {
-            for (int i = 0; i < width; i++) {
+        for(int j = 0; j < height; j++) {
+            for(int i = 0; i < width; i++) {
                 short v1 = (short)(i + j * meshWidth);
                 short v2 = (short)(i + 1 + j * meshWidth);
                 short v3 = (short)(i + (j + 1) * meshWidth);
@@ -109,7 +109,7 @@ internal static class LightingBuffer {
             }
         }
     }
-    
+
     internal struct LightMesh {
         private readonly Effect _effect;
         private readonly Matrix _matrix;
@@ -120,13 +120,13 @@ internal static class LightingBuffer {
             _matrix = Matrix.Identity;
             _color = Color.White;
         }
-        
+
         private LightMesh(Effect effect, Matrix matrix, Color color) {
             _effect = effect;
             _matrix = matrix;
             _color = color;
         }
-        
+
         public LightMesh WithEffect(Effect effect) {
             return new LightMesh(effect, _matrix, _color);
         }
@@ -136,13 +136,13 @@ internal static class LightingBuffer {
         }
 
         public void Draw(Texture2D texture) {
-            if (_vertices == null || _indices == null)
+            if(_vertices == null || _indices == null)
                 return;
 
             var gd = Main.instance.GraphicsDevice;
 
             var shader = Shaders.Fragment.LightMesh.Value;
-            
+
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
             Matrix view = Main.GameViewMatrix.TransformationMatrix;
             Matrix renderMatrix = Matrix.CreateTranslation(-Main.screenPosition.Vec3()) * view * projection;
@@ -150,11 +150,11 @@ internal static class LightingBuffer {
             shader.Parameters["uWorldViewProjection"]?.SetValue(renderMatrix);
             shader.Parameters["layer1Texture"]?.SetValue(texture);
             shader.Parameters["tintColor"]?.SetValue(_color.ToVector4());
-            
-            gd.BlendState = BlendState.AlphaBlend; 
+
+            gd.BlendState = BlendState.AlphaBlend;
             gd.SamplerStates[0] = SamplerState.PointClamp;
 
-            foreach (EffectPass pass in shader.CurrentTechnique.Passes) {
+            foreach(EffectPass pass in shader.CurrentTechnique.Passes) {
                 pass.Apply();
                 gd.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,

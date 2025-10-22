@@ -35,7 +35,7 @@ public class Graphics : ModSystem {
     public readonly List<BeginData> BeginDatas = [];
     public readonly List<EffectData> EffectDatas = [];
     public readonly List<Vector2> PositionDatas = [];
-    
+
     public readonly List<VertexPositionColorTexture> VertexPositionColorTextureDatas = [];
     public readonly List<short> IndexDatas = [];
     public readonly List<DrawTexturedIndexedMeshData> TexturedIndexedMeshDatas = [];
@@ -364,7 +364,7 @@ public class Graphics : ModSystem {
                 );
             }
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void RunDrawTexturedIndexedMesh(int index) {
             var meshData = graphics.TexturedIndexedMeshDatas[index];
@@ -377,7 +377,7 @@ public class Graphics : ModSystem {
             var effectData = graphics.EffectDatas[meshData.EffectDataIndex];
             SetEffectParams(effectData);
 
-            foreach (var pass in effectData.Effect.CurrentTechnique.Passes) {
+            foreach(var pass in effectData.Effect.CurrentTechnique.Passes) {
                 pass.Apply();
                 GraphicsDevice.DrawUserIndexedPrimitives(
                     primitiveType: meshData.PrimitiveType,

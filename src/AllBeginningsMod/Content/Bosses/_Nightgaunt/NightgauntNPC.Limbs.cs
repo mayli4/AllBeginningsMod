@@ -10,40 +10,40 @@ internal partial class NightgauntNPC {
         public Vector2 EndPosition = Vector2.Zero;
         public bool IsAnchored = anchored;
     }
-    
+
     private NightgauntLimb _body;
     private NightgauntLimb _rightArm;
     private NightgauntLimb _leftArm;
     private NightgauntLimb _rightLeg;
     private NightgauntLimb _leftLeg;
-    
+
     private NightgauntLimb _headNeck;
 
-// The point on the body IK chain where the neck roots
+    // The point on the body IK chain where the neck roots
     private const int NeckRootBodySegmentIndex = 0; // Typically the very first segment (closest to NPC.Center)
 
-// NEW: Offset for the neck's attachment point relative to NeckRootBodySegmentIndex
+    // NEW: Offset for the neck's attachment point relative to NeckRootBodySegmentIndex
     readonly static Vector2 NeckAttachmentOffset = new(0, -10);
 
     public static Vector2 ShoulderOffset;
-    
+
     public Vector2 RightShoulderPosition {
         get {
             var shoulderSegmentUp = (_body.Skeleton.Position(1) - _body.Skeleton.Position(0)).SafeNormalize(Vector2.UnitY);
             var shoulderSegmentRight = shoulderSegmentUp.RotatedBy(MathHelper.PiOver2);
 
-            return _body.Skeleton.Position(0) 
+            return _body.Skeleton.Position(0)
                    + shoulderSegmentRight * ShoulderOffset.X
                    - shoulderSegmentUp * ShoulderOffset.Y;
         }
     }
-    
+
     public Vector2 LeftShoulderPosition {
         get {
             var shoulderSegmentUp = (_body.Skeleton.Position(1) - _body.Skeleton.Position(0)).SafeNormalize(Vector2.UnitY);
             var shoulderSegmentRight = shoulderSegmentUp.RotatedBy(MathHelper.PiOver2);
 
-            return _body.Skeleton.Position(0) 
+            return _body.Skeleton.Position(0)
                    - shoulderSegmentRight * ShoulderOffset.X
                    - shoulderSegmentUp * ShoulderOffset.Y;
         }
@@ -55,7 +55,7 @@ internal partial class NightgauntNPC {
             var hipSegmentUp = (_body.Skeleton.Position(2) - _body.Skeleton.Position(1)).SafeNormalize(Vector2.UnitY);
             var hipSegmentRight = hipSegmentUp.RotatedBy(MathHelper.PiOver2);
 
-            return _body.Skeleton.Position(2) 
+            return _body.Skeleton.Position(2)
                    + hipSegmentRight * LegOffset.X
                    - hipSegmentUp * LegOffset.Y;
         }
@@ -66,7 +66,7 @@ internal partial class NightgauntNPC {
             var hipSegmentUp = (_body.Skeleton.Position(2) - _body.Skeleton.Position(1)).SafeNormalize(Vector2.UnitY);
             var hipSegmentRight = hipSegmentUp.RotatedBy(MathHelper.PiOver2);
 
-            return _body.Skeleton.Position(2) 
+            return _body.Skeleton.Position(2)
                    - hipSegmentRight * LegOffset.X
                    - hipSegmentUp * LegOffset.Y;
         }
@@ -74,7 +74,7 @@ internal partial class NightgauntNPC {
 
     private IKSkeleton _bodySkeleton;
     private Vector2 _bodyTargetPosition;
-    
+
     Vector2 _rightArmTargetPosition;
     Vector2 _rightArmEndPosition;
     bool _rightArmAnchored;
@@ -82,7 +82,7 @@ internal partial class NightgauntNPC {
     Vector2 _leftArmTargetPosition;
     Vector2 _leftArmEndPosition;
     bool _leftArmAnchored;
-    
+
     Vector2 _rightLegTargetPosition;
     Vector2 _rightLegEndPosition;
     bool _rightLegAnchored;
@@ -93,10 +93,10 @@ internal partial class NightgauntNPC {
 
     int _handSwapTimer;
     bool _rightHandSwap;
-    
+
     int _legSwapTimer;
     bool _rightLegSwap;
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void UpdateLimbState(ref NightgauntLimb nightgauntLimb, Vector2 basePos, float lerpSpeed, float anchorThreshold) {
         nightgauntLimb.EndPosition = Vector2.Lerp(nightgauntLimb.EndPosition, nightgauntLimb.TargetPosition, lerpSpeed);
@@ -125,7 +125,7 @@ internal partial class NightgauntNPC {
             (forearmLength, leftElbowConstraints),
             (handLength, wristConstraints)
         ));
-        
+
         float thighLength = 68f;
         float calfLength = 58f;
         float footLength = 15f;
@@ -140,13 +140,13 @@ internal partial class NightgauntNPC {
             (calfLength, rightKneeConstraints),
             (footLength, ankleConstraints)
         ));
-        
+
         _leftLeg = new NightgauntLimb(new IKSkeleton(
             (thighLength, hipConstraints),
             (calfLength, leftKneeConstraints),
             (footLength, ankleConstraints)
         ));
-        
+
         float torsoLength = 40f;
         float assLength = 30f;
 
@@ -155,12 +155,12 @@ internal partial class NightgauntNPC {
             (torsoLength, new() { }),
             (assLength, new() { })
         ));
-        
+
         float neckBaseLength = 30f;
         float midNeckLength = 20f;
         float headLength = 60f;
 
-        var neckBaseConstraints = new IKSkeleton.Constraints() {  };
+        var neckBaseConstraints = new IKSkeleton.Constraints() { };
 
         var midNeckConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.PiOver2 * 0.9f, MaxAngle = MathHelper.PiOver2 * 0.9f };
         var headJointConstraints = new IKSkeleton.Constraints() { MinAngle = -MathHelper.PiOver4, MaxAngle = MathHelper.PiOver4 };

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace AllBeginningsMod.Common.Graphics;
+
 public struct Commands() {
     public List<CommandType> Types = [];
     public List<int> Datas = [];

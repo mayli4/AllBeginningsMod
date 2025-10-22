@@ -11,21 +11,18 @@ internal class CollisionPlayer : ModPlayer {
 
     /// <summary> Should be checked continuously while the player is intersecting with custom platform. See <see cref="fallThrough"/>. </summary>
     /// <returns> Whether the player is falling through. </returns>
-    public bool FallThrough()
-    {
+    public bool FallThrough() {
         _noReset = true;
         return fallThrough || Player.grapCount > 0;
     }
 
-    public override void ResetEffects()
-    {
-        if (!_noReset)
+    public override void ResetEffects() {
+        if(!_noReset)
             fallThrough = false;
 
         _noReset = false;
 
-        if (rotation == 0 && _wasRotated)
-        {
+        if(rotation == 0 && _wasRotated) {
             Player.fullRotation = 0;
             Player.fullRotationOrigin = default;
         }

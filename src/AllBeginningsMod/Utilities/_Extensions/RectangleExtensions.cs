@@ -36,7 +36,7 @@ public static class RectangleExtensions {
         int sourceHeight = texture.Height / Main.projFrames[projectile.type];
         return new Rectangle(0, projectile.frame * sourceHeight, texture.Width, sourceHeight);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rectangle ToWorldCoordinates(this Rectangle rect) {
         return new Rectangle(
