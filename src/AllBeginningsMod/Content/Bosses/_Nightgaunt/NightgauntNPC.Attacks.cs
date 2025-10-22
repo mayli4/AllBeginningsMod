@@ -30,6 +30,7 @@ internal partial class NightgauntNPC {
         _body.TargetPosition = neutralBodyTarget + swayOffset;
     
         UpdateLimbState(ref _body, bodyBasePosition, 0.1f, 5f);
+        NPC.Center = _body.Skeleton.Position(0);
     
         float legTimerDecrement = 1f + Math.Abs(turnAmount) * 5;
 

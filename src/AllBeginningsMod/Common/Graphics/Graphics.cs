@@ -399,7 +399,7 @@ public class Graphics : ModSystem {
             Effect effect
         ) {
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            GraphicsDevice.RasterizerState = Main.Rasterizer;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             unsafe {
                 float* ptr = (float*)graphics.SpriteMatrix;

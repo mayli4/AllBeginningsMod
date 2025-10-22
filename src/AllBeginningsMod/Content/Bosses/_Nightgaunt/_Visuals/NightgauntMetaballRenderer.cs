@@ -81,8 +81,8 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
                 newBall.Radius = initialRadius;
                 newBall.Velocity = Vector2.Zero;
                 newBall.InitialRadius = initialRadius;
-                newBall.MaxTime = maxTime;
-                newBall.TimeLeft = maxTime;
+                newBall.MaxTime = 5;
+                newBall.TimeLeft = 5;
 
                 _activeMetaballCount++;
             }
@@ -91,7 +91,7 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         var balls = _metaballs.AsSpan(0, _activeMetaballCount);
 
         for (int i = balls.Length - 1; i >= 0; i--) {
-            ref Metaball ball = ref balls[i];
+            ref var ball = ref balls[i];
 
             ball.TimeLeft -= dt;
 
@@ -148,7 +148,7 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         
         effect.Parameters["metaballData"].SetValue(_metaballData);
         effect.Parameters["metaballCount"].SetValue(_activeMetaballCount);
-        effect.Parameters["smoothness"].SetValue(50f); 
+        effect.Parameters["smoothness"].SetValue(540f); 
         effect.Parameters["screenPos"].SetValue(correctScreenTopLeft);
         effect.Parameters["worldViewDimensions"].SetValue(worldViewDimensions);
 
@@ -157,6 +157,9 @@ internal unsafe sealed class NightgauntMetaballRenderer : ModSystem {
         
         gd.SetRenderTargets(rts);
         
-        Graphics.BeginPipeline(0.5f).DrawSprite(_screenBuffer, Vector2.Zero, Color.Red).Flush();
+        Graphics.BeginPipeline(0.5f)
+            .DrawSprite(_screenBuffer, Vector2.Zero, Color.Black)
+            .ApplyOutline(Color.White)
+            .Flush();
     }
 }

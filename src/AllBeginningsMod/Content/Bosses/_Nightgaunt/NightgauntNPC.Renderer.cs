@@ -1,4 +1,6 @@
-﻿using AllBeginningsMod.Utilities;
+﻿using AllBeginningsMod.Common.Graphics;
+using AllBeginningsMod.Utilities;
+using System;
 using Terraria.GameContent;
 
 namespace AllBeginningsMod.Content.Bosses;
@@ -107,6 +109,15 @@ internal partial class NightgauntNPC {
         
         DrawLeg(ref _rightLeg, true, drawColor, SpriteEffects.FlipHorizontally);
         DrawLeg(ref _leftLeg, false, drawColor, SpriteEffects.None);
+        
+        Graphics.BeginPipeline(1.0f)
+            .DrawBasicTrail(
+            _tailPoints.ToArray(),
+            t => 18,
+            Textures.NPCs.Bosses.Nightgaunt.NightgauntTail.Value,
+            drawColor
+            )
+            .Flush();
 
 #if DEBUG
         

@@ -50,6 +50,7 @@ Mods: {
 			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
 			VerletGrappleHook.DisplayName: Verlet Grapple Hook
 			DanglingRopeProjectile.DisplayName: Dangling Rope Projectile
+			NightgauntSwordPortal.DisplayName: Nightgaunt Sword Portal
 		}
 
 		NPCs: {

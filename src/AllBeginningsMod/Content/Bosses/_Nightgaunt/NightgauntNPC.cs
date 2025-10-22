@@ -1,6 +1,7 @@
 using AllBeginningsMod.Common;
 using AllBeginningsMod.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Terraria.DataStructures;
@@ -36,6 +37,11 @@ internal partial class NightgauntNPC : ModNPC {
             NPC.netUpdate = true;
         }
     }
+    private List<Vector2> _tailPoints = new();
+    private const int tail_points = 20;
+    private const float tail_segment_length = 10f;
+
+    private readonly static Vector2 TailRootOffset = new(0, 10);
 
     float _distanceToTarget;
     Vector2 _directionToTarget;
@@ -88,5 +94,53 @@ internal partial class NightgauntNPC : ModNPC {
         }
         
         State = NightgauntState.Crawling;
+        
+        UpdateTail();
+    }
+    
+    private void UpdateTail() {
+        Vector2 bodyTailRootSegmentPosition = _body.Skeleton.Position(3);
+
+        Vector2 segmentBeforeTailRootUp;
+        segmentBeforeTailRootUp =
+            (_body.Skeleton.Position(3) - _body.Skeleton.Position(3 - 1)).SafeNormalize(Vector2.UnitY);
+        Vector2 segmentBeforeTailRootRight = segmentBeforeTailRootUp.RotatedBy(MathHelper.PiOver2);
+
+        float tailOffset = -20f;
+
+        Vector2 tailRoot = bodyTailRootSegmentPosition
+                           + segmentBeforeTailRootRight
+                           - segmentBeforeTailRootUp * tailOffset;
+
+        
+        if (_tailPoints.Count == 0) {
+            _tailPoints.Add(tailRoot);
+            for (int i = 1; i < tail_points; i++) {
+                _tailPoints.Add(tailRoot - segmentBeforeTailRootUp * tail_segment_length * i); 
+            }
+        }
+
+        _tailPoints[0] = tailRoot;
+
+        for (int i = 1; i < _tailPoints.Count; i++) {
+            Vector2 prevPoint = _tailPoints[i - 1];
+            Vector2 currentPoint = _tailPoints[i];
+
+            Vector2 direction = (prevPoint - currentPoint).SafeNormalize(Vector2.Zero);
+            _tailPoints[i] = prevPoint - direction * tail_segment_length;
+
+            float sway = (float)Math.Sin(Main.GlobalTimeWrappedHourly * 0.1f + i * 0.5f) * 1f;
+            _tailPoints[i] += direction.RotatedBy(MathHelper.PiOver2) * sway;
+        }
+
+        while (_tailPoints.Count > tail_points) {
+            _tailPoints.RemoveAt(_tailPoints.Count - 1);
+        }
+        while (_tailPoints.Count < tail_points) {
+            Vector2 lastPoint = _tailPoints[^1];
+            Vector2 secondLastPoint = _tailPoints.Count > 1 ? _tailPoints[^2] : tailRoot;
+            Vector2 extendDirection = (lastPoint - secondLastPoint).SafeNormalize(Vector2.Zero);
+            _tailPoints.Add(lastPoint + extendDirection * tail_segment_length);
+        }
     }
 }
