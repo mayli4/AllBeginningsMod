@@ -22,7 +22,7 @@ Mods: {
 			}
 
 			AccentedRedDynastyShinglesItem: {
-				DisplayName: Accented Red Dynasty Shingles Item
+				DisplayName: Accented Red Dynasty Shingles
 				Tooltip: ""
 			}
 
@@ -48,17 +48,15 @@ Mods: {
 			GrabbityGunProjectile.DisplayName: Grabbity Gun Projectile
 			UrnOfGreedProjectile.DisplayName: Urn Of Greed Projectile
 			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
-			VerletGrappleHook.DisplayName: Verlet Grapple Hook
-			DanglingRopeProjectile.DisplayName: Dangling Rope Projectile
 			NightgauntSwordPortal.DisplayName: Nightgaunt Sword Portal
 		}
 
 		NPCs: {
-			NightgauntNPC.DisplayName: Nightgaunt N P C
+			NightgauntNPC.DisplayName: Nightgaunt
 			TestDialogueNPC.DisplayName: Test Dialogue N P C
 			TestSpecialDialogueNPC.DisplayName: Test Special Dialogue N P C
 			TreetopPlatformNPC.DisplayName: ""
-			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
+			CorpseFlowerBulb.DisplayName: ""
 		}
 
 		MapIcons.OldbotShack: Oldbot's Shack
