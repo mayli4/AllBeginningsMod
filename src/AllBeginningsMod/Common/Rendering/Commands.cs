@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 public struct Commands() {
     public List<CommandType> Types = [];

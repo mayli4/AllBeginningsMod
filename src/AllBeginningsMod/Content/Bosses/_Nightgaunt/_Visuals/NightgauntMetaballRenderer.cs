@@ -1,4 +1,4 @@
-﻿using AllBeginningsMod.Common.Graphics;
+﻿using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Utilities;
 using Daybreak.Common.Features.Hooks;
 using Microsoft.Xna.Framework;

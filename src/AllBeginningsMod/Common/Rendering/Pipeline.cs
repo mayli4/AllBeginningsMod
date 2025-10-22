@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 public struct Pipeline(Graphics graphics) {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

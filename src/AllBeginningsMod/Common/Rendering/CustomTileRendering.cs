@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Terraria.DataStructures;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 public interface ICustomLayerTile {
     public void DrawSpecialLayer(int i, int j, TileDrawLayer layer, SpriteBatch spriteBatch) { }

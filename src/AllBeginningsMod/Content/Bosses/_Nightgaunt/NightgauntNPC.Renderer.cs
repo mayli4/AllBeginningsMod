@@ -1,4 +1,4 @@
-﻿using AllBeginningsMod.Common.Graphics;
+﻿using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Utilities;
 using System;
 using Terraria.GameContent;

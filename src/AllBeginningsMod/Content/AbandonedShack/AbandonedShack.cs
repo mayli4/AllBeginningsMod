@@ -1,4 +1,4 @@
-﻿using AllBeginningsMod.Common.Graphics;
+﻿using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Common.World;
 using AllBeginningsMod.Core;
 using AllBeginningsMod.Utilities;

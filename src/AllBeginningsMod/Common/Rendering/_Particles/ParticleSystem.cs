@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using SVec2 = System.Numerics.Vector2;
 using TML = Terraria.ModLoader;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 [Autoload(Side = ModSide.Client)]
 internal unsafe sealed class ParticleSystem : ModSystem {

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 public enum RenderLayer {
     BeforeTiles,

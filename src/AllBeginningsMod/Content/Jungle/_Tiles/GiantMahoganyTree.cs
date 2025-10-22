@@ -1,5 +1,5 @@
 ﻿using AllBeginningsMod.Common;
-using AllBeginningsMod.Common.Graphics;
+using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Common.World;
 using System;
 using System.Collections.Generic;

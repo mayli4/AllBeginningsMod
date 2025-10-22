@@ -1,6 +1,6 @@
 ﻿using Daybreak.Common.Features.Hooks;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 internal static class RtContentPreserver {
     public static RenderTargetBinding[] GetAndPreserveMainRTs() {

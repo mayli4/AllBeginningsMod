@@ -1,6 +1,6 @@
 ﻿using AllBeginningsMod.Utilities;
 
-namespace AllBeginningsMod.Common.Graphics;
+namespace AllBeginningsMod.Common.Rendering;
 
 //todo murder this bruh
 
