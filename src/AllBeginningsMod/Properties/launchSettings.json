@@ -1,4 +1,4 @@
-﻿{
+{
   "profiles": {
     "Terraria": {
       "commandName": "Executable",
@@ -15,6 +15,18 @@
     "Terraria (faststart)": {
       "commandName": "Project",
       "commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect"
+    },
+    "Terraria Client": {
+      "commandName": "Executable",
+      "executablePath": "$(DotNetName)",
+      "commandLineArgs": "Tomat.TML.ClientBootstrap.dll --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode client --mod $(AssemblyName) --features $(TmlBuildBootstrapFeatures)",
+      "workingDirectory": "$(TmlBuildBootstrapRoot)"
+    },
+    "Terraria Server": {
+      "commandName": "Executable",
+      "executablePath": "$(DotNetName)",
+      "commandLineArgs": "Tomat.TML.ClientBootstrap.dll --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLServerPath)\" --mode server --mod $(AssemblyName) --features $(TmlBuildBootstrapFeatures)",
+      "workingDirectory": "$(TmlBuildBootstrapRoot)"
     }
   }
 }

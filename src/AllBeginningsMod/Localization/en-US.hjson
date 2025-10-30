@@ -40,6 +40,11 @@ Mods: {
 				DisplayName: Debug
 				Tooltip: ""
 			}
+
+			RitualDagger: {
+				DisplayName: Ritual Dagger
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -49,6 +54,7 @@ Mods: {
 			UrnOfGreedProjectile.DisplayName: Urn Of Greed Projectile
 			CorpseFlowerBulb.DisplayName: Corpse Flower Bulb
 			NightgauntSwordPortal.DisplayName: Nightgaunt Sword Portal
+			RitualDaggerHeld.DisplayName: Ritual Dagger Held
 		}
 
 		NPCs: {

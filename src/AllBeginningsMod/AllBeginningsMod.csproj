@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    
+
     <Import Project="..\..\..\tModLoader.targets" />
 
     <Import Project="..\Build\KBOFXC\KBOFXCTask.props" />
     <Import Project="..\Build\KBOFXC\KBOFXCTask.targets" />
-    
+
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
         <DefineConstants>$(DefineConstants);BUILDINGFROMCSPROJ_MOD</DefineConstants>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        
+
         <AssemblyName>AllBeginningsMod</AssemblyName>
         <TargetFramework>net8.0</TargetFramework>
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -23,7 +23,7 @@
         <!-- for github workflows -->
         <ExtraBuildModFlags Condition="'$(TML_SAVE_PATH)' != ''">$(ExtraBuildModFlags)-savedirectory "$([System.IO.Path]::GetFullPath('.'))/$(TML_SAVE_PATH)"</ExtraBuildModFlags>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     </PropertyGroup>
@@ -42,7 +42,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Generators\Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Generators\Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
@@ -52,14 +52,14 @@
         <AdditionalFiles Include="Assets/**/*.ogg" />
         <AdditionalFiles Include="Assets/**/*.mp3" />
     </ItemGroup>
-    
+
     <ItemGroup>
 
         <None Remove="..\Build/**/*" />
 
         <Compile Remove="..\Build/**/*" />
         <AdditionalFiles Remove="..\Build/**" />
-        
+
         <Compile Include="..\Build\Common.cs" />
     </ItemGroup>
 
@@ -71,5 +71,5 @@
             <HintPath>lib\StructureHelper.dll</HintPath>
         </Reference>
     </ItemGroup>
-    
+
 </Project>

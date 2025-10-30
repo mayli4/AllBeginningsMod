@@ -47,23 +47,25 @@ internal partial class NightgauntNPC {
         DrawLeg(ref _leftLeg, false, drawColor, SpriteEffects.None);
         
         Main.spriteBatch.End(out ss);
+        
         Main.instance.GraphicsDevice.SetRenderTargets(bindings);
         Main.spriteBatch.Begin(ss with { TransformMatrix = Main.Transform });
-        spriteBatch.Draw(NightgauntDistortion.Target.Value, Vector2.Zero, Color.Red);
+        //spriteBatch.Draw(NightgauntDistortion.Target.Value, Vector2.Zero, Color.Red);
 
         Graphics.BeginPipeline(1.0f)
             .DrawBasicTrail(
             _tailPoints.ToArray(),
-            t => 18,
+            static t => (1.25f - t) * 40f,
             Textures.NPCs.Bosses.Nightgaunt.NightgauntTail.Value,
-            drawColor
-            )
+            drawColor)
+            .ApplyOutline(Color.White)
             .Flush();
         
         Graphics.BeginPipeline(1.0f)
-            .DrawSprite(NightgauntDistortion.Target.Value, Vector2.Zero, Color.Black)
+            .DrawSprite(NightgauntDistortion.Target.Value, Vector2.Zero, drawColor)
             .ApplyOutline(Color.White)
             .Flush();
+        
         return false;
     }
 
@@ -184,6 +186,6 @@ internal partial class NightgauntNPC {
         Main.spriteBatch.Draw(headNeckTexture, midNeck - Main.screenPosition, midNeckFrame, drawColor, (midNeck - headPivot).ToRotation() + rotationOffset, midNeckOrigin, 1f, effects, 0f);
         Main.spriteBatch.Draw(headNeckTexture, headPivot - Main.screenPosition, headFrame, drawColor, (headPivot - headTip).ToRotation() + rotationOffset, headOrigin, 1f, effects, 0f);
         
-        Main.spriteBatch.Draw(headNeckTexture, headPivot - Main.screenPosition, eyesFrame, drawColor, (headPivot - headTip).ToRotation() + rotationOffset, headOrigin, 1f, effects, 0f);
+        Main.spriteBatch.Draw(headNeckTexture, headPivot - Main.screenPosition, eyesFrame, Color.White, (headPivot - headTip).ToRotation() + rotationOffset, headOrigin, 1f, effects, 0f);
     }
 }
