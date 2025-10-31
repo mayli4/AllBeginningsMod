@@ -68,4 +68,6 @@ public static class VectorExtensions {
     }
 
     public static Vector3 Vec3(this Vector2 vector) => new(vector.X, vector.Y, 0);
+    
+    public static int NonZeroSign(this float value) => Math.Sign(value) >= 0 ? 1 : -1;
 }

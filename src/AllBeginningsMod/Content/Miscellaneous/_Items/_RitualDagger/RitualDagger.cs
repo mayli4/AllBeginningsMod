@@ -1,12 +1,18 @@
-﻿using Terraria.Audio;
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.Miscellaneous;
 
+
 internal sealed class RitualDagger : ModItem {
-    public override string Texture => Textures.Sample.KEY_Blobs;
+    public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerItem;
     
     public override void SetDefaults() {
         Item.damage = 25;
@@ -16,18 +22,18 @@ internal sealed class RitualDagger : ModItem {
 
         Item.width = 30;
         Item.height = 30;
-
-        Item.useTime = 60;
-        Item.useAnimation = 60;
-        Item.useStyle = ItemUseStyleID.Swing;
-
+        
+        Item.useTurn = true;
+        Item.useTime = 5;
+        Item.useAnimation = 5;
+        Item.useStyle = ItemUseStyleID.Shoot;
+        Item.channel = true;
         Item.noMelee = true;
         Item.noUseGraphic = true;
 
         Item.shoot = ModContent.ProjectileType<RitualDaggerHeld>();
-        Item.shootSpeed = 1f;
+        Item.shootSpeed = 10f;
         
-        Item.channel = false;
         Item.autoReuse = false;
     }
 
@@ -37,10 +43,21 @@ internal sealed class RitualDagger : ModItem {
 }
 
 internal sealed class RitualDaggerHeld : ModProjectile {
-    public override string Texture => Textures.Sample.KEY_Blobs;
+    public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerItem;
+
+    public Player Owner => Main.player[Projectile.owner];
 
     public override void SetDefaults() {
-        
+        Projectile.width = 30;
+        Projectile.height = 28;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.ignoreWater = true;
+        Projectile.penetrate = -1;
+        Projectile.aiStyle = -1;
+        Projectile.alpha = 0;
+        Projectile.ownerHitCheck = true;
+        Projectile.hide = true;
     }
 
     public override void OnSpawn(IEntitySource source) {
@@ -48,6 +65,10 @@ internal sealed class RitualDaggerHeld : ModProjectile {
     }
 
     public override void AI() {
-        
+        base.AI();
+    }
+
+    public override bool PreDraw(ref Color lightColor) {
+        return base.PreDraw(ref lightColor);
     }
 }
