@@ -100,7 +100,7 @@ internal sealed class RitualDaggerHeld : ModProjectile {
             effect = SpriteEffects.FlipHorizontally;
         }
         
-        var position = Projectile.position;
+        var position = new Vector2((int)Projectile.position.X, (int)Projectile.position.Y - Owner.HeightOffsetVisual) + Vector2.UnitY * Owner.gfxOffY;
 
         Main.EntitySpriteDraw(texture, position - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, effect);
         
