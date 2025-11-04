@@ -170,4 +170,20 @@ internal static partial class Helper {
 
         return true;
     }
+    
+    public static Vector2 GetHeadRotationOrigin(this Player player)
+    {
+        Vector2 headVect = player.legFrame.Width * 0.5f * Vector2.UnitX + player.legFrame.Height * 0.4f * Vector2.UnitY * player.gravDir;
+        Vector2 headPosition = player.headPosition;
+        Vector2 basePosition = player.position;
+        Vector2 coreOffset = new Vector2(-(player.bodyFrame.Width / 2) + (player.width / 2), player.height - player.bodyFrame.Height + 4f);
+
+        if (player.gravDir == -1)
+        {
+            coreOffset.Y = player.bodyFrame.Height + 4f;
+            headPosition.Y *= -1;
+        }
+
+        return basePosition + coreOffset + headPosition + headVect;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AllBeginningsMod.Utilities;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -10,31 +11,28 @@ using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.Miscellaneous;
 
-
 internal sealed class RitualDagger : ModItem {
     public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerItem;
-    
-    public override void SetDefaults() {
-        Item.damage = 25;
-        Item.crit = 0;
-        Item.DamageType = DamageClass.Magic;
-        Item.knockBack = 0f;
 
-        Item.width = 30;
-        Item.height = 30;
-        
-        Item.useTurn = true;
-        Item.useTime = 5;
-        Item.useAnimation = 5;
+    public override void SetDefaults() {
         Item.useStyle = ItemUseStyleID.Shoot;
+        Item.useAnimation = 45;
+        Item.useTime = 45;
+        Item.knockBack = 5.5f;
+        Item.width = 32;
+        Item.mana = 4;
+        Item.height = 32;
+        Item.damage = 11;
+        Item.noUseGraphic = true;
+        Item.shoot = ModContent.ProjectileType<RitualDaggerHeld>();
+        Item.shootSpeed = 12f;
+        Item.UseSound = SoundID.Item1;
+        Item.rare = ItemRarityID.Blue;
+        Item.value = Item.sellPrice(gold: 3);
+        Item.DamageType = DamageClass.Magic;
         Item.channel = true;
         Item.noMelee = true;
-        Item.noUseGraphic = true;
-
-        Item.shoot = ModContent.ProjectileType<RitualDaggerHeld>();
-        Item.shootSpeed = 10f;
-        
-        Item.autoReuse = false;
+        Item.autoReuse = true;
     }
 
     public override bool CanUseItem(Player player) {
@@ -43,32 +41,43 @@ internal sealed class RitualDagger : ModItem {
 }
 
 internal sealed class RitualDaggerHeld : ModProjectile {
-    public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerItem;
+    public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerHeld;
 
     public Player Owner => Main.player[Projectile.owner];
 
+    public ref float DeployedFrames => ref Projectile.ai[0];
+    public Vector2 DaggerStartingPosition => Owner.Center - Vector2.UnitY * -8f * Owner.gravDir + Vector2.UnitX * 46 * Owner.direction;
+    
     public override void SetDefaults() {
-        Projectile.width = 30;
-        Projectile.height = 28;
+        Projectile.netImportant = true;
+        Projectile.width = 26;
+        Projectile.height = 26;
         Projectile.friendly = true;
-        Projectile.tileCollide = false;
-        Projectile.ignoreWater = true;
         Projectile.penetrate = -1;
-        Projectile.aiStyle = -1;
-        Projectile.alpha = 0;
-        Projectile.ownerHitCheck = true;
-        Projectile.hide = true;
+        Projectile.tileCollide = false;
+        Projectile.DamageType = DamageClass.Magic;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 10;
     }
 
-    public override void OnSpawn(IEntitySource source) {
-        base.OnSpawn(source);
-    }
-
+    public override bool ShouldUpdatePosition() => false;
+    public override bool? CanDamage() => false;
+    public override bool? CanCutTiles() => false;
+    
     public override void AI() {
-        base.AI();
-    }
+        Player player = Main.player[Projectile.owner];
+        if (!player.active || player.dead || player.noItems || player.CCed || !player.channel || (Main.myPlayer == Projectile.owner && Main.mapFullscreen)) {
+            Projectile.Kill();
+            return;
+        }
+        Projectile.timeLeft = 2;
 
-    public override bool PreDraw(ref Color lightColor) {
-        return base.PreDraw(ref lightColor);
+        Projectile.Center = DaggerStartingPosition;
+        player.direction = (Main.MouseWorld.X - player.Center.X).NonZeroSign();
+        player.heldProj = Projectile.whoAmI;
+        player.SetDummyItemTime(2);
+        if (player.mount.Active)
+            player.mount.Dismount(player);
+        DeployedFrames++;
     }
 }
