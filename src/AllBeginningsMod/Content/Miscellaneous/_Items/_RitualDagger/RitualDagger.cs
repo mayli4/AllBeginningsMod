@@ -46,7 +46,9 @@ internal sealed class RitualDaggerHeld : ModProjectile {
     public Player Owner => Main.player[Projectile.owner];
 
     public ref float DeployedFrames => ref Projectile.ai[0];
-    public Vector2 DaggerStartingPosition => Owner.Center - Vector2.UnitY * -8f * Owner.gravDir + Vector2.UnitX * 46 * Owner.direction;
+    public ref float InitialSpawnOffset => ref Projectile.ai[1];
+    
+    public Vector2 DaggerStartingPosition => Owner.Center - Vector2.UnitY * -18f * Owner.gravDir + Vector2.UnitX * 6 * Owner.direction;
     
     public override void SetDefaults() {
         Projectile.netImportant = true;
@@ -58,6 +60,10 @@ internal sealed class RitualDaggerHeld : ModProjectile {
         Projectile.DamageType = DamageClass.Magic;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
+    }
+    
+    public override void OnSpawn(IEntitySource source) {
+        InitialSpawnOffset = 46f;
     }
 
     public override bool ShouldUpdatePosition() => false;
@@ -72,12 +78,32 @@ internal sealed class RitualDaggerHeld : ModProjectile {
         }
         Projectile.timeLeft = 2;
 
-        Projectile.Center = DaggerStartingPosition;
+        InitialSpawnOffset = Math.Max(0f, InitialSpawnOffset - 2f); 
+        Projectile.Center = DaggerStartingPosition + new Vector2(1, 0) * InitialSpawnOffset * Owner.direction;
+
         player.direction = (Main.MouseWorld.X - player.Center.X).NonZeroSign();
         player.heldProj = Projectile.whoAmI;
         player.SetDummyItemTime(2);
         if (player.mount.Active)
             player.mount.Dismount(player);
         DeployedFrames++;
+    }
+
+    public override bool PreDraw(ref Color lightColor) {
+        var daggerTex = Textures.Items.Misc.RitualDagger.RitualDaggerHeld.Value;
+        
+        Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+        Vector2 origin = new Vector2(10, texture.Height / 2f);
+        SpriteEffects effect = SpriteEffects.None;
+        
+        if(Owner.direction == 1) {
+            effect = SpriteEffects.FlipHorizontally;
+        }
+        
+        var position = Projectile.position;
+
+        Main.EntitySpriteDraw(texture, position - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, effect);
+        
+        return false;
     }
 }
