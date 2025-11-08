@@ -1,4 +1,6 @@
-﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/1.0.8">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\..\tModLoader.targets" />
 
     <Import Project="..\Build\KBOFXC\KBOFXCTask.props" />
     <Import Project="..\Build\KBOFXC\KBOFXCTask.targets" />
@@ -37,6 +39,10 @@
              stuff. -->
         <Publicize Include="tModLoader" IncludeCompilerGeneratedMembers="false" />
         <Publicize Include="FNA" IncludeCompilerGeneratedMembers="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Generators\Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>

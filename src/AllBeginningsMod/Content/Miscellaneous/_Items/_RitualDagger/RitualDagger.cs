@@ -1,12 +1,18 @@
 ﻿using AllBeginningsMod.Utilities;
 using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace AllBeginningsMod.Content.Miscellaneous;
 
 internal sealed class RitualDagger : ModItem {
-    public override string Texture => Assets.Textures.Items.Misc.RitualDagger.RitualDaggerItem.KEY;
+    public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerItem;
 
     public override void SetDefaults() {    
         Item.useStyle = ItemUseStyleID.HiddenAnimation;
@@ -35,7 +41,7 @@ internal sealed class RitualDagger : ModItem {
 }
 
 internal sealed class RitualDaggerHeld : ModProjectile {
-    public override string Texture => Assets.Textures.Items.Misc.RitualDagger.RitualDaggerHeld.KEY;
+    public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerHeld;
 
     public Player Owner => Main.player[Projectile.owner];
 
@@ -88,6 +94,8 @@ internal sealed class RitualDaggerHeld : ModProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
+        var daggerTex = Textures.Items.Misc.RitualDagger.RitualDaggerHeld.Value;
+        
         Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
         Vector2 origin = new Vector2(10, texture.Height / 2f);
         SpriteEffects effect = SpriteEffects.None;
