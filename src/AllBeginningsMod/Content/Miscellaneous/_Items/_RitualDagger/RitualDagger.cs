@@ -14,8 +14,8 @@ namespace AllBeginningsMod.Content.Miscellaneous;
 internal sealed class RitualDagger : ModItem {
     public override string Texture => Textures.Items.Misc.RitualDagger.KEY_RitualDaggerItem;
 
-    public override void SetDefaults() {
-        Item.useStyle = ItemUseStyleID.Shoot;
+    public override void SetDefaults() {    
+        Item.useStyle = ItemUseStyleID.HiddenAnimation;
         Item.useAnimation = 45;
         Item.useTime = 45;
         Item.knockBack = 5.5f;
@@ -50,6 +50,8 @@ internal sealed class RitualDaggerHeld : ModProjectile {
     
     public Vector2 DaggerStartingPosition => Owner.Center - Vector2.UnitY * -18f * Owner.gravDir + Vector2.UnitX * 6 * Owner.direction;
     
+    public float PutMaskOnTimer => Easings.SineInEasing(1 - Math.Clamp(DeployedFrames / 25f, 0f, 1f), 1);
+    
     public override void SetDefaults() {
         Projectile.netImportant = true;
         Projectile.width = 26;
@@ -83,6 +85,8 @@ internal sealed class RitualDaggerHeld : ModProjectile {
 
         player.direction = (Main.MouseWorld.X - player.Center.X).NonZeroSign();
         player.heldProj = Projectile.whoAmI;
+        player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.ThreeQuarters, (MathHelper.Pi + MathHelper.PiOver4 * 11.9f + PutMaskOnTimer * MathHelper.PiOver4) * player.direction);
+        
         player.SetDummyItemTime(2);
         if (player.mount.Active)
             player.mount.Dismount(player);

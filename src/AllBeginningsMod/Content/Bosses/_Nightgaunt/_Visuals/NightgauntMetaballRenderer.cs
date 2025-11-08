@@ -58,7 +58,7 @@ internal unsafe sealed class NightgauntMetaballRenderer {
             Main.OnResolutionChanged += ReinitTargets;
         });
     }
-
+    
     [OnUnload]
     static void Unload() {
         Main.OnResolutionChanged -= ReinitTargets;

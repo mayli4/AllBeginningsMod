@@ -1,0 +1,9 @@
+﻿<Solution>
+  <Folder Name="/.common/" />
+  <Folder Name="/.github/">
+    <File Path=".github\readme.md" />
+  </Folder>
+  <Project Path="src\AllBeginningsMod\AllBeginningsMod.csproj" Type="Classic C#" />
+  <Project Path="src\Build\Build.csproj" Type="Classic C#" />
+  <Project Path="src\Generators\Generators.csproj" Type="Classic C#" />
+</Solution>
