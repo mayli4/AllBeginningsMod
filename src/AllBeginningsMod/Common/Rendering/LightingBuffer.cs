@@ -141,7 +141,7 @@ internal static class LightingBuffer {
 
             var gd = Main.instance.GraphicsDevice;
 
-            var shader = Shaders.Fragment.LightMesh.Value;
+            var shader = Assets.Shaders.Fragment.LightMesh.Asset.Value;
 
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
             Matrix view = Main.Camera.GameViewMatrix.TransformationMatrix;

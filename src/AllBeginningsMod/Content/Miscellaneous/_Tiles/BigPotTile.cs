@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 namespace AllBeginningsMod.Content.Miscellaneous;
 
 public class BigPotTile : ModTile {
-    public override string Texture => Textures.Tiles.Decoration.KEY_BigPotTile;
+    public override string Texture => Assets.Textures.Tiles.Decoration.BigPotTile.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileMergeDirt[Type] = false;
@@ -21,7 +21,7 @@ public class BigPotTile : ModTile {
 }
 
 public class BigPotItem : ModItem {
-    public override string Texture => Textures.Tiles.Decoration.KEY_BigPotItem;
+    public override string Texture => Assets.Textures.Tiles.Decoration.BigPotItem.KEY;
 
     public override void SetDefaults() {
         Item.DefaultToPlaceableTile(ModContent.TileType<BigPotTile>());

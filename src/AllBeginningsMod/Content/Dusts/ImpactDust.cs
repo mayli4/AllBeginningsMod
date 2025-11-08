@@ -32,7 +32,7 @@ public class ImpactLineDust : ModDust {
     public override bool PreDraw(Dust dust) {
         float lerper = 1f - dust.alpha / 255f;
 
-        Texture2D tex = Textures.Sample.Line.Value;
+        Texture2D tex = Assets.Textures.Sample.Line.Asset.Value;
 
         Graphics.BeginPipeline(0.5f)
             .DrawSprite(tex, dust.position - Main.screenPosition, dust.color * lerper, null, dust.rotation, tex.Size() / 2f, new Vector2(dust.scale * lerper, dust.scale), 0f)

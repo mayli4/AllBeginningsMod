@@ -1,5 +1,5 @@
 ﻿namespace AllBeginningsMod;
 
-public class ModImpl {
+partial class ModImpl {
     
 }

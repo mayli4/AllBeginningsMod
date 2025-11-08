@@ -4,7 +4,7 @@ using Terraria.ObjectData;
 namespace AllBeginningsMod.Content.AbandonedShack;
 
 internal sealed class ContainerSmeltery : ModTile {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_ContainerSmeltery;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.ContainerSmeltery.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;

@@ -6,7 +6,7 @@ using Terraria.ObjectData;
 namespace AllBeginningsMod.Content.AbandonedShack;
 
 internal sealed class ContainerTeleporter : ModTile {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_ContainerTeleporter;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.ContainerTeleporter.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;

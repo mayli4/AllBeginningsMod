@@ -17,7 +17,7 @@ namespace AllBeginningsMod.Content.Forest;
 //okk so, if were gonna have lots of tiles that have stuff like this i should probably come up with a dummy system or something
 
 public sealed class GiantShroom : ModTile {
-    public override string Texture => Textures.Tiles.Forest.KEY_GiantShroomStem;
+    public override string Texture => Assets.Textures.Tiles.Forest.GiantShroomStem.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileSolid[Type] = false;
@@ -65,20 +65,20 @@ public sealed class GiantShroom : ModTile {
     internal sealed class GiantShroomCapDummy : ModProjectile {
         public Point ParentPosition { get; set; }
 
-        public override string Texture => Assets.Assets.Textures.Tiles.Forest.KEY_GiantShroomCap;
+        public override string Texture => Assets.Textures.Tiles.Forest.GiantShroomCap.KEY;
 
         private int _squishTimer;
         private float _bounceState;
         private float _leanDirection;
 
-        private const int SQUISH_ANIMATION_DURATION = 60;
-        private const float MAX_LEAN_RADIANS = 0.3f;
+        private const int squish_animation_duration = 60;
+        private const float max_lean_radians = 0.3f;
 
-        private const float IDLE_WOBBLE_AMOUNT = 0.02f;
-        private const float IDLE_WOBBLE_SPEED = 0.8f;
+        private const float idle_wobble_amount = 0.02f;
+        private const float idle_wobble_speed = 0.8f;
 
-        private const int HEART_SPAWN_COOLDOWN = 60 * 15;
-        private int _heartSpawnTimer = HEART_SPAWN_COOLDOWN;
+        private const int heart_spawn_cooldown = 60 * 15;
+        private int _heartSpawnTimer = heart_spawn_cooldown;
 
         public override void SetDefaults() {
             Projectile.width = 70;
@@ -134,7 +134,7 @@ public sealed class GiantShroom : ModTile {
 
                 if(_heartSpawnTimer <= 0) {
                     Item.NewItem(Projectile.GetSource_FromThis(), Projectile.Center, ItemID.Heart, 3);
-                    _heartSpawnTimer = HEART_SPAWN_COOLDOWN;
+                    _heartSpawnTimer = heart_spawn_cooldown;
                 }
             }
 
@@ -156,9 +156,9 @@ public sealed class GiantShroom : ModTile {
             Vector2 scale = Vector2.One;
 
             float rotation;
-            if(_bounceState == 1 && _squishTimer <= SQUISH_ANIMATION_DURATION) {
+            if(_bounceState == 1 && _squishTimer <= squish_animation_duration) {
                 float animationProgress =
-                    (float)_squishTimer / SQUISH_ANIMATION_DURATION;
+                    (float)_squishTimer / squish_animation_duration;
 
                 float decay = 5f;
                 float frequency = 15f;
@@ -169,16 +169,16 @@ public sealed class GiantShroom : ModTile {
 
                 float leanProgress = Math.Clamp(animationProgress, 0f, 1f);
                 float currentLeanFactor = 1f - leanProgress;
-                rotation = _leanDirection * MAX_LEAN_RADIANS * currentLeanFactor;
+                rotation = _leanDirection * max_lean_radians * currentLeanFactor;
             }
             else {
                 float time = Main.GameUpdateCount * 0.05f;
 
-                float wobbleX = (float)Math.Sin(time * IDLE_WOBBLE_SPEED);
-                scale.X = 1 + wobbleX * IDLE_WOBBLE_AMOUNT;
+                float wobbleX = (float)Math.Sin(time * idle_wobble_speed);
+                scale.X = 1 + wobbleX * idle_wobble_amount;
 
-                float wobbleY = (float)Math.Sin(time * IDLE_WOBBLE_SPEED + 1);
-                scale.Y = 1 + wobbleY * IDLE_WOBBLE_AMOUNT;
+                float wobbleY = (float)Math.Sin(time * idle_wobble_speed + 1);
+                scale.Y = 1 + wobbleY * idle_wobble_amount;
 
                 rotation = 0f;
             }

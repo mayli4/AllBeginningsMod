@@ -124,7 +124,7 @@ internal static partial class Helper {
         float length = edge.Length();
 
         spriteBatch.Draw(
-            Textures.Sample.Pixel.Value,
+            Assets.Textures.Sample.Pixel.Asset.Value,
             start,
             null,
             color,

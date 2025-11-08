@@ -54,8 +54,8 @@ internal sealed class LargeCeilingLamp : ModTile {
         var worldPos = new Vector2(i, j) * 16;
         var drawPos = worldPos - Main.screenPosition;
 
-        var tex = Textures.Tiles.AbandonedShack.LargeCeilingLamp.Value;
-        var ray = Textures.Tiles.AbandonedShack.LargeCeilingLampRay.Value;
+        var tex = Assets.Textures.Tiles.AbandonedShack.LargeCeilingLamp.Asset.Value;
+        var ray = Assets.Textures.Tiles.AbandonedShack.LargeCeilingLampRay.Asset.Value;
 
         var rayPos = drawPos + new Vector2(-1, 14);
 
@@ -125,8 +125,8 @@ internal sealed class SmallLongCeilingLamp : ModTile {
         var worldPos = new Vector2(i, j) * 16;
         var drawPos = worldPos - Main.screenPosition;
 
-        var tex = Textures.Tiles.AbandonedShack.SmallLongCeilingLamp.Value;
-        var ray = Textures.Tiles.AbandonedShack.SmallCeilingLampRay.Value;
+        var tex = Assets.Textures.Tiles.AbandonedShack.SmallLongCeilingLamp.Asset.Value;
+        var ray = Assets.Textures.Tiles.AbandonedShack.SmallCeilingLampRay.Asset.Value;
 
         var rayPos = drawPos + new Vector2(3, 23);
 
@@ -182,8 +182,8 @@ internal sealed class SmallShortCeilingLamp : ModTile {
         var worldPos = new Vector2(i, j) * 16;
         var drawPos = worldPos - Main.screenPosition;
 
-        var tex = Textures.Tiles.AbandonedShack.SmallShortCeilingLamp.Value;
-        var ray = Textures.Tiles.AbandonedShack.SmallCeilingLampRay.Value;
+        var tex = Assets.Textures.Tiles.AbandonedShack.SmallShortCeilingLamp.Asset.Value;
+        var ray = Assets.Textures.Tiles.AbandonedShack.SmallCeilingLampRay.Asset.Value;
 
         var rayPos = drawPos + new Vector2(3, 18);
 
@@ -222,7 +222,7 @@ internal sealed class LampLightDust : ModDust {
     public override bool PreDraw(Dust dust) {
         float lerper = 1f - dust.alpha / 255f;
 
-        Texture2D tex = Textures.Sample.Line.Value;
+        Texture2D tex = Assets.Textures.Sample.Line.Asset.Value;
 
         Graphics.BeginPipeline(0.5f)
             .DrawSprite(tex, dust.position - Main.screenPosition, dust.color * lerper, null, dust.rotation, tex.Size() / 2f, new Vector2(dust.scale * lerper, dust.scale), 0f)

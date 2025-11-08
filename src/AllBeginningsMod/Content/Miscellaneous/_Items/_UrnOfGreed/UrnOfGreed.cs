@@ -27,7 +27,7 @@ internal abstract class BaseUrnTile : ModTile {
         TileObjectData.newTile.CoordinateHeights = [16, 18];
         TileObjectData.addTile(Type);
 
-        AddMapEntry(Color.Gray, Keys.Items.UrnOfGreedItem.DisplayName.GetText());
+        AddMapEntry(Color.Gray, Mods.AllBeginningsMod.Items.UrnOfGreedItem.DisplayName.GetText());
 
         this.DustType = Dust;
         HitSound = SoundID.Shatter;
@@ -50,7 +50,7 @@ internal abstract class BaseUrnTile : ModTile {
 }
 
 internal sealed class UrnOfGreedItem : ModItem {
-    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_UrnOfGreedItem;
+    public override string Texture => Assets.Textures.Items.Misc.UrnOfGreed.UrnOfGreedItem.KEY;
 
     public override void SetStaticDefaults() {
         Item.ResearchUnlockCount = 1;
@@ -120,7 +120,7 @@ internal sealed class UrnTileEntity : ModTileEntity {
 }
 
 internal sealed class UrnOfGreedProjectile : ModProjectile {
-    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_UrnOfGreedTile;
+    public override string Texture => Assets.Textures.Items.Misc.UrnOfGreed.UrnOfGreedTile.KEY;
 
     public long StoredCoins;
 
@@ -214,25 +214,25 @@ internal sealed class UrnOfGreedProjectile : ModProjectile {
 
         switch(UrnToPlace) {
             case UrnType.Copper:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.CopperUrnProj.KEY;
                 break;
             case UrnType.CopperRich:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnRichProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.CopperUrnRichProj.KEY;
                 break;
             case UrnType.Clay:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.ClayUrnProj.KEY;
                 break;
             case UrnType.ClayRich:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_PorcelainUrnProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.PorcelainUrnProj.KEY;
                 break;
             case UrnType.Stone:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_StoneUrnProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.StoneUrnProj.KEY;
                 break;
             case UrnType.StoneRich:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_GildedGraniteProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.GildedGraniteProj.KEY;
                 break;
             default:
-                texturePath = Textures.Items.Misc.UrnOfGreed.KEY_CopperUrnProj;
+                texturePath = Assets.Textures.Items.Misc.UrnOfGreed.CopperUrnProj.KEY;
                 break;
         }
 

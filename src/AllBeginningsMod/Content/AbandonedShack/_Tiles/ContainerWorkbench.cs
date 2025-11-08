@@ -8,7 +8,7 @@ using Terraria.ObjectData;
 namespace AllBeginningsMod.Content.AbandonedShack;
 
 internal sealed class ContainerWorkbench : ModTile {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_ContainerWorkbenchTile;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.ContainerWorkbenchTile.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;
@@ -54,7 +54,7 @@ internal sealed class ContainerWorkbench : ModTile {
         var worldPos = new Vector2(i, j - 3) * 16;
         var drawPos = worldPos - Main.screenPosition + Helper.TileOffset;
 
-        var tex = Textures.Tiles.AbandonedShack.ContainerWorkbenchTile_Extras.Value;
+        var tex = Assets.Textures.Tiles.AbandonedShack.ContainerWorkbenchTile_Extras.Asset.Value;
 
         if(PointsOfInterestSystem.LocalPlayerInShack) {
             Lighting.AddLight(worldPos + new Vector2(152, 20), Color.DarkOrange.ToVector3());

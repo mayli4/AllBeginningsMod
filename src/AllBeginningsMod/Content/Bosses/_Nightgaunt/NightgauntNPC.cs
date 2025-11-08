@@ -26,7 +26,7 @@ internal partial class NightgauntNPC : ModNPC {
         [FieldOffset(0)] public NightgauntState State;
     }
 
-    public override string Texture => Textures.NPCs.Bosses.Nightgaunt.KEY_NightgauntNPC;
+    public override string Texture => Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.KEY;
 
     public Player Target => Main.player[NPC.target];
 

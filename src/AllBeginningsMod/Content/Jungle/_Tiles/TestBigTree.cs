@@ -6,7 +6,7 @@ using Keys = Microsoft.Xna.Framework.Input.Keys;
 namespace AllBeginningsMod.Content.Jungle;
 
 public class TestBigTree : ModTile {
-    public override string Texture => Textures.Tiles.Jungle.KEY_TestBigTree;
+    public override string Texture => Assets.Textures.Tiles.Jungle.TestBigTree.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileMergeDirt[Type] = false;

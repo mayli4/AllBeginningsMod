@@ -91,7 +91,7 @@ internal static class SpritebatchExtensions {
             (int)offset.Length(), width
         );
 
-        sb.Draw(texture ?? Textures.Sample.Pixel.Value, rect, null, color ?? Color.White, angle, Vector2.Zero, SpriteEffects.None, 0f);
+        sb.Draw(texture ?? Assets.Textures.Sample.Pixel.Asset.Value, rect, null, color ?? Color.White, angle, Vector2.Zero, SpriteEffects.None, 0f);
     }
 
     public static void DrawRect(this SpriteBatch sb, Rectangle rect, Color? color = null, int thickness = 1, Texture2D? texture = null) {

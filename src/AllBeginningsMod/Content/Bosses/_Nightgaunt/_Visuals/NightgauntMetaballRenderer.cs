@@ -116,7 +116,7 @@ internal sealed unsafe class NightgauntMetaballRenderer {
 
         var sb = Main.spriteBatch;
         var gd = Main.instance.GraphicsDevice;
-        var effect = Shaders.Nightgaunt.NightgauntMetaball.Value;
+        var effect = Assets.Shaders.Nightgaunt.NightgauntMetaball.Asset.Value;
         RtContentPreserver.ApplyToBindings(gd.GetRenderTargets());
         var rts = gd.GetRenderTargets();
         RtContentPreserver.ApplyToBindings(rts);

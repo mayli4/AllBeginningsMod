@@ -3,7 +3,7 @@
 namespace AllBeginningsMod.Content.AbandonedShack;
 
 internal sealed class GrassyDirtWall : ModWall {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_GrassyDirtWall;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.GrassyDirtWall.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileBlockLight[Type] = true;
@@ -13,7 +13,7 @@ internal sealed class GrassyDirtWall : ModWall {
 }
 
 internal sealed class GrassyDirtWallItem : ModItem {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_GrassyDirtWall;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.GrassyDirtWall.KEY;
 
     public override void SetDefaults() {
         Item.DefaultToPlaceableWall(ModContent.WallType<GrassyDirtWall>());
@@ -30,7 +30,7 @@ internal sealed class GrassyDirtWallItem : ModItem {
 }
 
 internal sealed class SmoothStoneWall : ModWall {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_SmoothStoneWall;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.SmoothStoneWall.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileBlockLight[Type] = true;
@@ -40,7 +40,7 @@ internal sealed class SmoothStoneWall : ModWall {
 }
 
 internal sealed class SmoothStoneWallItem : ModItem {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_SmoothStoneWall;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.SmoothStoneWall.KEY;
 
     public override void SetDefaults() {
         Item.DefaultToPlaceableWall(ModContent.WallType<SmoothStoneWall>());

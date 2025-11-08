@@ -8,7 +8,7 @@ public struct Pipeline(Graphics graphics) {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly Pipeline ApplyOutline(Color color, float threshold = 0.001f) {
         ApplyEffect(
-            Shaders.Fragment.Outline.Value,
+            Assets.Shaders.Fragment.Outline.Asset.Value,
             ("uColor", color.ToVector4()),
             ("uSize", Main.ScreenSize.ToVector2()),
             ("uThreshold", threshold)
@@ -49,7 +49,7 @@ public struct Pipeline(Graphics graphics) {
         Color color,
         int spriteRotation = 0
     ) {
-        var effect = Shaders.Trail.Default.Value;
+        var effect = Assets.Shaders.Trail.Default.Asset.Value;
         ReadOnlySpan<(string, ParameterValue)> parameters = [
             ("sampleTexture", texture),
                 ("color", color.ToVector4()),
@@ -67,7 +67,7 @@ public struct Pipeline(Graphics graphics) {
         Func<float, Color> color,
         int spriteRotation = 0
     ) {
-        var effect = Shaders.Trail.Default.Value;
+        var effect = Assets.Shaders.Trail.Default.Asset.Value;
         ReadOnlySpan<(string, ParameterValue)> parameters = [
             ("sampleTexture", texture),
                 ("color", Color.White.ToVector4()),
@@ -305,7 +305,7 @@ public struct Pipeline(Graphics graphics) {
     }
 
     public readonly Pipeline ApplyTint(Color color) {
-        ApplyEffect(Shaders.Fragment.Tint.Value, ("color", color.ToVector4()));
+        ApplyEffect(Assets.Shaders.Fragment.Tint.Asset.Value, ("color", color.ToVector4()));
         return this;
     }
 

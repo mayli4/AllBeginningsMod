@@ -1,5 +1,5 @@
 ﻿namespace AllBeginningsMod.Content.Bosses;
 
 public class NightgauntSwordPortal : ModProjectile {
-    public override string Texture => Textures.NPCs.Bosses.Nightgaunt.KEY_NightgauntNPC;
+    public override string Texture => Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.KEY;
 }

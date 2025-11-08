@@ -56,7 +56,7 @@ internal partial class NightgauntNPC {
             .DrawBasicTrail(
             _tailPoints.ToArray(),
             static t => (1.25f - t) * 40f,
-            Textures.NPCs.Bosses.Nightgaunt.NightgauntTail.Value,
+            Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntTail.Asset.Value,
             drawColor)
             .ApplyOutline(Color.White)
             .Flush();
@@ -70,7 +70,7 @@ internal partial class NightgauntNPC {
     }
 
     static void DrawArm(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
-        var armTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
+        var armTexture = Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Asset.Value;
 
         Vector2 shoulder = limb.Skeleton.Position(0);
         Vector2 elbow = limb.Skeleton.Position(1);
@@ -105,7 +105,7 @@ internal partial class NightgauntNPC {
     }
 
     static void DrawLeg(ref NightgauntLimb limb, bool right, Color drawColor, SpriteEffects effects) {
-        var legTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
+        var legTexture = Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Asset.Value;
 
         Vector2 hip = limb.Skeleton.Position(0);
         Vector2 knee = limb.Skeleton.Position(1);
@@ -140,7 +140,7 @@ internal partial class NightgauntNPC {
     }
 
     static void DrawBody(ref NightgauntLimb body, Color drawColor, SpriteEffects effects) {
-        var bodyTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
+        var bodyTexture = Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Asset.Value;
 
         Vector2 neck = body.Skeleton.Position(0);
         Vector2 midTorso = body.Skeleton.Position(1);
@@ -163,7 +163,7 @@ internal partial class NightgauntNPC {
     }
 
     static void DrawHeadNeck(ref NightgauntLimb headNeck, Color drawColor, SpriteEffects effects) {
-        var headNeckTexture = Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Value;
+        var headNeckTexture = Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.Asset.Value;
 
         Vector2 neckBase = headNeck.Skeleton.Position(0);
         Vector2 midNeck = headNeck.Skeleton.Position(1);

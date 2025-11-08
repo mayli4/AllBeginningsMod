@@ -6,7 +6,7 @@ using Terraria.ObjectData;
 namespace AllBeginningsMod.Content.AbandonedShack;
 
 internal sealed class ContainerHeavyWorkbench : ModTile {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_ContainerHeavyWorkbench;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.ContainerHeavyWorkbench.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;

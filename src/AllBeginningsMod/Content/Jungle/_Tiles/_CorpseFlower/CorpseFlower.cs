@@ -13,7 +13,7 @@ using Terraria.ObjectData;
 namespace AllBeginningsMod.Content.Jungle;
 
 internal sealed class CorpseFlower : ModTile {
-    public override string Texture => Textures.Tiles.Jungle.KEY_CorpseFlowerBase;
+    public override string Texture => Assets.Textures.Tiles.Jungle.CorpseFlowerBase.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileFrameImportant[Type] = true;
@@ -76,7 +76,7 @@ internal sealed class CorpseFlower : ModTile {
 }
 
 internal sealed class CorpseFlowerBulb : ModNPC {
-    public override string Texture => Textures.Tiles.Jungle.KEY_CorpseFlowerBase;
+    public override string Texture => Assets.Textures.Tiles.Jungle.CorpseFlowerBase.KEY;
 
     public Point16 ParentPosition { get; set; }
 
@@ -118,7 +118,7 @@ internal sealed class CorpseFlowerBulb : ModNPC {
         NPC.dontTakeDamage = Bloomed;
 
         if(Bloomed && !_wasBloomed) {
-            SoundEngine.PlaySound(Sounds.Tile.Jungle.CorpseFlowerHit with { Volume = 0.8f, PitchVariance = 0.2f }, NPC.Center);
+            SoundEngine.PlaySound(Assets.Sounds.Tile.Jungle.CorpseFlowerHit.Asset with { Volume = 0.8f, PitchVariance = 0.2f }, NPC.Center);
             _bloomAnimationTimer = 0f;
             _postBloomSquashTimer = -1f;
         }
@@ -128,7 +128,7 @@ internal sealed class CorpseFlowerBulb : ModNPC {
             if(_bloomAnimationTimer >= BloomAnimationDuration) {
                 _bloomAnimationTimer = BloomAnimationDuration;
                 _postBloomSquashTimer = 0f;
-                SoundEngine.PlaySound(Sounds.Tile.Jungle.CorpseFlowerOpen with { Volume = 0.8f, PitchVariance = 0.2f }, NPC.Center);
+                SoundEngine.PlaySound(Assets.Sounds.Tile.Jungle.CorpseFlowerOpen.Asset with { Volume = 0.8f, PitchVariance = 0.2f }, NPC.Center);
                 for(int i = 0; i < Main.rand.NextFloat(10, 20); i++) {
                     Dust.NewDust(NPC.Center - new Vector2(30, 30), 70, 70, DustID.RedMoss);
                     Dust.NewDust(NPC.Center - new Vector2(30, 30), 70, 70, DustID.Water_Jungle);

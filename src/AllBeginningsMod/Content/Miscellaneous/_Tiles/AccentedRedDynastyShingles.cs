@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 namespace AllBeginningsMod.Content.Miscellaneous;
 
 public class AccentedRedDynastyShinglesTile : ModTile {
-    public override string Texture => Textures.Tiles.Decoration.KEY_AccentedRedDynastyShinglesTile;
+    public override string Texture => Assets.Textures.Tiles.Decoration.AccentedRedDynastyShinglesTile.KEY;
 
     public override void SetStaticDefaults() {
         Main.tileMergeDirt[Type] = false;
@@ -20,7 +20,7 @@ public class AccentedRedDynastyShinglesTile : ModTile {
 }
 
 public class AccentedRedDynastyShinglesItem : ModItem {
-    public override string Texture => Textures.Tiles.Decoration.KEY_AccentedRedDynastyShinglesItem;
+    public override string Texture => Assets.Textures.Tiles.Decoration.AccentedRedDynastyShinglesItem.KEY;
 
     public override void SetDefaults() {
         Item.DefaultToPlaceableTile(ModContent.TileType<AccentedRedDynastyShinglesTile>());

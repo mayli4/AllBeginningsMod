@@ -24,7 +24,7 @@ internal class JungleBushes : GenPass {
         return false;
     }
 
-    public override void ApplyPass(GenerationProgress progress, GameConfiguration configuration) {
+    protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration) {
         progress.Set(0f);
 
         var genNoise = new FastNoiseLite();

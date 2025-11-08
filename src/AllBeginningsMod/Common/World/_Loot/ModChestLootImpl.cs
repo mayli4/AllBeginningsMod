@@ -12,7 +12,7 @@ public abstract class ModChestLoot : ModType {
 
     public virtual RegionFlags Region => RegionFlags.All;
 
-    public override void Register() {
+    protected sealed override void Register() {
         ModTypeLookup<ModChestLoot>.Register(this);
         AddLoot();
     }

@@ -2,6 +2,7 @@
 using AllBeginningsMod.Common.World;
 using AllBeginningsMod.Core;
 using AllBeginningsMod.Utilities;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using Terraria.Audio;
@@ -117,7 +118,7 @@ internal sealed class AbandonedShackSystem : ModSystem {
             .Prepare(totalRenderArea)
             .WithColor(renderColor);
 
-        overArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackOver.Value);
+        overArea.Draw(Assets.Textures.Tiles.AbandonedShack.AbandonedShackOver.Asset.Value);
     }
 
     private void DrawInsideContainer() {
@@ -129,7 +130,7 @@ internal sealed class AbandonedShackSystem : ModSystem {
 
         Main.spriteBatch.End(out var snapshot);
 
-        baseArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackBack.Value);
+        baseArea.Draw(Assets.Textures.Tiles.AbandonedShack.AbandonedShackBack.Asset.Value);
 
         Main.spriteBatch.Begin(snapshot);
     }
@@ -158,7 +159,7 @@ internal sealed class AbandonedShackSystem : ModSystem {
             .Prepare(totalRenderArea)
             .WithColor(Color.White);
 
-        baseArea.Draw(Textures.Tiles.AbandonedShack.AbandonedShackBase.Value);
+        baseArea.Draw(Assets.Textures.Tiles.AbandonedShack.AbandonedShackBase.Asset.Value);
 
         if(Main.rand.NextBool(50)) {
             Gore.NewGore(
@@ -187,7 +188,7 @@ internal sealed class AbandonedShackSystem : ModSystem {
         }
 
         Main.spriteBatch.Begin(new SpriteBatchSnapshot() with { BlendState = BlendState.Additive });
-        var ray = Textures.Sample.Godray2.Value;
+        var ray = Assets.Textures.Sample.Godray2.Asset.Value;
         var pos = PointsOfInterestSystem.ShackPosition.ToVector2() * 16 + new Vector2(200, -400);
 
         Main.spriteBatch.Draw(ray, pos - Main.screenPosition, null, godrayColor, godrayRot, Vector2.Zero, 1f, 0, 0);
@@ -402,7 +403,7 @@ internal sealed class AbandonedShackMicrobiome : MicroBiome {
             return false;
         }
 
-        var mod = ModContent.GetInstance<AllBeginningsModImpl>();
+        var mod = ModContent.GetInstance<ModImpl>();
         string structurePath = "Assets/Structures/AbandonedShack.shstruct";
         Point16 structureDimensions = StructureHelper.API.Generator.GetStructureDimensions(structurePath, mod);
 
@@ -447,7 +448,7 @@ public class AbandonedShackMapIcon : ModMapLayer {
         if(!PointsOfInterestSystem.FoundOldbotShack)
             return;
 
-        var icon = Textures.UI.AbandonedShackIcon.Value;
+        var icon = Assets.Textures.UI.AbandonedShackIcon.Asset.Value;
 
         bool hasRecallPot = false;
         bool hasUnityPot = false;
@@ -461,7 +462,7 @@ public class AbandonedShackMapIcon : ModMapLayer {
         float scaleIfSelected = (hasRecallPot || hasUnityPot) ? 1.15f : 1f;
 
         if(context.Draw(icon, PointsOfInterestSystem.ShackBounds.Center(), Color.White, new(1, 1, 0, 0), scaleIfNotSelected, scaleIfSelected, Alignment.Center).IsMouseOver) {
-            text = Keys.MapIcons.OldbotShack.GetTextValue();
+            text = Mods.AllBeginningsMod.MapIcons.OldbotShack.GetTextValue();
 
             if(hasRecallPot || hasUnityPot) {
                 if(!MouseOver) {
@@ -486,7 +487,7 @@ public class AbandonedShackMapIcon : ModMapLayer {
 }
 
 public class Debug : ModItem {
-    public override string Texture => Textures.Items.Misc.UrnOfGreed.KEY_ClayUrnProj;
+    public override string Texture => Assets.Textures.Items.Misc.UrnOfGreed.ClayUrnProj.KEY;
 
     public override void SetDefaults() {
         Item.width = 28;

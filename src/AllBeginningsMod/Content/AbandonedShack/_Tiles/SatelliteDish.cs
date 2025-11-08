@@ -8,7 +8,7 @@ using Terraria.ObjectData;
 namespace AllBeginningsMod.Content.AbandonedShack;
 
 public class SatelliteDish : ModTile {
-    public override string Texture => Textures.Tiles.AbandonedShack.KEY_SatelliteDishTile;
+    public override string Texture => Assets.Textures.Tiles.AbandonedShack.SatelliteDishTile.KEY;
 
     private float _currentDishRotation = 0f;
     private float _targetDishRotation = 0f;
@@ -55,7 +55,7 @@ public class SatelliteDish : ModTile {
         var worldPos = new Vector2(i, j + 1) * 16 + new Vector2(12, 4);
         var drawPos = worldPos - Main.screenPosition;
 
-        var tex = Textures.Tiles.AbandonedShack.SatelliteDish_Dish.Value;
+        var tex = Assets.Textures.Tiles.AbandonedShack.SatelliteDish_Dish.Asset.Value;
 
         if(_dishRotationPauseTimer > 0) {
             _dishRotationPauseTimer--;
@@ -70,7 +70,7 @@ public class SatelliteDish : ModTile {
             }
         }
 
-        var dishTex = Textures.Tiles.AbandonedShack.SatelliteDish_Dish.Value;
+        var dishTex = Assets.Textures.Tiles.AbandonedShack.SatelliteDish_Dish.Asset.Value;
 
         spriteBatch.Draw(
             dishTex,

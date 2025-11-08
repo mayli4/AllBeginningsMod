@@ -16,7 +16,7 @@ using Terraria.ModLoader.IO;
 namespace AllBeginningsMod.Content.Miscellaneous;
 
 internal sealed class GrabbityGunItem : ModItem {
-    public override string Texture => Textures.Items.Misc.GrabbityGun.KEY_GrabbityGunItem;
+    public override string Texture => Assets.Textures.Items.Misc.GrabbityGun.GrabbityGunItem.KEY;
 
     private static float tooltipProgress;
 
@@ -77,7 +77,7 @@ internal sealed class GrabbityGunItem : ModItem {
 
     public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset) {
         if(line.Mod == "Terraria" && line.Name == "ItemName") {
-            Effect effect = Shaders.Text.WarpTooltip.Value;
+            Effect effect = Assets.Shaders.Text.WarpTooltip.Asset.Value;
 
             if(effect is null)
                 return true;
@@ -107,7 +107,7 @@ internal sealed class GrabbityGunItem : ModItem {
 
 //lazy :\\
 internal sealed class GrabbityGunItemHeldProjectile : ModProjectile {
-    public override string Texture => Textures.Items.Misc.GrabbityGun.KEY_GrabbityGunHeld;
+    public override string Texture => Assets.Textures.Items.Misc.GrabbityGun.GrabbityGunHeld.KEY;
 
     public int GrabbityGunID => (int)Projectile.ai[0];
     public ref float ShakeTimer => ref Projectile.ai[1];
@@ -261,7 +261,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
             }
 
             if(!loopPlaying) {
-                loopSlotID = SoundEngine.PlaySound(Sounds.Item.GrabbityGun.GrabbityGunHum);
+                loopSlotID = SoundEngine.PlaySound(Assets.Sounds.Item.GrabbityGun.GrabbityGunHum.Asset);
                 loopPlaying = SoundEngine.TryGetActiveSound(loopSlotID, out loopSound);
                 if(loopPlaying) {
                     loopSound.Volume = 0f;
@@ -304,7 +304,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
 
                             npc.GetGlobalNPC<GrabbityGunGlobalNPC>().IsGrabbed = true;
 
-                            SoundEngine.PlaySound(Sounds.Item.GrabbityGun.GrabbityGunGrab with { Pitch = 0.0f, PitchVariance = 0.5f }, Projectile.Center);
+                            SoundEngine.PlaySound(Assets.Sounds.Item.GrabbityGun.GrabbityGunGrab.Asset with { Pitch = 0.0f, PitchVariance = 0.5f }, Projectile.Center);
                             npc.netUpdate = true;
                             break;
                         }
@@ -393,7 +393,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
         Projectile.ai[0] = 0;
         Projectile.ai[1] = -1;
         Projectile.netUpdate = true;
-        SoundEngine.PlaySound(Sounds.Item.GrabbityGun.GrabbityGunLaunch with { Pitch = 0.0f, PitchVariance = 0.5f }, Projectile.Center);
+        SoundEngine.PlaySound(Assets.Sounds.Item.GrabbityGun.GrabbityGunLaunch.Asset with { Pitch = 0.0f, PitchVariance = 0.5f }, Projectile.Center);
 
         GrabbityGunItemHeldProjectile heldGun = heldGunVisualProjectile?.ModProjectile as GrabbityGunItemHeldProjectile;
         heldGun?.TriggerShake();
@@ -445,7 +445,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                     trailPoints = curve.GetPoints(segments + 1);
                 }
 
-                var shader = Shaders.Trail.GrabbityGunBeam.Value;
+                var shader = Assets.Shaders.Trail.GrabbityGunBeam.Asset.Value;
 
                 Graphics.BeginPipeline(0.5f)
                     .DrawTrail(
@@ -455,7 +455,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                         shader,
                         ("transformMatrix", Graphics.WorldTransformMatrix),
                         ("time", Main.GameUpdateCount * -0.025f),
-                        ("sampleTexture", Textures.Sample.GlowTrail.Value),
+                        ("sampleTexture", Assets.Textures.Sample.GlowTrail.Asset.Value),
                         ("repeats", 0)
                         )
                     .Flush();
@@ -468,7 +468,7 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                         shader,
                         ("transformMatrix", Graphics.WorldTransformMatrix),
                         ("time", Main.GameUpdateCount * -0.025f),
-                        ("sampleTexture", Textures.Sample.EnergyTrail.Value),
+                        ("sampleTexture", Assets.Textures.Sample.EnergyTrail.Asset.Value),
                         ("repeats", 2)
                     )
                     .ApplyOutline(Color.Yellow)
@@ -477,36 +477,36 @@ internal sealed class GrabbityGunProjectile : ModProjectile {
                 var snapshot = Main.spriteBatch.CaptureEndBegin(new() { BlendState = BlendState.Additive });
 
                 Main.spriteBatch.Draw(
-                    Textures.Sample.Glow1.Value,
+                    Assets.Textures.Sample.Glow1.Asset.Value,
                     beamEnd - Main.screenPosition,
                     null,
                     new Color(255, 106, 0) * 0.25f,
                     0f,
-                    Textures.Sample.Glow1.Value.Size() / 2f,
+                    Assets.Textures.Sample.Glow1.Asset.Value.Size() / 2f,
                     0.6f,
                     SpriteEffects.None,
                     0f
                 );
 
                 Main.spriteBatch.Draw(
-                    Textures.Sample.Glow1.Value,
+                    Assets.Textures.Sample.Glow1.Asset.Value,
                     beamEnd - Main.screenPosition,
                     null,
                     new Color(255, 106, 0) * 0.35f,
                     0f,
-                    Textures.Sample.Glow1.Value.Size() / 2f,
+                    Assets.Textures.Sample.Glow1.Asset.Value.Size() / 2f,
                     0.3f,
                     SpriteEffects.None,
                     0f
                 );
 
                 Main.spriteBatch.Draw(
-                    Textures.Sample.Glow1.Value,
+                    Assets.Textures.Sample.Glow1.Asset.Value,
                     beamStart - Main.screenPosition,
                     null,
                     new Color(255, 106, 0) * 0.35f,
                     0f,
-                    Textures.Sample.Glow1.Value.Size() / 2f,
+                    Assets.Textures.Sample.Glow1.Asset.Value.Size() / 2f,
                     0.3f,
                     SpriteEffects.None,
                     0f
@@ -709,7 +709,7 @@ public class GrabbityGunOutline : ILoadable {
         if(Main.dedServ || spriteBatch == null || NPCTarget == null || graphicsDevice == null)
             return;
 
-        var shader = Shaders.Fragment.Outline.Value;
+        var shader = Assets.Shaders.Fragment.Outline.Asset.Value;
 
         shader.Parameters["uColor"].SetValue(Color.Orange.ToVector4());
         shader.Parameters["uSize"].SetValue(new Vector2(NPCTarget.Width / 2, NPCTarget.Height / 2));

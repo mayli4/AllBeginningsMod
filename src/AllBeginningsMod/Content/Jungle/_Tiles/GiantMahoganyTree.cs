@@ -23,7 +23,7 @@ namespace AllBeginningsMod.Content.Jungle;
 //fix breaking (high prio)
 
 internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
-    public override string Texture => Textures.Tiles.Jungle.KEY_GiantJungleTreeTile;
+    public override string Texture => Assets.Textures.Tiles.Jungle.GiantJungleTreeTile.KEY;
 
     private const int big_right_branch_frame = 220;
     private const int big_left_branch_frame = 210;
@@ -443,7 +443,7 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
             new(botLeft + new Vector3(410, 0, 0), color, new Vector2(1, 1)),
         ];
 
-        Effect effect = Shaders.Fragment.Shade.Value;
+        Effect effect = Assets.Shaders.Fragment.Shade.Asset.Value;
 
         var projection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
         Matrix view = Main.GameViewMatrix.TransformationMatrix;
@@ -463,7 +463,7 @@ internal sealed class GiantMahoganyTree : ModTile, ICustomLayerTile {
                 ("noiseScroll", Main.GameUpdateCount * 0.0005f + positionalOffset),
                 ("noiseStretch", 2),
                 ("uWorldViewProjection", renderMatrix),
-                ("noiseTexture", Textures.Sample.Noise4.Value)
+                ("noiseTexture", Assets.Textures.Sample.Noise4.Asset.Value)
             )
             .Flush();
     }
