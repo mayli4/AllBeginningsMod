@@ -78,5 +78,14 @@ Mods: {
 				}
 			}
 		}
+
+		AuthorTags: {
+			Mathica.DisplayName: mathicamathicamathicamathica
+			Tobias.DisplayName: Tobias
+			Scss.DisplayName: Scss
+			Waff.DisplayName: Waff
+		}
 	}
 }
+
+UI.ModIcon.AuthorHeader: Made by:

@@ -1,5 +1,8 @@
-﻿namespace AllBeginningsMod;
+﻿using Daybreak.Common.Features.Authorship;
+using Daybreak.Common.Features.ModPanel;
 
-partial class ModImpl {
-    
+namespace AllBeginningsMod;
+
+partial class ModImpl : IHasCustomAuthorMessage {
+    public string GetAuthorText() => AuthorText.GetAuthorTooltip(this, "Made by:");
 }
