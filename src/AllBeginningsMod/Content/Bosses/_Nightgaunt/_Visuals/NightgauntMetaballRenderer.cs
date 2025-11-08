@@ -1,14 +1,9 @@
 ﻿using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Utilities;
 using Daybreak.Common.Features.Hooks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Runtime.InteropServices;
-using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace AllBeginningsMod.Content.Bosses;
@@ -25,7 +20,7 @@ namespace AllBeginningsMod.Content.Bosses;
 /// <summary>
 ///     Handles all metaball related rendering for the nightgaunt, dreamspawn, etc
 /// </summary>
-internal unsafe sealed class NightgauntMetaballRenderer {
+internal sealed unsafe class NightgauntMetaballRenderer {
     [StructLayout(LayoutKind.Explicit)]
     private struct Metaball {
         [FieldOffset(0)] public Vector2 Position;
