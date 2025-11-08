@@ -1,6 +1,5 @@
 ﻿using AllBeginningsMod.Common.Rendering;
 using AllBeginningsMod.Utilities;
-using System;
 using Terraria.GameContent;
 
 namespace AllBeginningsMod.Content.Bosses;

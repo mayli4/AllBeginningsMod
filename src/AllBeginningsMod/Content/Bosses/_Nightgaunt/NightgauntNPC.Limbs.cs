@@ -19,10 +19,7 @@ internal partial class NightgauntNPC {
 
     private NightgauntLimb _headNeck;
 
-    // The point on the body IK chain where the neck roots
-    private const int NeckRootBodySegmentIndex = 0; // Typically the very first segment (closest to NPC.Center)
-
-    // NEW: Offset for the neck's attachment point relative to NeckRootBodySegmentIndex
+    private const int NeckRootBodySegmentIndex = 0;
     readonly static Vector2 NeckAttachmentOffset = new(0, -10);
 
     public static Vector2 ShoulderOffset;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AllBeginningsMod.Utilities;
+﻿namespace AllBeginningsMod.Utilities;
 
 #nullable enable
 
