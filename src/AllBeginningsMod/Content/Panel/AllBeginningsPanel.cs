@@ -23,6 +23,7 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
 
     [UsedImplicitly]
     [OnLoad(Side = ModSide.Client)]
+    /* todo: remove when pr gets merged or make it apply specifically to allbeginnings */
     static void KillBaubles() {
         MonoModHooks.Modify(getMethod(nameof(UIModItem.OnInitialize)), il => {
             var c = new ILCursor(il);
@@ -32,7 +33,7 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
                 return;
             }
             
-            // now right after "loaded = true", jump to the instruction right after the for loop
+            // now right before "loaded = true", jump to the instruction right after the for loop
             if (!c.TryGotoNext(MoveType.Before,
                     i => i.MatchLdarg0(),
                     i => i.MatchLdfld<UIModItem>(nameof(UIModItem._loaded)),
