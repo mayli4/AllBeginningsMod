@@ -1,5 +1,7 @@
-﻿using Daybreak.Common.Features.Hooks;
+﻿using AllBeginningsMod.Core;
+using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Features.ModPanel;
+using Daybreak.Common.Rendering;
 using JetBrains.Annotations;
 using MonoMod.Cil;
 using ReLogic.Content;
@@ -21,59 +23,31 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
         };
     }
 
-    [UsedImplicitly]
-    [OnLoad(Side = ModSide.Client)]
-    /* todo: remove when pr gets merged or make it apply specifically to allbeginnings */
-    static void KillBaubles() {
-        MonoModHooks.Modify(getMethod(nameof(UIModItem.OnInitialize)), il => {
-            var c = new ILCursor(il);
-
-            // find "loaded = true" instr, go to next instr, skip forward to the end of the `if (loadedMod != null)` block
-            if (!c.TryGotoNext(MoveType.After, i => i.MatchStfld<UIModItem>(nameof(UIModItem._loaded)))) {
-                return;
-            }
-            
-            // now right before "loaded = true", jump to the instruction right after the for loop
-            if (!c.TryGotoNext(MoveType.Before,
-                    i => i.MatchLdarg0(),
-                    i => i.MatchLdfld<UIModItem>(nameof(UIModItem._loaded)),
-                    i => i.MatchBrtrue(out _)
-                )) {
-                return;
-            }
-
-            // mark current cursor pos as a label to jump to
-            var targetLabel = c.DefineLabel();
-            c.MarkLabel(targetLabel);
-
-            if (!c.TryGotoPrev(MoveType.After, i => i.MatchStfld<UIModItem>(nameof(UIModItem._loaded)))) {
-                 return;
-            }
-
-            // murder
-            c.EmitBr(targetLabel);
-        });
-
-        return;
-
-        static MethodInfo getMethod(string name) => typeof(UIModItem).GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)!;
-    }
-
     public override bool PreDrawPanel(UIModItem element, SpriteBatch sb, ref bool drawDivider) {
-        if (element._needsTextureLoading)
-        {
+        if (element._needsTextureLoading) {
             element._needsTextureLoading = false;
             element.LoadTextures();
         }
 
-        GraphicsDevice device = Main.instance.GraphicsDevice;
+        var device = Main.instance.GraphicsDevice;
 
         var dims = element.GetDimensions();
 
-        // Make sure the panel draws correctly on any scale.
         Vector2 size = Vector2.Transform(dims.ToRectangle().Size(), Main.UIScaleMatrix);
+        Vector2 position = Vector2.Transform(dims.Position(), Main.UIScaleMatrix);
 
-        return true;
+        Rectangle source = new((int)position.X, (int)position.Y, 
+            (int)size.X, (int)size.Y);
+
+        sb.End(out var snapshot);
+        sb.Begin(snapshot);
+        
+        element.DrawPanel(sb, element._borderTexture.Value, Color.Black);
+        drawDivider = false;
+        
+        sb.Restart(in snapshot);
+        
+        return false;
     }
     
     private static Vector4 Transform(Vector4 vector) {
@@ -102,5 +76,43 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
             
             spriteBatch.Draw(iconAsset.Value, dims.Position() + offsetpos, null, Color.White, 0, origin, 0.9f, SpriteEffects.None, 0f);
         }
+    }
+    
+    [UsedImplicitly]
+    [OnLoad(Side = ModSide.Client)]
+    /* todo: remove when pr gets merged or make it apply specifically to allbeginnings */
+    static void KillBaubles() {
+        MonoModHooks.Modify(getMethod(nameof(UIModItem.OnInitialize)), il => {
+            var c = new ILCursor(il);
+
+            // find "loaded = true" instr, go to next instr, skip forward to the end of the `if (loadedMod != null)` block
+            if (!c.TryGotoNext(MoveType.After, i => i.MatchStfld<UIModItem>(nameof(UIModItem._loaded)))) {
+                return;
+            }
+            
+            // now right before "loaded = true", jump to the instruction right after the for loop
+            if (!c.TryGotoNext(MoveType.Before,
+                    i => i.MatchLdarg0(),
+                    i => i.MatchLdfld<UIModItem>(nameof(UIModItem._loaded)),
+                    i => i.MatchBrtrue(out _)
+                )) {
+                return;
+            }
+
+            // mark current cursor pos as a label to jump to
+            var targetLabel = c.DefineLabel();
+            c.MarkLabel(targetLabel);
+
+            if (!c.TryGotoPrev(MoveType.After, i => i.MatchStfld<UIModItem>(nameof(UIModItem._loaded)))) {
+                return;
+            }
+
+            // murder
+            c.EmitBr(targetLabel);
+        });
+
+        return;
+
+        static MethodInfo getMethod(string name) => typeof(UIModItem).GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)!;
     }
 }
