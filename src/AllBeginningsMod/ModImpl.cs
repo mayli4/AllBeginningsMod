@@ -3,6 +3,6 @@ using Daybreak.Common.Features.ModPanel;
 
 namespace AllBeginningsMod;
 
-partial class ModImpl : IHasCustomAuthorMessage {
+partial class ModImpl : Mod, IHasCustomAuthorMessage {
     public string GetAuthorText() => AuthorText.GetAuthorTooltip(this, "Made by:");
 }

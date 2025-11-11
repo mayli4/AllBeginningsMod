@@ -24,13 +24,37 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
     [UsedImplicitly]
     [OnLoad(Side = ModSide.Client)]
     static void KillBaubles() {
-        MonoModHooks.Modify(getMethod(nameof(UIModItem.OnInitialize)), il =>
-        {
+        MonoModHooks.Modify(getMethod(nameof(UIModItem.OnInitialize)), il => {
             var c = new ILCursor(il);
+
+            // find "loaded = true" instr, go to next instr, skip forward to the end of the `if (loadedMod != null)` block
+            if (!c.TryGotoNext(MoveType.After, i => i.MatchStfld<UIModItem>(nameof(UIModItem._loaded)))) {
+                return;
+            }
+            
+            // now right after "loaded = true", jump to the instruction right after the for loop
+            if (!c.TryGotoNext(MoveType.Before,
+                    i => i.MatchLdarg0(),
+                    i => i.MatchLdfld<UIModItem>(nameof(UIModItem._loaded)),
+                    i => i.MatchBrtrue(out _)
+                )) {
+                return;
+            }
+
+            // mark current cursor pos as a label to jump to
+            var targetLabel = c.DefineLabel();
+            c.MarkLabel(targetLabel);
+
+            if (!c.TryGotoPrev(MoveType.After, i => i.MatchStfld<UIModItem>(nameof(UIModItem._loaded)))) {
+                 return;
+            }
+
+            // murder
+            c.EmitBr(targetLabel);
         });
-        
+
         return;
-        
+
         static MethodInfo getMethod(string name) => typeof(UIModItem).GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)!;
     }
 
