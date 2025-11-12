@@ -1,5 +1,4 @@
-﻿using AllBeginningsMod.Core;
-using Daybreak.Common.Features.Hooks;
+﻿using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Features.ModPanel;
 using Daybreak.Common.Rendering;
 using JetBrains.Annotations;
@@ -23,7 +22,7 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
         };
     }
 
-    public override bool PreDrawPanel(UIModItem element, SpriteBatch sb, ref bool drawDivider) {
+    public override bool PreDrawPanel(UIModItem element, SpriteBatch spriteBatch, ref bool drawDivider) {
         if (element._needsTextureLoading) {
             element._needsTextureLoading = false;
             element.LoadTextures();
@@ -39,15 +38,54 @@ internal sealed class AllBeginningsPanel : ModPanelStyleExt {
         Rectangle source = new((int)position.X, (int)position.Y, 
             (int)size.X, (int)size.Y);
 
-        sb.End(out var snapshot);
-        sb.Begin(snapshot);
+        spriteBatch.End(out var snapshot);
+
+        var leasedTarget = RenderTargetPool.Shared.Rent(device, (int)size.X, (int)size.Y, RenderTargetDescriptor.Default);
+
+        using (var _ = new RenderTargetScope(device, leasedTarget.Target, true, true, Color.Transparent))
+            DrawPanelBackground(spriteBatch, size, source);
+
+        DrawAsPanel(spriteBatch, snapshot, device, leasedTarget.Target, source, element);
         
-        element.DrawPanel(sb, element._borderTexture.Value, Color.Black);
+        leasedTarget.Dispose();
+        
+        spriteBatch.Begin(snapshot);
+        
+        element.DrawPanel(spriteBatch, element._borderTexture.Value, Color.Black);
         drawDivider = false;
         
-        sb.Restart(in snapshot);
+        spriteBatch.Restart(in snapshot);
         
         return false;
+    }
+    
+    private static void DrawPanelBackground(SpriteBatch spriteBatch, Vector2 size, Rectangle frame)
+    {
+        var shader = Assets.Shaders.Panel.PanelBackgroundShader.CreatePanelShader();
+        shader.Parameters.uSource = new Vector4(frame.Width, frame.Height, frame.X, frame.Y);
+        shader.Apply();
+    
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, shader.Shader, Matrix.Identity);
+        Rectangle background = new(0, 0, (int)size.X, (int)size.Y);
+        spriteBatch.Draw(Assets.Textures.Sample.Blobs.Asset.Value, background, Color.White);
+        spriteBatch.End(out var snapshot);
+    }
+    
+    private static void DrawAsPanel(SpriteBatch spriteBatch, SpriteBatchSnapshot snapshot, GraphicsDevice device, Texture2D texture, Rectangle frame, UIPanel element, Color? color = null)
+    {
+        var shader = Assets.Shaders.Panel.PanelProjection.CreatePass1();
+        shader.Parameters.Source = new(frame.Width, frame.Height, frame.X, frame.Y);
+        shader.Apply();
+        
+        spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, CustomEffect = shader.Shader});
+
+        device.Textures[1] = texture;
+        device.SamplerStates[1] = SamplerState.PointClamp;
+
+        element.DrawPanel(spriteBatch, element._backgroundTexture.Value, color ?? element.BackgroundColor);
+        element.DrawPanel(spriteBatch, element._borderTexture.Value, color ?? element.BorderColor);
+
+        spriteBatch.End();
     }
     
     private static Vector4 Transform(Vector4 vector) {
