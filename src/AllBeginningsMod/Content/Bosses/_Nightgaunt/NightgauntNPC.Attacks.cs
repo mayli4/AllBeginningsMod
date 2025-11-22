@@ -43,7 +43,7 @@ internal partial class NightgauntNPC {
                                  + neckRootSegmentDirection * NeckAttachmentOffset.Y;
 
         float headTargetOffset = 80f;
-        float headSway = 20f;
+        float headSway = 0f;
 
         _headNeck.TargetPosition = Main.MouseWorld
                                    + neckRootSegmentDirection * headTargetOffset

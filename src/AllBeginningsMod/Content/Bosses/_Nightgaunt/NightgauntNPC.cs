@@ -17,6 +17,11 @@ internal partial class NightgauntNPC : ModNPC {
         Crawling,
     }
 
+    internal enum NightgauntForm {
+        Day,
+        Night
+    }
+
     internal enum Attack {
         SwingLunge
     }
@@ -26,7 +31,7 @@ internal partial class NightgauntNPC : ModNPC {
         [FieldOffset(0)] public NightgauntState State;
     }
 
-    public override string Texture => Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC.KEY;
+    public override string Texture => Assets.Textures.NPCs.Bosses.Nightgaunt.NightgauntNPC_Daytime.KEY;
 
     public Player Target => Main.player[NPC.target];
 
@@ -68,7 +73,7 @@ internal partial class NightgauntNPC : ModNPC {
     public override void OnSpawn(IEntitySource source) {
         CreateLimbs();
 
-        LegOffset = new(-15, -40);
+        LegOffset = new(-15, -42);
         ShoulderOffset = new(-38, -30);
     }
 
